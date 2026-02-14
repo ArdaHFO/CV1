@@ -80,9 +80,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate shareable URL
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const shareUrl = `${baseUrl}/share/${shareToken}`;
+    // Generate shareable URL - use request origin for automatic production/staging support
+    const origin = request.headers.get('origin') || request.headers.get('referer')?.split('/').slice(0, 3).join('/') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const shareUrl = `${origin}/share/${shareToken}`;
 
     return NextResponse.json({
       success: true,
