@@ -79,12 +79,14 @@ export default function Home() {
               >
                 {currentUser ? displayName : 'Sign In'}
               </Link>
-              <Link
-                href="/register"
-                className="px-6 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
-              >
-                Get Started Free
-              </Link>
+              {!currentUser && (
+                <Link
+                  href="/register"
+                  className="px-6 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                >
+                  Sign Up
+                </Link>
+              )}
             </div>
           </div>
         </div>
