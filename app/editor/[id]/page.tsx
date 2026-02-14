@@ -326,6 +326,18 @@ export default function EditorPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownloadQR = () => {
+    if (!qrUrl) return;
+    
+    // Create a temporary link to download the QR code image
+    const link = document.createElement('a');
+    link.href = qrUrl;
+    link.download = `cv-${resumeId}-qr-code.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleAIOptimize = async () => {
     if (!content || !jobDescriptionForOptimization.trim()) {
       alert('Please enter a job description');
@@ -651,7 +663,7 @@ export default function EditorPage() {
                   <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded mb-4 text-xs font-mono break-all text-zinc-700 dark:text-zinc-300">
                     {`${window.location.origin}/preview/demo/${resumeId}`}
                   </div>
-                  <Button className="w-full gap-2">
+                  <Button onClick={handleDownloadQR} className="w-full gap-2">
                     <Download className="w-4 h-4" />
                     Download QR Code
                   </Button>
