@@ -452,7 +452,7 @@ export default function Home() {
               {
                 icon: Link2,
                 title: 'Share with Link',
-                description: 'Generate a public CV link instantly and share it in applications, emails, and LinkedIn messages.',
+                description: 'Generate shareable CV links instantly. Free users get 7-day links, Pro users get permanent links that never expire.',
                 gradient: 'from-sky-500 to-blue-700'
               },
               {

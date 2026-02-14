@@ -86,6 +86,7 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 								'1 job search (up to 25 results)',
 								'Manual CV editing',
 								'Download as PDF',
+								'Shareable links (7-day expiration)',
 								'Basic support',
 							].map((item, index) => (
 								<li key={index} className="flex items-center gap-2">
@@ -147,6 +148,7 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 								'Job posting-specific tailoring',
 								'Automatic cover letter generation',
 								'LinkedIn job search integration',
+								'Permanent shareable links (no expiration)',
 								'QR code CV sharing',
 								'Multiple CV version management',
 								'Priority support',

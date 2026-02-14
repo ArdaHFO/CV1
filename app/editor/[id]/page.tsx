@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
-import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut } from 'lucide-react';
+import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -51,6 +51,9 @@ export default function EditorPage() {
   const [copied, setCopied] = useState(false);
   const [qrUrl, setQrUrl] = useState('');
   const [showQR, setShowQR] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [linkExpiresAt, setLinkExpiresAt] = useState<string | null>(null);
+  const [isProUser, setIsProUser] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState<{ type: string; content: string } | null>(null);
   const [jobDescriptionForOptimization, setJobDescriptionForOptimization] = useState('');
@@ -300,28 +303,77 @@ export default function EditorPage() {
 
   const handleGenerateQR = async () => {
     if (!showQR && content) {
-      // Encode CV data to base64 (using btoa for browser compatibility)
-      const cvDataString = JSON.stringify(content);
-      const encodedData = btoa(unescape(encodeURIComponent(cvDataString)));
-      
-      // Generate QR code with embedded CV data and template
-      const previewUrl = `${window.location.origin}/preview/demo/${resumeId}?data=${encodeURIComponent(encodedData)}&template=${selectedTemplate}`;
-      const qrImageUrl = `/api/qr?url=${encodeURIComponent(previewUrl)}&size=400`;
-      setQrUrl(qrImageUrl);
+      // Create shared link via API
+      try {
+        const response = await fetch('/api/share', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resumeId,
+            content,
+            template: selectedTemplate,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setShareUrl(data.shareUrl);
+          setLinkExpiresAt(data.expiresAt);
+          setIsProUser(data.isPro);
+          
+          // Generate QR code with shared link
+          const qrImageUrl = `/api/qr?url=${encodeURIComponent(data.shareUrl)}&size=400`;
+          setQrUrl(qrImageUrl);
+        } else {
+          alert('Failed to create shareable link');
+          return;
+        }
+      } catch (error) {
+        console.error('Error creating shared link:', error);
+        alert('Failed to create shareable link');
+        return;
+      }
     }
     setShowQR(!showQR);
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     if (!content) return;
     
-    // Encode CV data to base64 (using btoa for browser compatibility)
-    const cvDataString = JSON.stringify(content);
-    const encodedData = btoa(unescape(encodeURIComponent(cvDataString)));
+    // Create shared link via API if not already created
+    if (!shareUrl) {
+      try {
+        const response = await fetch('/api/share', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resumeId,
+            content,
+            template: selectedTemplate,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setShareUrl(data.shareUrl);
+          setLinkExpiresAt(data.expiresAt);
+          setIsProUser(data.isPro);
+          navigator.clipboard.writeText(data.shareUrl);
+        } else {
+          alert('Failed to create shareable link');
+          return;
+        }
+      } catch (error) {
+        console.error('Error creating shared link:', error);
+        alert('Failed to create shareable link');
+        return;
+      }
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+    }
     
-    // Create shareable link with embedded CV data and template
-    const previewUrl = `${window.location.origin}/preview/demo/${resumeId}?data=${encodeURIComponent(encodedData)}&template=${selectedTemplate}`;
-    navigator.clipboard.writeText(previewUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -660,8 +712,38 @@ export default function EditorPage() {
                   <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
                     Use this QR code to share your CV with employers or print it on your application materials.
                   </p>
+                  
+                  {/* Link expiration info */}
+                  {linkExpiresAt && !isProUser && (
+                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4">
+                      <div className="flex items-start gap-2">
+                        <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <div className="text-xs">
+                          <p className="font-medium text-amber-900 dark:text-amber-100 mb-1">
+                            Link expires in {Math.ceil((new Date(linkExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
+                          </p>
+                          <p className="text-amber-700 dark:text-amber-300">
+                            Upgrade to Pro for permanent links that never expire
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {isProUser && (
+                    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+                      <div className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                        <div className="text-xs">
+                          <p className="font-medium text-blue-900 dark:text-blue-100">
+                            ✨ Permanent Link - Never Expires
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded mb-4 text-xs font-mono break-all text-zinc-700 dark:text-zinc-300">
-                    {`${window.location.origin}/preview/demo/${resumeId}`}
+                    {shareUrl || `${window.location.origin}/share/...`}
                   </div>
                   <Button onClick={handleDownloadQR} className="w-full gap-2">
                     <Download className="w-4 h-4" />
