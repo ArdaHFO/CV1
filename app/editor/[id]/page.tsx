@@ -260,7 +260,7 @@ export default function EditorPage() {
 
     setIsDirty(false);
     // TODO: Show success toast
-    alert('CV kaydedildi!');
+    alert('CV saved successfully!');
 
     setIsSaving(false);
   };
@@ -297,7 +297,7 @@ export default function EditorPage() {
       }
     } catch (error) {
       console.error('Error downloading PDF:', error);
-      alert('PDF indirme başarısız oldu');
+      alert('Failed to download PDF');
     }
   };
 
