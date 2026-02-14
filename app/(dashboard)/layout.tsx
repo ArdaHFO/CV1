@@ -177,7 +177,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleSignOut = async () => {
     await signOut();
-    router.push('/');
+    window.location.href = '/login';
   };
 
   const navigation = [

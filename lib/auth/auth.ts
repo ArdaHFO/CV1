@@ -133,8 +133,32 @@ export async function signIn(data: SignInData): Promise<User | AuthError> {
 }
 
 export async function signOut(): Promise<void> {
-  if (supabase) {
-    await supabase.auth.signOut();
+  if (!supabase) return;
+
+  try {
+    await supabase.auth.signOut({ scope: 'local' });
+  } catch (error) {
+    console.error('SignOut error:', error);
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const clearSupabaseKeys = (storage: Storage) => {
+        const keysToRemove: string[] = [];
+        for (let index = 0; index < storage.length; index += 1) {
+          const key = storage.key(index);
+          if (key && key.startsWith('sb-')) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach((key) => storage.removeItem(key));
+      };
+
+      clearSupabaseKeys(window.localStorage);
+      clearSupabaseKeys(window.sessionStorage);
+    } catch (error) {
+      console.error('Failed to clear Supabase storage keys:', error);
+    }
   }
 }
 
