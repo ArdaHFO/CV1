@@ -133,7 +133,15 @@ export default function RegisterPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    setError('Google registration is disabled. Please sign up with email/password.');
+    setError('');
+    setGoogleLoading(true);
+
+    try {
+      await signInWithGoogle();
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign up with Google');
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -292,7 +300,7 @@ export default function RegisterPage() {
                 variant="outline"
                 className="w-full gap-2"
                 onClick={handleGoogleSignIn}
-                disabled={true}
+                disabled={googleLoading || loading}
               >
                 {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
                 Continue with Google

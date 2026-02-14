@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { signIn, signInWithGoogle } from '@/lib/auth/auth';
-import { supabase } from '@/lib/supabase/client';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 
 function GoogleIcon() {
@@ -33,30 +32,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const { isDark } = useAppDarkModeState();
-
-  useEffect(() => {
-    const completeOAuthFromHash = async () => {
-      if (!supabase || typeof window === 'undefined') return;
-
-      const hash = window.location.hash.replace(/^#/, '');
-      if (!hash) return;
-
-      const params = new URLSearchParams(hash);
-      const accessToken = params.get('access_token');
-      const refreshToken = params.get('refresh_token');
-
-      if (!accessToken || !refreshToken) return;
-      const cleanUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
-      window.history.replaceState({}, '', cleanUrl);
-
-      // If we ever receive OAuth tokens in the URL hash on /login, it means the OAuth redirect
-      // is misconfigured (implicit flow). We intentionally refuse to create a session here.
-      setError('OAuth redirect is misconfigured. Please register first, then sign in again.');
-      setGoogleLoading(false);
-    };
-
-    completeOAuthFromHash();
-  }, [router]);
 
   const highlights = [
     {
@@ -94,7 +69,15 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    setError('Google sign-in requires an existing account. Please sign up with email/password first.');
+    setError('');
+    setGoogleLoading(true);
+
+    try {
+      await signInWithGoogle();
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in with Google');
+      setGoogleLoading(false);
+    }
   };
 
   return (
@@ -203,7 +186,7 @@ export default function LoginPage() {
                 variant="outline"
                 className="w-full gap-2"
                 onClick={handleGoogleSignIn}
-                disabled={true}
+                disabled={googleLoading || loading}
               >
                 {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
                 Continue with Google

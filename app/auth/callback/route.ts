@@ -60,28 +60,6 @@ export async function GET(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user) {
-    const identities = (user.identities || []) as Array<{ provider?: string }>;
-    const hasGoogleIdentity = identities.some((identity) => identity.provider === 'google');
-    const hasEmailIdentity = identities.some((identity) => identity.provider === 'email');
-
-    if (hasGoogleIdentity && !hasEmailIdentity) {
-      await supabase.auth.signOut();
-
-      if (supabaseAdmin) {
-        await (supabaseAdmin as any).auth.admin.deleteUser(user.id);
-      }
-
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('error', 'membership_required');
-      loginUrl.searchParams.set(
-        'reason',
-        'Please register with email/password first, then sign in with Google.'
-      );
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
   if (user && supabaseAdmin) {
     const fullName =
       (user.user_metadata?.full_name as string | undefined) ||
