@@ -1,14 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth/auth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { ResumeContent, TemplateType } from '@/types';
 
 // Create a shareable link for CV
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    
-    if (!user) {
+    const supabase = await createSupabaseServerClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      );
+    }
+
+    // Get authenticated user from server-side
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -21,15 +33,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Resume ID and content are required' },
         { status: 400 }
-      );
-    }
-
-    const supabase = await createSupabaseServerClient();
-
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Database connection failed' },
-        { status: 500 }
       );
     }
 
