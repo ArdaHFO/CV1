@@ -303,7 +303,7 @@ export default function EditorPage() {
 
   const handleGenerateQR = async () => {
     if (!showQR && content) {
-      // Create shared link via API
+      // Try to create shared link via API
       try {
         const response = await fetch('/api/share', {
           method: 'POST',
@@ -326,13 +326,24 @@ export default function EditorPage() {
           const qrImageUrl = `/api/qr?url=${encodeURIComponent(data.shareUrl)}&size=400`;
           setQrUrl(qrImageUrl);
         } else {
-          alert('Failed to create shareable link');
-          return;
+          // Fallback to base64 encoding if API fails
+          console.warn('API failed, using fallback base64 encoding:', data);
+          const cvDataString = JSON.stringify(content);
+          const encodedData = btoa(unescape(encodeURIComponent(cvDataString)));
+          const previewUrl = `${window.location.origin}/preview/demo/${resumeId}?data=${encodeURIComponent(encodedData)}&template=${selectedTemplate}`;
+          setShareUrl(previewUrl);
+          const qrImageUrl = `/api/qr?url=${encodeURIComponent(previewUrl)}&size=400`;
+          setQrUrl(qrImageUrl);
         }
       } catch (error) {
-        console.error('Error creating shared link:', error);
-        alert('Failed to create shareable link');
-        return;
+        // Fallback to base64 encoding if API fails
+        console.warn('API error, using fallback base64 encoding:', error);
+        const cvDataString = JSON.stringify(content);
+        const encodedData = btoa(unescape(encodeURIComponent(cvDataString)));
+        const previewUrl = `${window.location.origin}/preview/demo/${resumeId}?data=${encodeURIComponent(encodedData)}&template=${selectedTemplate}`;
+        setShareUrl(previewUrl);
+        const qrImageUrl = `/api/qr?url=${encodeURIComponent(previewUrl)}&size=400`;
+        setQrUrl(qrImageUrl);
       }
     }
     setShowQR(!showQR);
@@ -362,13 +373,22 @@ export default function EditorPage() {
           setIsProUser(data.isPro);
           navigator.clipboard.writeText(data.shareUrl);
         } else {
-          alert('Failed to create shareable link');
-          return;
+          // Fallback to base64 encoding if API fails
+          console.warn('API failed, using fallback base64 encoding:', data);
+          const cvDataString = JSON.stringify(content);
+          const encodedData = btoa(unescape(encodeURIComponent(cvDataString)));
+          const previewUrl = `${window.location.origin}/preview/demo/${resumeId}?data=${encodeURIComponent(encodedData)}&template=${selectedTemplate}`;
+          setShareUrl(previewUrl);
+          navigator.clipboard.writeText(previewUrl);
         }
       } catch (error) {
-        console.error('Error creating shared link:', error);
-        alert('Failed to create shareable link');
-        return;
+        // Fallback to base64 encoding if API fails
+        console.warn('API error, using fallback base64 encoding:', error);
+        const cvDataString = JSON.stringify(content);
+        const encodedData = btoa(unescape(encodeURIComponent(cvDataString)));
+        const previewUrl = `${window.location.origin}/preview/demo/${resumeId}?data=${encodeURIComponent(encodedData)}&template=${selectedTemplate}`;
+        setShareUrl(previewUrl);
+        navigator.clipboard.writeText(previewUrl);
       }
     } else {
       navigator.clipboard.writeText(shareUrl);

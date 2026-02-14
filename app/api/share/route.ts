@@ -68,7 +68,11 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Error creating shared link:', error);
       return NextResponse.json(
-        { error: 'Failed to create shared link' },
+        { 
+          error: 'Failed to create shared link',
+          details: error.message,
+          hint: error.hint || 'Check if shared_links table exists in database'
+        },
         { status: 500 }
       );
     }
