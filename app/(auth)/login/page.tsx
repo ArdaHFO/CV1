@@ -46,25 +46,13 @@ export default function LoginPage() {
       const refreshToken = params.get('refresh_token');
 
       if (!accessToken || !refreshToken) return;
-
-      setGoogleLoading(true);
-      setError('');
-
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
-
       const cleanUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
       window.history.replaceState({}, '', cleanUrl);
 
-      if (sessionError) {
-        setError('Google sign-in session could not be created. Please try again.');
-        setGoogleLoading(false);
-        return;
-      }
-
-      router.replace('/dashboard');
+      // If we ever receive OAuth tokens in the URL hash on /login, it means the OAuth redirect
+      // is misconfigured (implicit flow). We intentionally refuse to create a session here.
+      setError('OAuth redirect is misconfigured. Please register first, then sign in again.');
+      setGoogleLoading(false);
     };
 
     completeOAuthFromHash();
@@ -106,14 +94,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    setError('');
-    setGoogleLoading(true);
-
-    const result = await signInWithGoogle();
-    if (result !== true) {
-      setError(result.message);
-      setGoogleLoading(false);
-    }
+    setError('Google sign-in requires an existing account. Please sign up with email/password first.');
   };
 
   return (
@@ -222,7 +203,7 @@ export default function LoginPage() {
                 variant="outline"
                 className="w-full gap-2"
                 onClick={handleGoogleSignIn}
-                disabled={googleLoading || loading}
+                disabled={true}
               >
                 {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon />}
                 Continue with Google

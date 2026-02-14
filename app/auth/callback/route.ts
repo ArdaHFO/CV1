@@ -60,43 +60,25 @@ export async function GET(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user && supabaseAdmin) {
-    const provider = user.app_metadata?.provider as string | undefined;
+  if (user) {
     const identities = (user.identities || []) as Array<{ provider?: string }>;
-    const isGoogleOnlyIdentity =
-      provider === 'google' &&
-      identities.length === 1 &&
-      identities[0]?.provider === 'google';
+    const hasGoogleIdentity = identities.some((identity) => identity.provider === 'google');
+    const hasEmailIdentity = identities.some((identity) => identity.provider === 'email');
 
-    if (isGoogleOnlyIdentity) {
-      const { data: existingProfile } = await (supabaseAdmin as any)
-        .from('profiles')
-        .select('id, created_at')
-        .eq('id', user.id)
-        .maybeSingle();
+    if (hasGoogleIdentity && !hasEmailIdentity) {
+      await supabase.auth.signOut();
 
-      const now = Date.now();
-      const userCreatedAtMs = Date.parse(user.created_at || '');
-      const profileCreatedAtMs = existingProfile?.created_at
-        ? Date.parse(existingProfile.created_at)
-        : Number.NaN;
-      const isRecentUser =
-        Number.isFinite(userCreatedAtMs) && now - userCreatedAtMs < 10 * 60 * 1000;
-      const isRecentProfile =
-        Number.isFinite(profileCreatedAtMs) && now - profileCreatedAtMs < 10 * 60 * 1000;
-
-      if (!existingProfile || isRecentUser || isRecentProfile) {
-        await supabase.auth.signOut();
+      if (supabaseAdmin) {
         await (supabaseAdmin as any).auth.admin.deleteUser(user.id);
-
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('error', 'membership_required');
-        loginUrl.searchParams.set(
-          'reason',
-          'Please register first before using Google sign-in.'
-        );
-        return NextResponse.redirect(loginUrl);
       }
+
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('error', 'membership_required');
+      loginUrl.searchParams.set(
+        'reason',
+        'Please register with email/password first, then sign in with Google.'
+      );
+      return NextResponse.redirect(loginUrl);
     }
   }
 
