@@ -47,6 +47,78 @@ export async function createResume(
   return data;
 }
 
+type CreateResumeFailureReason =
+  | 'supabase_not_configured'
+  | 'missing_profile'
+  | 'duplicate_slug'
+  | 'rls_denied'
+  | 'unknown';
+
+export async function createResumeWithResult(
+  userId: string,
+  title: string,
+  baseSlug: string
+): Promise<{ resume: Resume | null; reason?: CreateResumeFailureReason; error?: unknown }> {
+  if (!supabase) {
+    return { resume: null, reason: 'supabase_not_configured' };
+  }
+
+  const normalizedBase = baseSlug.trim() || 'cv';
+  const candidates = [
+    normalizedBase,
+    `${normalizedBase}-2`,
+    `${normalizedBase}-3`,
+    `${normalizedBase}-4`,
+    `${normalizedBase}-5`,
+  ];
+
+  let lastError: any = null;
+
+  for (const candidateSlug of candidates) {
+    const { data, error } = await (supabase as any)
+      .from('resumes')
+      .insert({
+        user_id: userId,
+        title,
+        slug: candidateSlug,
+        is_default: false,
+        view_count: 0,
+      })
+      .select()
+      .single();
+
+    if (!error) {
+      return { resume: data };
+    }
+
+    lastError = error;
+
+    // Postgres error codes via Postgrest
+    const code = String((error as any).code || '');
+
+    // 23505 = unique_violation (likely UNIQUE(user_id, slug))
+    if (code === '23505') {
+      continue;
+    }
+  }
+
+  const code = String(lastError?.code || '');
+  if (code === '23503') {
+    return { resume: null, reason: 'missing_profile', error: lastError };
+  }
+
+  if (code === '23505') {
+    return { resume: null, reason: 'duplicate_slug', error: lastError };
+  }
+
+  // 42501 = insufficient_privilege (can happen with RLS)
+  if (code === '42501') {
+    return { resume: null, reason: 'rls_denied', error: lastError };
+  }
+
+  return { resume: null, reason: 'unknown', error: lastError };
+}
+
 // Update resume
 export async function updateResume(
   resumeId: string,

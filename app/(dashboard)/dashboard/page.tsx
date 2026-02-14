@@ -36,7 +36,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getCurrentUser } from '@/lib/auth/auth';
-import { getUserResumes, createResume, deleteResume } from '@/lib/database/resumes';
+import { getUserResumes, createResumeWithResult, deleteResume } from '@/lib/database/resumes';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import type { Resume } from '@/types';
@@ -58,6 +58,16 @@ export default function DashboardPage() {
   const [cvLimitMessage, setCvLimitMessage] = useState('');
   const [userId, setUserId] = useState('');
   const { isDark } = useAppDarkModeState();
+
+  const ensureProfileRow = async (): Promise<boolean> => {
+    const response = await fetch('/api/profile/ensure', { method: 'POST' });
+    const payload = (await response.json()) as { success?: boolean; message?: string };
+    if (!response.ok || !payload.success) {
+      setCvLimitMessage(payload.message || 'Account setup is incomplete. Please sign out and sign in again.');
+      return false;
+    }
+    return true;
+  };
 
   const loadBillingStatus = async () => {
     const response = await fetch('/api/billing/status');
@@ -87,6 +97,9 @@ export default function DashboardPage() {
       }
 
       setUserId(user.id);
+
+      // Ensure the FK target exists (some older accounts may be missing profiles rows).
+      await ensureProfileRow();
       await loadBillingStatus();
 
       const userResumes = await getUserResumes(user.id);
@@ -104,6 +117,13 @@ export default function DashboardPage() {
 
     if (!userId) {
       router.replace('/login');
+      return;
+    }
+
+    // If profile bootstrap fails, do NOT consume billing credits.
+    const profileOk = await ensureProfileRow();
+    if (!profileOk) {
+      setCreating(false);
       return;
     }
 
@@ -144,10 +164,16 @@ export default function DashboardPage() {
       return;
     }
 
-    const newResume = await createResume(userId, newResumeTitle, slug);
+    const { resume: newResume, reason } = await createResumeWithResult(userId, newResumeTitle, slug);
     if (!newResume) {
       setCreating(false);
-      setCvLimitMessage('Could not create CV right now. Please try again.');
+      if (reason === 'missing_profile') {
+        setCvLimitMessage('Your account profile is missing. Please sign out and sign in again.');
+      } else if (reason === 'rls_denied') {
+        setCvLimitMessage('Permission denied while creating CV. Please sign out and sign in again.');
+      } else {
+        setCvLimitMessage('Could not create CV right now. Please try again.');
+      }
       return;
     }
 
