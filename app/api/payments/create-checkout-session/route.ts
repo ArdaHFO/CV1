@@ -5,7 +5,7 @@ import { getServerUserId } from '@/lib/auth/server-user';
 const PLAN_CONFIG = {
   'pro-monthly': {
     name: 'CSpark Pro Monthly',
-    amount: 999,
+    amount: 1999,
     intervalLabel: 'month',
   },
   'pro-yearly': {
@@ -23,7 +23,7 @@ const TOKEN_PACK_CONFIG = {
   },
   'job-search-10': {
     name: 'CSpark Job Search Tokens (10)',
-    amount: 999,
+    amount: 1999,
     tokenCount: 10,
   },
 } as const;

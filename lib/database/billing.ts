@@ -181,7 +181,7 @@ export async function markCheckoutSuccess(userId: string, planId: 'pro-monthly' 
 
   const plan = planId === 'pro-yearly'
     ? { planName: 'Pro Yearly', amount: '$79.99', durationDays: 365 }
-    : { planName: 'Pro Monthly', amount: '$9.99', durationDays: 30 };
+    : { planName: 'Pro Monthly', amount: '$19.99', durationDays: 30 };
 
   const paidAt = new Date();
   const expiresAt = new Date(paidAt);

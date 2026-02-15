@@ -190,7 +190,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     {
       id: 'pro-monthly' as const,
       name: 'Pro Monthly',
-      price: '$9.99',
+      price: '$19.99',
       period: '/month',
       description: 'Great for active job seekers needing flexible monthly billing.',
     },
@@ -214,7 +214,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     {
       id: 'job-search-10' as const,
       name: '10 Job Search Tokens',
-      price: '$9.99',
+      price: '$19.99',
       description: 'Add 10 extra job searches.',
       badge: 'Best Value',
     },
