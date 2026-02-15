@@ -20,7 +20,9 @@ type UsageRow = {
   freemium_job_searches: number;
   pro_job_searches: number;
   freemium_cv_creations: number;
+  freemium_cv_optimizations: number;
   purchased_job_search_tokens: number;
+  purchased_optimization_tokens: number;
 };
 
 export type BillingStatus = {
@@ -38,13 +40,16 @@ export type BillingStatus = {
     freemiumJobSearches: number;
     proJobSearches: number;
     freemiumCvCreations: number;
+    freemiumCvOptimizations: number;
     purchasedJobSearchTokens: number;
+    purchasedOptimizationTokens: number;
   };
   remaining: {
     jobSearches: number;
     includedJobSearches: number;
     tokenJobSearches: number;
     cvCreations: number | 'unlimited';
+    cvOptimizations: number | 'unlimited';
   };
 };
 
@@ -86,7 +91,9 @@ async function ensureUsageRow(userId: string): Promise<UsageRow> {
     freemium_job_searches: 0,
     pro_job_searches: 0,
     freemium_cv_creations: 0,
+    freemium_cv_optimizations: 0,
     purchased_job_search_tokens: 0,
+    purchased_optimization_tokens: 0,
   };
 
   const { data: inserted, error: insertError } = await (admin as any)
@@ -135,6 +142,10 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
     ? 'unlimited'
     : Math.max(0, 1 - usage.freemium_cv_creations);
 
+  const optimizationRemaining = planTier === 'pro'
+    ? 'unlimited'
+    : Math.max(0, 1 - (usage.freemium_cv_optimizations ?? 0));
+
   return {
     planTier,
     subscription: {
@@ -150,13 +161,16 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
       freemiumJobSearches: usage.freemium_job_searches,
       proJobSearches: usage.pro_job_searches,
       freemiumCvCreations: usage.freemium_cv_creations,
+      freemiumCvOptimizations: usage.freemium_cv_optimizations ?? 0,
       purchasedJobSearchTokens: usage.purchased_job_search_tokens ?? 0,
+      purchasedOptimizationTokens: usage.purchased_optimization_tokens ?? 0,
     },
     remaining: {
       jobSearches: remainingJobSearches,
       includedJobSearches: remainingIncludedSearches,
       tokenJobSearches: remainingTokenSearches,
       cvCreations: cvRemaining,
+      cvOptimizations: optimizationRemaining,
     },
   };
 }
@@ -209,7 +223,7 @@ export async function addJobSearchTokens(userId: string, tokenPackId: TokenPackI
 
 export async function consumeUsage(
   userId: string,
-  action: 'job-search' | 'cv-creation'
+  action: 'job-search' | 'cv-creation' | 'cv-optimization'
 ): Promise<{ allowed: boolean; message: string; status: BillingStatus }> {
   const admin = requireAdminClient();
   const status = await getBillingStatus(userId);
@@ -263,32 +277,71 @@ export async function consumeUsage(
     }
   }
 
-  if (status.planTier === 'pro') {
+  if (action === 'cv-creation') {
+    if (status.planTier === 'pro') {
+      return {
+        allowed: true,
+        message: 'Pro plan has unlimited CV creations.',
+        status,
+      };
+    }
+
+    if (status.remaining.cvCreations === 0) {
+      return {
+        allowed: false,
+        message: 'Freemium allows only 1 CV creation.',
+        status,
+      };
+    }
+
+    const { error } = await (admin as any)
+      .from('user_usage_limits')
+      .update({ freemium_cv_creations: status.usage.freemiumCvCreations + 1 })
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
     return {
       allowed: true,
-      message: 'Pro plan has unlimited CV creations.',
-      status,
+      message: 'CV creation quota consumed.',
+      status: await getBillingStatus(userId),
     };
   }
 
-  if (status.remaining.cvCreations === 0) {
+  if (action === 'cv-optimization') {
+    if (status.planTier === 'pro') {
+      return {
+        allowed: true,
+        message: 'Pro plan has unlimited CV optimizations.',
+        status,
+      };
+    }
+
+    if (status.remaining.cvOptimizations === 0) {
+      return {
+        allowed: false,
+        message: 'Freemium allows only 1 CV optimization. Upgrade to Pro for unlimited optimizations.',
+        status,
+      };
+    }
+
+    const { error } = await (admin as any)
+      .from('user_usage_limits')
+      .update({ freemium_cv_optimizations: status.usage.freemiumCvOptimizations + 1 })
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
     return {
-      allowed: false,
-      message: 'Freemium allows only 1 CV creation.',
-      status,
+      allowed: true,
+      message: 'CV optimization quota consumed.',
+      status: await getBillingStatus(userId),
     };
   }
-
-  const { error } = await (admin as any)
-    .from('user_usage_limits')
-    .update({ freemium_cv_creations: status.usage.freemiumCvCreations + 1 })
-    .eq('user_id', userId);
-
-  if (error) throw error;
 
   return {
-    allowed: true,
-    message: 'CV creation quota consumed.',
-    status: await getBillingStatus(userId),
+    allowed: false,
+    message: 'Invalid action.',
+    status,
   };
 }

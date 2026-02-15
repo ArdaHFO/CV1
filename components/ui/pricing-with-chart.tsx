@@ -82,16 +82,19 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 							isDark ? 'text-white/70' : 'text-gray-600'
 						}`}>
 							{[
-								'1 CV creation',
-								'1 job search (up to 25 results)',
-								'Manual CV editing',
-								'Download as PDF',
-								'Shareable links (7-day expiration)',
-								'Basic support',
+								{ text: '1 CV creation', bold: true },
+								{ text: '1 CV optimization per account', bold: true },
+								{ text: '1 job search (up to 25 results)', bold: false },
+								{ text: 'Manual CV editing', bold: false },
+								{ text: 'Download as PDF', bold: false },
+								{ text: 'Shareable links (7-day expiration)', bold: false },
+								{ text: 'Basic support', bold: false },
 							].map((item, index) => (
-								<li key={index} className="flex items-center gap-2">
+								<li key={index} className={`flex items-center gap-2 ${
+									item.bold ? 'font-semibold' : ''
+								}`}>
 									<CheckCircleIcon className="h-4 w-4 text-blue-500" />
-									{item}
+									{item.text}
 								</li>
 							))}
 						</ul>
@@ -109,7 +112,7 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 								Pro
 							</h2>
 							<span className="my-3 block text-3xl font-bold bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent">
-								$9.99<span className={`text-base ml-1 ${isDark ? 'text-white/60' : 'text-gray-600'}`}>/month</span>
+								$19.99<span className={`text-base ml-1 ${isDark ? 'text-white/60' : 'text-gray-600'}`}>/month</span>
 							</span>
 							<p className={`text-sm ${
 								isDark ? 'text-white/60' : 'text-gray-600'
@@ -141,21 +144,23 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 							isDark ? 'text-white/70' : 'text-gray-600'
 						}`}>
 							{[
-								'Unlimited CV creation',
-								'10 job searches per cycle',
-								'Result limits: 25, 50, or all',
-								'AI-powered CV optimization',
-								'Job posting-specific tailoring',
-								'Automatic cover letter generation',
-								'LinkedIn job search integration',
-								'Permanent shareable links (no expiration)',
-								'QR code CV sharing',
-								'Multiple CV version management',
-								'Priority support',
+								{ text: 'Unlimited CV creation', bold: true },
+								{ text: 'Unlimited AI-powered CV optimization', bold: true },
+								{ text: '10 job searches per cycle', bold: true },
+								{ text: 'Result limits: 25, 50, or all', bold: false },
+								{ text: 'Job posting-specific tailoring', bold: false },
+								{ text: 'Automatic cover letter generation', bold: false },
+								{ text: 'LinkedIn job search integration', bold: false },
+								{ text: 'Permanent shareable links (no expiration)', bold: false },
+								{ text: 'QR code CV sharing', bold: false },
+								{ text: 'Multiple CV version management', bold: false },
+								{ text: 'Priority support', bold: false },
 							].map((item, index) => (
-								<li key={index} className="flex items-center gap-2">
+								<li key={index} className={`flex items-center gap-2 ${
+									item.bold ? 'font-semibold' : ''
+								}`}>
 									<CheckCircleIcon className="h-4 w-4 text-violet-500" />
-									{item}
+									{item.text}
 								</li>
 							))}
 						</ul>

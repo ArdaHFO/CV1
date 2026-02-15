@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as {
-      action?: 'job-search' | 'cv-creation';
+      action?: 'job-search' | 'cv-creation' | 'cv-optimization';
     };
 
     if (!body.action) {

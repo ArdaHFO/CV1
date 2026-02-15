@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UpgradeModal } from '@/components/ui/upgrade-modal';
 import { getCurrentUser } from '@/lib/auth/auth';
 import { getUserResumes, createResumeWithResult, deleteResume } from '@/lib/database/resumes';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
@@ -56,6 +57,7 @@ export default function DashboardPage() {
   const [planTier, setPlanTier] = useState<PlanTier>('freemium');
   const [remainingCvCreations, setRemainingCvCreations] = useState(1);
   const [cvLimitMessage, setCvLimitMessage] = useState('');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [userId, setUserId] = useState('');
   const { isDark } = useAppDarkModeState();
 
@@ -131,7 +133,7 @@ export default function DashboardPage() {
     const tier = latestBilling.tier;
 
     if (tier === 'freemium' && latestBilling.remainingCv <= 0) {
-      setCvLimitMessage('Freemium allows only 1 CV creation. Upgrade to Pro for unlimited CVs.');
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -158,9 +160,7 @@ export default function DashboardPage() {
 
     if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
       setCreating(false);
-      setCvLimitMessage(
-        consumePayload.message || 'Freemium allows only 1 CV creation. Upgrade to Pro for unlimited CVs.'
-      );
+      setShowUpgradeModal(true);
       return;
     }
 
@@ -572,6 +572,12 @@ export default function DashboardPage() {
       )}
         </div>
       </div>
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        feature="cv-creation"
+      />
     </div>
   );
 }

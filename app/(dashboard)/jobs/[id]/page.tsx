@@ -20,6 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UpgradeModal } from '@/components/ui/upgrade-modal';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import type { Job, CVOptimizationResult, Resume, ResumeContent } from '@/types';
@@ -343,6 +344,7 @@ export default function JobDetailPage() {
   const [applyingOptimization, setApplyingOptimization] = useState(false);
   const [sourceResumeContent, setSourceResumeContent] = useState<ResumeContent | null>(null);
   const [selectedSuggestionIndexes, setSelectedSuggestionIndexes] = useState<number[]>([]);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const { isDark } = useAppDarkModeState();
 
   useEffect(() => {
@@ -376,6 +378,25 @@ export default function JobDetailPage() {
 
   const handleOptimize = async () => {
     if (!job || !selectedResumeId) return;
+
+    // Check billing limits before optimization
+    const consumeResponse = await fetch('/api/billing/consume', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'cv-optimization' }),
+    });
+
+    const consumePayload = (await consumeResponse.json()) as {
+      success?: boolean;
+      allowed?: boolean;
+      message?: string;
+    };
+
+    if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
+      // Show upgrade modal for free users
+      setShowUpgradeModal(true);
+      return;
+    }
 
     setOptimizing(true);
 
@@ -773,6 +794,12 @@ export default function JobDetailPage() {
           </div>
         </div>
       </div>
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        onOpenChange={setShowUpgradeModal}
+        feature="cv-optimization"
+      />
     </div>
   );
 }
