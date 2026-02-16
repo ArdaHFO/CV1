@@ -81,7 +81,10 @@ export default function DashboardPage() {
       status?: { planTier: PlanTier; remaining: { cvCreations: number | 'unlimited' } };
     };
 
+    console.log(`[LOAD_BILLING] response.ok=${response.ok}, payload.success=${payload.success}, payload.status=${JSON.stringify(payload.status)}`);
+
     if (!response.ok || !payload.success || !payload.status) {
+      console.log(`[LOAD_BILLING_FALLBACK] Using default: tier=freemium, remainingCv=1`);
       setPlanTier('freemium');
       setRemainingCvCreations(1);
       return { tier: 'freemium' as PlanTier, remainingCv: 1 };
@@ -90,6 +93,7 @@ export default function DashboardPage() {
     setPlanTier(payload.status.planTier);
     const remaining = payload.status.remaining.cvCreations === 'unlimited' ? Number.POSITIVE_INFINITY : payload.status.remaining.cvCreations;
     setRemainingCvCreations(remaining);
+    console.log(`[LOAD_BILLING_SUCCESS] planTier=${payload.status.planTier}, remaining=${remaining}`);
     return { tier: payload.status.planTier, remainingCv: remaining };
   };
 
@@ -128,6 +132,7 @@ export default function DashboardPage() {
     // If profile bootstrap fails, do NOT consume billing credits.
     const profileOk = await ensureProfileRow();
     if (!profileOk) {
+      console.log(`[HANDLE_CREATE_PROFILE_FAIL] Profile row could not be ensured`);
       setCreating(false);
       return;
     }
@@ -135,7 +140,11 @@ export default function DashboardPage() {
     const latestBilling = await loadBillingStatus();
     const tier = latestBilling.tier;
 
+    console.log(`[HANDLE_CREATE_CHECK] tier=${tier}, remainingCv=${latestBilling.remainingCv}, check_result=${tier === 'freemium' && latestBilling.remainingCv <= 0}`);
+
     if (tier === 'freemium' && latestBilling.remainingCv <= 0) {
+      console.log(`[HANDLE_CREATE_BLOCKED] No remaining CV creations`);
+      setCvLimitMessage('Ücretsiz paket ile 1 CV oluşturabilirsiniz. Sınırınıza ulaştınız.');
       setShowUpgradeModal(true);
       return;
     }
