@@ -146,6 +146,8 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
     ? 'unlimited'
     : Math.max(0, 1 - (usage.freemium_cv_optimizations ?? 0));
 
+  console.log(`[GET_BILLING_STATUS] userId=${userId}, planTier=${planTier}, freemium_cv_creations=${usage.freemium_cv_creations}, cvRemaining=${cvRemaining}`);
+
   return {
     planTier,
     subscription: {
@@ -278,6 +280,8 @@ export async function consumeUsage(
   }
 
   if (action === 'cv-creation') {
+    console.log(`[CONSUME_CV] userId=${userId}, planTier=${status.planTier}, remaining=${status.remaining.cvCreations}`);
+    
     if (status.planTier === 'pro') {
       return {
         allowed: true,
@@ -287,6 +291,7 @@ export async function consumeUsage(
     }
 
     if (status.remaining.cvCreations === 0) {
+      console.log(`[CONSUME_CV_BLOCKED] userId=${userId}, no remaining CV creations`);
       return {
         allowed: false,
         message: 'Freemium allows only 1 CV creation.',
@@ -300,6 +305,8 @@ export async function consumeUsage(
       .eq('user_id', userId);
 
     if (error) throw error;
+
+    console.log(`[CONSUME_CV_SUCCESS] userId=${userId}, updated from ${status.usage.freemiumCvCreations} to ${status.usage.freemiumCvCreations + 1}`);
 
     return {
       allowed: true,

@@ -39,7 +39,7 @@ import { Label } from '@/components/ui/label';
 import { UpgradeModal } from '@/components/ui/upgrade-modal';
 import { UploadCVDialog } from '@/components/ui/upload-cv-dialog';
 import { getCurrentUser } from '@/lib/auth/auth';
-import { getUserResumes, createResumeWithResult, deleteResume } from '@/lib/database/resumes';
+import { getUserResumes, createResumeWithResult, deleteResume, updateResume } from '@/lib/database/resumes';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import type { Resume } from '@/types';
@@ -48,7 +48,7 @@ type PlanTier = 'freemium' | 'pro';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { resumes, setResumes, addResume, deleteResume: removeResume, updateResume, setDefaultResume } = useDashboardStore();
+  const { resumes, setResumes, addResume, deleteResume: removeResume, updateResume: updateResumeInStore, setDefaultResume } = useDashboardStore();
   const [loading, setLoading] = useState(false); // Set to false for development
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newResumeTitle, setNewResumeTitle] = useState('');
@@ -212,7 +212,7 @@ export default function DashboardPage() {
     setRenameDialogOpen(true);
   };
 
-  const handleRenameSubmit = () => {
+  const handleRenameSubmit = async () => {
     if (!renamingResume || !renameTitle.trim()) return;
 
     const slug = renameTitle
@@ -220,11 +220,21 @@ export default function DashboardPage() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    updateResume(renamingResume.id, {
+    // Update in database first
+    const dbResult = await updateResume(renamingResume.id, {
       title: renameTitle,
       slug,
       updated_at: new Date().toISOString(),
     });
+
+    if (dbResult) {
+      // Only update the store if database update succeeded
+      updateResumeInStore(renamingResume.id, {
+        title: renameTitle,
+        slug,
+        updated_at: new Date().toISOString(),
+      });
+    }
 
     setRenameDialogOpen(false);
     setRenamingResume(null);

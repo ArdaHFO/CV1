@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     const status = await getBillingStatus(userId);
+    console.log(`[BILLING_STATUS] userId=${userId}, planTier=${status.planTier}, cvRemaining=${status.remaining.cvCreations}`);
     return NextResponse.json({ success: true, status });
   } catch (error) {
     console.error('Failed to fetch billing status:', error);
