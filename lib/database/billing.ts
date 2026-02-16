@@ -316,6 +316,8 @@ export async function consumeUsage(
   }
 
   if (action === 'cv-optimization') {
+    console.log(`[CONSUME_OPTIMIZATION] userId=${userId}, planTier=${status.planTier}, remaining=${status.remaining.cvOptimizations}`);
+    
     if (status.planTier === 'pro') {
       return {
         allowed: true,
@@ -325,6 +327,7 @@ export async function consumeUsage(
     }
 
     if (status.remaining.cvOptimizations === 0) {
+      console.log(`[CONSUME_OPTIMIZATION_BLOCKED] userId=${userId}, no remaining optimizations`);
       return {
         allowed: false,
         message: 'Freemium allows only 1 CV optimization. Upgrade to Pro for unlimited optimizations.',
@@ -338,6 +341,8 @@ export async function consumeUsage(
       .eq('user_id', userId);
 
     if (error) throw error;
+
+    console.log(`[CONSUME_OPTIMIZATION_SUCCESS] userId=${userId}, updated from ${status.usage.freemiumCvOptimizations} to ${status.usage.freemiumCvOptimizations + 1}`);
 
     return {
       allowed: true,
