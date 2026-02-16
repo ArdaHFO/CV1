@@ -398,143 +398,222 @@ export default function Home() {
 
         {/* Features Section */}
         <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-16">
-            <h2 className={`text-4xl font-bold mb-4 ${
+          <div className="text-center mb-20">
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
+              isDark 
+                ? 'bg-blue-500/20 border-blue-500/30 text-blue-300' 
+                : 'bg-blue-100 border-blue-300 text-blue-700'
+            }`}>
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-semibold">Powerful Features</span>
+            </span>
+            <h2 className={`text-5xl font-bold mb-6 ${
               isDark ? 'text-white' : 'text-gray-900'
             }`}>
               Everything You Need to Land Your Dream Job
             </h2>
-            <p className={`text-xl max-w-2xl mx-auto ${
+            <p className={`text-xl max-w-3xl mx-auto ${
               isDark ? 'text-white/70' : 'text-gray-600'
             }`}>
-              Powerful features designed to make CV creation effortless and effective
+              Our AI-powered platform helps you create tailored CVs for every job, optimize your application, and stand out to recruiters
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Linkedin,
-                title: 'LinkedIn Job Search',
-                description: 'Search and browse LinkedIn job postings directly in our platform. Find your perfect role without leaving the app.',
-                gradient: 'from-blue-600 to-blue-800'
-              },
-              {
-                icon: MetaLogo,
-                title: 'AI-Powered Optimization',
-                description: 'Get AI suggestions tailored to each job posting, then approve selected edits before they are applied to your CV.',
-                gradient: 'from-blue-500 to-cyan-500'
-              },
-              {
-                icon: Target,
-                title: 'Job-Specific Tailoring',
-                description: 'For each LinkedIn job, CSpark highlights missing skills and suggests targeted updates so you can customize every CV version faster.',
-                gradient: 'from-purple-500 to-pink-500'
-              },
-              {
-                icon: Layers,
-                title: 'Multiple CV Versions',
-                description: 'Create and manage different CV versions for various positions. Switch between them effortlessly.',
-                gradient: 'from-green-500 to-emerald-500'
-              },
-              {
-                icon: Code,
-                title: 'Professional Templates',
-                description: 'Choose from modern, academic, or minimalist templates. All professionally designed and ATS-friendly.',
-                gradient: 'from-orange-500 to-red-500'
-              },
-              {
-                icon: Download,
-                title: 'Export & Share',
-                description: 'Download as PDF or share with custom URLs and QR codes. Perfect for digital portfolios and applications.',
-                gradient: 'from-indigo-500 to-purple-500'
-              },
-              {
-                icon: Link2,
-                title: 'Share with Link',
-                description: 'Generate shareable CV links instantly. Free users get 7-day links, Pro users get permanent links that never expire.',
-                gradient: 'from-sky-500 to-blue-700'
-              },
-              {
-                icon: QrCode,
-                title: 'Share with QR Code',
-                description: 'Create a scannable QR code for your CV to use on portfolios, business cards, and event badges.',
-                gradient: 'from-fuchsia-500 to-violet-600'
-              },
-              {
-                icon: Zap,
-                title: 'Real-Time Preview',
-                description: 'See your changes instantly with our live preview. What you see is exactly what you get in the final PDF.',
-                gradient: 'from-yellow-500 to-orange-500'
-              },
-              {
-                icon: Globe,
-                title: 'Digital Portfolio',
-                description: 'Get a shareable online link for your CV. Perfect for email signatures and LinkedIn profiles.',
-                gradient: 'from-teal-500 to-green-500'
-              },
-              {
-                icon: Lightbulb,
-                title: 'Smart Suggestions',
-                description: 'Get AI-powered recommendations for improving your experience descriptions and skill sections.',
-                gradient: 'from-pink-500 to-rose-500'
-              },
-              {
-                icon: Database,
-                title: 'Cloud Storage',
-                description: 'Your CVs are securely stored in the cloud. Access them from anywhere, on any device.',
-                gradient: 'from-cyan-500 to-blue-500'
-              },
-              {
-                icon: PlusSquare,
-                title: 'Custom Sections',
-                description: 'Add personalized sections like Awards, Volunteer Work, or Publications to showcase your unique achievements and stand out.',
-                gradient: 'from-violet-500 to-purple-600'
-              },
-              {
-                icon: Upload,
-                title: 'Import Existing CV',
-                description: 'Upload your PDF or DOCX resume and let AI automatically extract and optimize the content. Start editing instantly.',
-                gradient: 'from-blue-600 to-indigo-700'
-              },
-            ].map((feature, index) => (
-              <GlareCard key={index} className="h-full">
-                <div className={`backdrop-blur-md rounded-2xl p-6 h-full flex flex-col shadow-lg transition-all border hover:scale-105 ${
-                  isDark 
-                    ? 'bg-zinc-950/55 border-white/20 hover:bg-zinc-950/65 shadow-2xl' 
-                    : 'bg-white/90 border-gray-200 hover:shadow-2xl'
-                }`}>
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                    <feature.icon className="w-6 h-6 text-white" />
+          {/* Primary/Core Features - 6 most important */}
+          <div className="mb-20">
+            <h3 className={`text-2xl font-bold mb-8 text-center ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              Core Features
+            </h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: Linkedin,
+                  title: 'LinkedIn Job Search',
+                  description: 'Search and browse LinkedIn job postings directly in our platform. Find your perfect role without leaving the app.',
+                  gradient: 'from-blue-600 to-blue-800',
+                  badge: 'Popular'
+                },
+                {
+                  icon: MetaLogo,
+                  title: 'AI-Powered Optimization',
+                  description: 'Get AI suggestions tailored to each job posting, then approve selected edits before they are applied to your CV.',
+                  gradient: 'from-blue-500 to-cyan-500',
+                  badge: 'AI'
+                },
+                {
+                  icon: Target,
+                  title: 'Job-Specific Tailoring',
+                  description: 'CSpark highlights missing skills and suggests targeted updates so you can customize every CV version faster than ever.',
+                  gradient: 'from-purple-500 to-pink-500',
+                  badge: 'Featured'
+                },
+                {
+                  icon: PlusSquare,
+                  title: 'Custom Sections',
+                  description: 'Add personalized sections like Awards, Volunteer Work, or Publications to showcase your unique achievements and stand out.',
+                  gradient: 'from-violet-500 to-purple-600',
+                  badge: 'New'
+                },
+                {
+                  icon: Upload,
+                  title: 'Import Existing CV',
+                  description: 'Upload your PDF or DOCX resume to quickly get started. Create a new CV in seconds and start editing.',
+                  gradient: 'from-blue-600 to-indigo-700',
+                  badge: 'New'
+                },
+                {
+                  icon: Layers,
+                  title: 'Multiple CV Versions',
+                  description: 'Create and manage different CV versions for various positions. Switch between them effortlessly and keep them organized.',
+                  gradient: 'from-green-500 to-emerald-500',
+                  badge: ''
+                },
+              ].map((feature, index) => (
+                <GlareCard key={index} className="h-full">
+                  <div className={`backdrop-blur-md rounded-2xl p-6 h-full flex flex-col shadow-lg transition-all border hover:scale-105 hover:shadow-2xl ${
+                    isDark 
+                      ? 'bg-zinc-950/55 border-white/20 hover:bg-zinc-950/65' 
+                      : 'bg-white/90 border-gray-200 hover:border-gray-300'
+                  }`}>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                        <feature.icon className="w-6 h-6 text-white" />
+                      </div>
+                      {feature.badge && (
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                          feature.badge === 'New' 
+                            ? 'bg-green-500/20 text-green-400' 
+                            : feature.badge === 'Featured'
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-blue-500/20 text-blue-400'
+                        }`}>
+                          {feature.badge}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className={`text-lg font-bold mb-2 ${
+                      isDark ? 'text-white' : 'text-gray-900'
+                    }`}>
+                      {feature.title}
+                    </h3>
+                    <p className={`text-sm leading-relaxed ${
+                      isDark ? 'text-white/85' : 'text-gray-600'
+                    }`}>
+                      {feature.description}
+                    </p>
                   </div>
-                  <h3 className={`text-xl font-semibold mb-2 ${
+                </GlareCard>
+              ))}
+            </div>
+          </div>
+
+          {/* Additional Features - Supporting/Secondary */}
+          <div>
+            <h3 className={`text-2xl font-bold mb-8 text-center ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              Supporting Features
+            </h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                {
+                  icon: Code,
+                  title: 'Professional Templates',
+                  description: 'Modern, academic, or minimalist templates. All ATS-friendly.',
+                  gradient: 'from-orange-500 to-red-500'
+                },
+                {
+                  icon: Download,
+                  title: 'Export & Share',
+                  description: 'Download as PDF or share with custom URLs and QR codes.',
+                  gradient: 'from-indigo-500 to-purple-500'
+                },
+                {
+                  icon: Zap,
+                  title: 'Real-Time Preview',
+                  description: 'See changes instantly. WYSIWYG editor with live preview.',
+                  gradient: 'from-yellow-500 to-orange-500'
+                },
+                {
+                  icon: Lightbulb,
+                  title: 'Smart Suggestions',
+                  description: 'AI-powered recommendations for better descriptions.',
+                  gradient: 'from-pink-500 to-rose-500'
+                },
+                {
+                  icon: Link2,
+                  title: 'Shareable Links',
+                  description: 'Generate links that never expire (Pro) or last 7 days (Free).',
+                  gradient: 'from-sky-500 to-blue-700'
+                },
+                {
+                  icon: QrCode,
+                  title: 'QR Codes',
+                  description: 'Create scannable QR codes for portfolios and business cards.',
+                  gradient: 'from-fuchsia-500 to-violet-600'
+                },
+                {
+                  icon: Database,
+                  title: 'Cloud Storage',
+                  description: 'Secure cloud storage. Access CVs from anywhere, anytime.',
+                  gradient: 'from-cyan-500 to-blue-500'
+                },
+                {
+                  icon: Globe,
+                  title: 'Digital Portfolio',
+                  description: 'Online link for emails and LinkedIn profiles.',
+                  gradient: 'from-teal-500 to-green-500'
+                },
+              ].map((feature, index) => (
+                <div 
+                  key={index} 
+                  className={`rounded-xl p-4 backdrop-blur-md border transition-all hover:scale-105 ${
+                    isDark 
+                      ? 'bg-zinc-950/40 border-white/10 hover:bg-zinc-950/60' 
+                      : 'bg-white/70 border-gray-200 hover:bg-white/90'
+                  }`}
+                >
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-3 shadow-lg`}>
+                    <feature.icon className="w-5 h-5 text-white" />
+                  </div>
+                  <h4 className={`font-semibold mb-1 text-sm ${
                     isDark ? 'text-white' : 'text-gray-900'
                   }`}>
                     {feature.title}
-                  </h3>
-                  <p className={`text-sm leading-relaxed ${
-                    isDark ? 'text-white/85' : 'text-gray-600'
+                  </h4>
+                  <p className={`text-xs leading-snug ${
+                    isDark ? 'text-white/75' : 'text-gray-600'
                   }`}>
                     {feature.description}
                   </p>
                 </div>
-              </GlareCard>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
         {/* How It Works */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-16">
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
+              isDark 
+                ? 'bg-violet-500/20 border-violet-500/30 text-violet-300' 
+                : 'bg-violet-100 border-violet-300 text-violet-700'
+            }`}>
+              <Rocket className="w-4 h-4" />
+              <span className="text-sm font-semibold">Quick Start</span>
+            </span>
             <h2 className={`text-4xl font-bold mb-4 ${
               isDark ? 'text-white' : 'text-gray-900'
             }`}>
-              Create Your CV in 3 Simple Steps
+              From Zero to Hired in 3 Steps
             </h2>
             <p className={`text-xl max-w-2xl mx-auto ${
               isDark ? 'text-white/70' : 'text-gray-600'
             }`}>
-              Get from zero to professional CV in less than 10 minutes
+              Create a professional CV and start applying to jobs in less than 10 minutes - guaranteed
             </p>
           </div>
 
@@ -849,33 +928,87 @@ export default function Home() {
 
         {/* Pricing */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-16">
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
+              isDark 
+                ? 'bg-green-500/20 border-green-500/30 text-green-300' 
+                : 'bg-green-100 border-green-300 text-green-700'
+            }`}>
+              <TrendingUp className="w-4 h-4" />
+              <span className="text-sm font-semibold">Transparent Pricing</span>
+            </span>
+            <h2 className={`text-4xl font-bold mb-4 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              Simple, Honest Pricing
+            </h2>
+            <p className={`text-xl max-w-2xl mx-auto ${
+              isDark ? 'text-white/70' : 'text-gray-600'
+            }`}>
+              Start free, upgrade only when you need more. No hidden fees, cancel anytime.
+            </p>
+          </div>
           <PricingWithChart isDark={isDark} />
         </section>
 
         {/* Final CTA */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className={`rounded-3xl p-12 md:p-16 text-center backdrop-blur-md border bg-gradient-to-br ${
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+          <div className={`rounded-3xl p-12 md:p-20 text-center backdrop-blur-md border bg-gradient-to-br overflow-hidden relative ${
             isDark 
-              ? 'from-blue-900/30 to-purple-900/30 border-blue-500/20' 
-              : 'from-blue-100 to-purple-100 border-blue-300'
+              ? 'from-blue-900/40 via-purple-900/40 to-blue-900/40 border-blue-500/30' 
+              : 'from-blue-50 via-purple-50 to-blue-50 border-blue-300'
           }`}>
-            <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Ready to Build Your Perfect CV?
-            </h2>
-            <p className={`text-xl mb-8 max-w-2xl mx-auto ${
-              isDark ? 'text-white/80' : 'text-gray-700'
-            }`}>
-              Join 50,000+ professionals who are landing better jobs with CSpark
-            </p>
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-2 px-10 py-5 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-105"
-            >
-              Get Started Free — No Credit Card Required
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent dark:via-white/5 pointer-events-none" />
+            
+            <div className="relative z-10 space-y-8">
+              <div>
+                <h2 className={`text-5xl md:text-6xl font-bold mb-6 leading-tight ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  Start Your Journey to<br/>
+                  <span className={`${
+                    isDark
+                      ? 'text-blue-300'
+                      : 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
+                  }`}>
+                    Your Dream Job
+                  </span>
+                </h2>
+              </div>
+              
+              <p className={`text-xl mb-10 max-w-2xl mx-auto leading-relaxed ${
+                isDark ? 'text-white/80' : 'text-gray-700'
+              }`}>
+                Create a professional CV in minutes, get AI-optimized suggestions for every job application, and land more interviews.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <Link
+                  href="/register"
+                  className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-105 whitespace-nowrap"
+                >
+                  Get Started Free
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href="#features"
+                  className={`inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-xl border transition-all hover:scale-105 whitespace-nowrap ${
+                    isDark
+                      ? 'border-blue-400/50 text-blue-300 hover:bg-blue-500/10'
+                      : 'border-blue-300 text-blue-700 hover:bg-blue-50'
+                  }`}
+                >
+                  Explore Features
+                  <ChevronDown className="w-5 h-5 -rotate-90" />
+                </Link>
+              </div>
+              
+              <p className={`text-sm mt-8 ${
+                isDark ? 'text-white/60' : 'text-gray-600'
+              }`}>
+                ✓ No credit card required  •  ✓ Takes less than 2 minutes  •  ✓ Start creating immediately
+              </p>
+            </div>
           </div>
         </section>
       </main>
