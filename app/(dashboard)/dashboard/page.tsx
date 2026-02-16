@@ -148,6 +148,23 @@ export default function DashboardPage() {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
+    // Create resume FIRST, before consuming quota
+    const { resume: newResume, reason } = await createResumeWithResult(userId, newResumeTitle, slug);
+    
+    if (!newResume) {
+      // Resume creation failed - don't consume any quota
+      setCreating(false);
+      if (reason === 'missing_profile') {
+        setCvLimitMessage('Your account profile is missing. Please sign out and sign in again.');
+      } else if (reason === 'rls_denied') {
+        setCvLimitMessage('Permission denied while creating CV. Please sign out and sign in again.');
+      } else {
+        setCvLimitMessage('Could not create CV right now. Please try again.');
+      }
+      return;
+    }
+
+    // Resume created successfully - now consume the quota
     const consumeResponse = await fetch('/api/billing/consume', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -162,21 +179,13 @@ export default function DashboardPage() {
     };
 
     if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
+      // Quota consumption failed but resume was already created
+      // This shouldn't happen in normal flow but handle gracefully
       setCreating(false);
-      setShowUpgradeModal(true);
-      return;
-    }
-
-    const { resume: newResume, reason } = await createResumeWithResult(userId, newResumeTitle, slug);
-    if (!newResume) {
-      setCreating(false);
-      if (reason === 'missing_profile') {
-        setCvLimitMessage('Your account profile is missing. Please sign out and sign in again.');
-      } else if (reason === 'rls_denied') {
-        setCvLimitMessage('Permission denied while creating CV. Please sign out and sign in again.');
-      } else {
-        setCvLimitMessage('Could not create CV right now. Please try again.');
-      }
+      addResume(newResume);
+      setCreateDialogOpen(false);
+      setNewResumeTitle('');
+      router.push(`/editor/${newResume.id}`);
       return;
     }
 
