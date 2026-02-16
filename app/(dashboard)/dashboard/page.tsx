@@ -154,6 +154,7 @@ export default function DashboardPage() {
     if (!newResume) {
       // Resume creation failed - don't consume any quota
       setCreating(false);
+      console.log(`[CREATE_RESUME_FAILED] reason=${reason}`);
       if (reason === 'missing_profile') {
         setCvLimitMessage('Your account profile is missing. Please sign out and sign in again.');
       } else if (reason === 'rls_denied') {
@@ -163,6 +164,8 @@ export default function DashboardPage() {
       }
       return;
     }
+
+    console.log(`[CREATE_RESUME_SUCCESS] resumeId=${newResume.id}`);
 
     // Resume created successfully - now consume the quota
     const consumeResponse = await fetch('/api/billing/consume', {
@@ -178,14 +181,18 @@ export default function DashboardPage() {
       status?: { remaining: { cvCreations: number | 'unlimited' } };
     };
 
+    console.log(`[CONSUME_RESPONSE] ok=${consumeResponse.ok}, success=${consumePayload.success}, allowed=${consumePayload.allowed}`);
+
     if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
-      // Quota consumption failed but resume was already created
-      // This shouldn't happen in normal flow but handle gracefully
+      // Quota consumption failed - clean up the resume we created
       setCreating(false);
-      addResume(newResume);
-      setCreateDialogOpen(false);
-      setNewResumeTitle('');
-      router.push(`/editor/${newResume.id}`);
+      console.log(`[CONSUME_FAILED] Deleting resume ${newResume.id}`);
+      
+      // Delete the resume we just created since quota consumption was denied
+      await deleteResume(newResume.id);
+      
+      // Show upgrade modal to user
+      setShowUpgradeModal(true);
       return;
     }
 
