@@ -9,7 +9,7 @@ interface ModernTemplateProps {
 }
 
 export function ModernTemplate({ content }: ModernTemplateProps) {
-  const { personal_info, summary, experience, education, skills } = content;
+  const { personal_info, summary, experience, education, skills, custom_sections } = content;
 
   return (
     <div className="bg-white p-8 max-w-[210mm] mx-auto shadow-lg">
@@ -170,6 +170,25 @@ export function ModernTemplate({ content }: ModernTemplateProps) {
             </div>
           ))}
         </section>
+      )}
+
+      {/* Custom Sections */}
+      {custom_sections && custom_sections.length > 0 && (
+        <>
+          {custom_sections
+            .sort((a, b) => a.order - b.order)
+            .map((section) => (
+              <section key={section.id} className="mb-6">
+                <h2 className="text-xl font-bold text-zinc-900 mb-3 uppercase tracking-wide">
+                  {section.title}
+                </h2>
+                <FormattedText
+                  text={section.content}
+                  className="text-zinc-700 leading-relaxed"
+                />
+              </section>
+            ))}
+        </>
       )}
     </div>
   );

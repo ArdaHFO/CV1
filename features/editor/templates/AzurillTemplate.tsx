@@ -59,7 +59,7 @@ const sectionClassName = cn(
  * Template: Azurill
  */
 export function AzurillTemplate({ content }: AzurillTemplateProps) {
-  const { personal_info, summary, experience, education, skills } = content;
+  const { personal_info, summary, experience, education, skills, custom_sections } = content;
 
   return (
     <div className="template-azurill bg-white p-8 max-w-[210mm] mx-auto">
@@ -190,6 +190,25 @@ export function AzurillTemplate({ content }: AzurillTemplateProps) {
                 ))}
               </div>
             </section>
+          )}
+
+          {/* Custom Sections */}
+          {custom_sections && custom_sections.length > 0 && (
+            <>
+              {custom_sections
+                .sort((a, b) => a.order - b.order)
+                .map((section) => (
+                  <section key={section.id} className={sectionClassName}>
+                    <h6 className="text-lg font-bold mb-4 text-zinc-900">{section.title}</h6>
+                    <div className="section-content">
+                      <FormattedText
+                        text={section.content}
+                        className="text-sm text-zinc-700 leading-relaxed"
+                      />
+                    </div>
+                  </section>
+                ))}
+            </>
           )}
         </main>
       </div>

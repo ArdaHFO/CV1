@@ -7,7 +7,7 @@ import {
   FileText, Sparkles, Globe, Zap, Shield, Lock, Eye, Download,
   CheckCircle, ArrowRight, Users, TrendingUp, Clock, Star,
   Lightbulb, Target, Rocket, ChevronDown, Code, Database,
-  Cpu, Layers, Linkedin, Search, Link2, QrCode
+  Cpu, Layers, Linkedin, Search, Link2, QrCode, Upload, PlusSquare
 } from 'lucide-react';
 import ShaderBackground from '@/components/ui/shader-background';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -484,6 +484,18 @@ export default function Home() {
                 title: 'Cloud Storage',
                 description: 'Your CVs are securely stored in the cloud. Access them from anywhere, on any device.',
                 gradient: 'from-cyan-500 to-blue-500'
+              },
+              {
+                icon: PlusSquare,
+                title: 'Custom Sections',
+                description: 'Add personalized sections like Awards, Volunteer Work, or Publications to showcase your unique achievements and stand out.',
+                gradient: 'from-violet-500 to-purple-600'
+              },
+              {
+                icon: Upload,
+                title: 'Import Existing CV',
+                description: 'Upload your PDF or DOCX resume and let AI automatically extract and optimize the content. Start editing instantly.',
+                gradient: 'from-blue-600 to-indigo-700'
               },
             ].map((feature, index) => (
               <GlareCard key={index} className="h-full">

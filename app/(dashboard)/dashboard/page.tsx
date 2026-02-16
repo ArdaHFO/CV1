@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Star,
   Pencil,
+  Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,6 +37,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UpgradeModal } from '@/components/ui/upgrade-modal';
+import { UploadCVDialog } from '@/components/ui/upload-cv-dialog';
 import { getCurrentUser } from '@/lib/auth/auth';
 import { getUserResumes, createResumeWithResult, deleteResume } from '@/lib/database/resumes';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
@@ -58,6 +60,7 @@ export default function DashboardPage() {
   const [remainingCvCreations, setRemainingCvCreations] = useState(1);
   const [cvLimitMessage, setCvLimitMessage] = useState('');
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [userId, setUserId] = useState('');
   const { isDark } = useAppDarkModeState();
 
@@ -282,22 +285,32 @@ export default function DashboardPage() {
           {cvLimitMessage && <p className="text-xs text-amber-700 dark:text-amber-400">{cvLimitMessage}</p>}
         </div>
 
-        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2 group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
-              Create New CV
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader className="space-y-3">
-              <DialogTitle className="text-2xl">Create New CV</DialogTitle>
-              <DialogDescription className="text-base">
-                Enter a title for your CV. For example: "Frontend Developer", "Project Manager"
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
+        <div className="flex gap-3">
+          <Button 
+            onClick={() => setUploadDialogOpen(true)}
+            variant="outline"
+            className="gap-2 group relative overflow-hidden border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 dark:border-blue-400 dark:text-blue-400 shadow-md hover:shadow-lg transition-all duration-300"
+          >
+            <Upload className="w-4 h-4" />
+            Import CV
+          </Button>
+
+          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2 group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+                Create New CV
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader className="space-y-3">
+                <DialogTitle className="text-2xl">Create New CV</DialogTitle>
+                <DialogDescription className="text-base">
+                  Enter a title for your CV. For example: "Frontend Developer", "Project Manager"
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-sm font-medium">CV Title</Label>
                 <Input
@@ -344,8 +357,9 @@ export default function DashboardPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+      </div>
 
-        {/* Rename Dialog */}
+      {/* Rename Dialog */}
         <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader className="space-y-3">
@@ -577,6 +591,12 @@ export default function DashboardPage() {
         open={showUpgradeModal}
         onOpenChange={setShowUpgradeModal}
         feature="cv-creation"
+      />
+
+      <UploadCVDialog
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        userId={userId}
       />
     </div>
   );

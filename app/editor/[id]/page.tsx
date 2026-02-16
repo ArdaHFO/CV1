@@ -24,6 +24,7 @@ import { PersonalInfoForm } from '@/features/editor/components/PersonalInfoForm'
 import { ExperienceForm } from '@/features/editor/components/ExperienceForm';
 import { EducationForm } from '@/features/editor/components/EducationForm';
 import { SkillsForm } from '@/features/editor/components/SkillsForm';
+import { CustomSectionForm } from '@/features/editor/components/CustomSectionForm';
 import { ModernTemplate } from '@/features/editor/templates/ModernTemplate';
 import { AzurillTemplate } from '@/features/editor/templates/AzurillTemplate';
 import { AcademicTemplate, generateLatexFromContent as generateLatexFromContentHelper } from '@/features/editor/templates/AcademicTemplate';
@@ -958,11 +959,12 @@ export default function EditorPage() {
             ) : (
               // Regular Forms for Other Templates
               <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="personal">Personal</TabsTrigger>
                 <TabsTrigger value="experience">Experience</TabsTrigger>
                 <TabsTrigger value="education">Education</TabsTrigger>
                 <TabsTrigger value="skills">Skills</TabsTrigger>
+                <TabsTrigger value="custom">Custom</TabsTrigger>
               </TabsList>
 
               <TabsContent value="personal" className="space-y-4">
@@ -1017,6 +1019,20 @@ export default function EditorPage() {
                   </CardHeader>
                   <CardContent>
                     <SkillsForm />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="custom" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Custom Sections</CardTitle>
+                    <CardDescription>
+                      Add custom sections like Awards, Volunteer Work, Publications, etc.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CustomSectionForm />
                   </CardContent>
                 </Card>
               </TabsContent>

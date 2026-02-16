@@ -13,7 +13,7 @@ interface AcademicTemplateProps {
 
 // Helper function to generate LaTeX from CV content
 function generateLatexFromContent(content: ResumeContent): string {
-  const { personal_info, summary, experience, education, skills } = content;
+  const { personal_info, summary, experience, education, skills, custom_sections } = content;
   
   return `\\documentclass[11pt,a4paper]{article}
 \\usepackage[utf8]{inputenc}
@@ -61,14 +61,18 @@ ${skills && skills.length > 0 ? `\\section*{Skills}
 ${skills.map(skill => `    \\item \\textbf{${skill.name}}${skill.level ? ` (${skill.level})` : ''}`).join('\n')}
 \\end{itemize}` : ''}
 
-\\end{document}`;
+${custom_sections && custom_sections.length > 0 ? custom_sections.sort((a, b) => a.order - b.order).map(section => `\\section*{${section.title}}
+
+${section.content}
+
+`).join('') : ''}\\end{document}`;
 }
 
 // Export the function for use in editor
 export { generateLatexFromContent };
 
 export function AcademicTemplate({ content, latexCode, onLatexChange, hideLatexCode = false }: AcademicTemplateProps) {
-  const { personal_info, summary, experience, education, skills } = content;
+  const { personal_info, summary, experience, education, skills, custom_sections } = content;
   
   const defaultLatex = generateLatexFromContent(content);
   const displayLatex = latexCode || defaultLatex;
@@ -194,6 +198,23 @@ export function AcademicTemplate({ content, latexCode, onLatexChange, hideLatexC
             ))}
           </div>
         </section>
+      )}
+
+      {/* Custom Sections */}
+      {custom_sections && custom_sections.length > 0 && (
+        <>
+          {custom_sections.sort((a, b) => a.order - b.order).map((section) => (
+            <section key={section.id} className="mb-6">
+              <h2 className="text-lg font-serif font-bold text-zinc-900 mb-3 border-b border-gray-200">
+                {section.title.toUpperCase()}
+              </h2>
+              <FormattedText
+                text={section.content}
+                className="text-sm text-zinc-700 leading-relaxed"
+              />
+            </section>
+          ))}
+        </>
       )}
 
       {/* LaTeX Code Section - Only show when not in editor */}
