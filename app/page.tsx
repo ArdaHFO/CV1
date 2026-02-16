@@ -617,7 +617,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 md:gap-4">
             {[
               {
                 step: '01',
@@ -642,13 +642,13 @@ export default function Home() {
                 key={index}
                 className="relative"
               >
-                <div className={`rounded-2xl p-8 backdrop-blur-md border transition-all hover:scale-105 ${
+                <div className={`rounded-2xl p-8 backdrop-blur-md border transition-all hover:scale-105 h-full ${
                   isDark 
                     ? 'bg-white/5 border-white/10 hover:bg-white/10' 
                     : 'bg-white/80 border-gray-200 hover:shadow-2xl'
                 }`}>
-                  <div className={`text-6xl font-bold mb-6 ${
-                    isDark ? 'text-white/10' : 'text-gray-100'
+                  <div className={`text-7xl font-black mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent ${
+                    isDark ? 'drop-shadow-lg' : ''
                   }`}>
                     {step.step}
                   </div>
@@ -665,9 +665,13 @@ export default function Home() {
                   </p>
                 </div>
                 {index < 2 && (
-                  <ArrowRight className={`hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 ${
-                    isDark ? 'text-white/20' : 'text-gray-300'
-                  }`} />
+                  <div className={`hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full border-2 ${
+                    isDark 
+                      ? 'bg-zinc-900 border-white/20 text-white/40' 
+                      : 'bg-white border-gray-300 text-gray-400'
+                  }`}>
+                    <ArrowRight className="w-5 h-5" />
+                  </div>
                 )}
               </div>
             ))}
@@ -772,83 +776,6 @@ export default function Home() {
                 </li>
               </ul>
             </div>
-          </div>
-        </section>
-
-        {/* Testimonials */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-16">
-            <h2 className={`text-4xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Loved by Job Seekers Worldwide
-            </h2>
-            <p className={`text-xl max-w-2xl mx-auto ${
-              isDark ? 'text-white/70' : 'text-gray-600'
-            }`}>
-              Join thousands of professionals who landed their dream jobs
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                name: 'Sarah Johnson',
-                role: 'Senior Software Engineer',
-                company: 'Google',
-                content: 'This tool helped me land my dream job at Google! The AI suggestions made my experience stand out.',
-                avatar: '👩‍💻',
-              },
-              {
-                name: 'Michael Chen',
-                role: 'Product Manager',
-                company: 'Meta',
-                content: 'I created 5 different CV versions for different roles. The customization options are incredible!',
-                avatar: '👨‍💼',
-              },
-              {
-                name: 'Emily Rodriguez',
-                role: 'Data Scientist',
-                company: 'Amazon',
-                content: 'The templates are so professional. I got 3x more interview calls after using this platform.',
-                avatar: '👩‍🔬',
-              },
-            ].map((testimonial, index) => (
-              <div
-                key={index}
-                className={`p-6 rounded-2xl backdrop-blur-3xl backdrop-saturate-200 border transition-all hover:scale-105 ${
-                  isDark 
-                    ? 'bg-white/[0.08] border-white/20 hover:bg-white/[0.12]' 
-                    : 'bg-white/30 border-gray-200/50 hover:shadow-xl'
-                }`}
-              >
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className={`mb-6 italic ${
-                  isDark ? 'text-white/80' : 'text-gray-700'
-                }`}>
-                  "{testimonial.content}"
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="text-3xl">{testimonial.avatar}</div>
-                  <div>
-                    <div className={`font-semibold ${
-                      isDark ? 'text-white' : 'text-gray-900'
-                    }`}>
-                      {testimonial.name}
-                    </div>
-                    <div className={`text-sm ${
-                      isDark ? 'text-white/60' : 'text-gray-600'
-                    }`}>
-                      {testimonial.role} at {testimonial.company}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </section>
 
