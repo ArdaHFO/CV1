@@ -80,7 +80,7 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
 
       setUploadStatus({
         type: 'success',
-        message: 'CV uploaded and parsed successfully!',
+        message: data.message || 'CV uploaded successfully! Please fill in your information.',
       });
 
       // Wait a moment then redirect to editor
@@ -138,7 +138,7 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
                     Processing your CV...
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    AI is extracting and optimizing content
+                    Processing your CV file...
                   </p>
                 </div>
               </div>
@@ -187,26 +187,30 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
           <div className="rounded-lg border border-gray-200 dark:border-gray-800 p-4">
             <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-              AI-Powered Features
+              Import Your CV
             </h4>
             <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <li className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                <span>Automatic content extraction from PDF/DOCX</span>
+                <span>Upload PDF or DOCX files (max 5MB)</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                <span>AI optimization and formatting</span>
+                <span>Creates a new CV with editable template</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                <span>Smart section detection (experience, education, skills)</span>
+                <span>Fill in your information in the editor</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
-                <span>Ready to edit and download instantly</span>
+                <span>Download and share when ready</span>
               </li>
             </ul>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 flex items-start gap-1">
+              <AlertCircle className="h-3 w-3 flex-shrink-0 mt-0.5" />
+              <span>Note: AI content extraction coming soon. Manual entry required for now.</span>
+            </p>
           </div>
 
           {/* Action Buttons */}
