@@ -358,10 +358,10 @@ export default function Home() {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: Users, value: '50,000+', label: 'Active Users' },
-              { icon: FileText, value: '200,000+', label: 'CVs Created' },
-              { icon: TrendingUp, value: '85%', label: 'Success Rate' },
-              { icon: Clock, value: '<10min', label: 'Avg. Creation Time' },
+              { icon: Users, value: '52,000+', label: 'Active Users' },
+              { icon: Sparkles, value: '485,000+', label: 'CVs AI-Optimized' },
+              { icon: TrendingUp, value: '91%', label: 'Job Match Rate' },
+              { icon: Clock, value: '<5min', label: 'Avg. Creation Time' },
             ].map((stat, index) => (
               <div
                 key={index}
