@@ -379,6 +379,8 @@ export default function JobDetailPage() {
   const handleOptimize = async () => {
     if (!job || !selectedResumeId) return;
 
+    console.log(`[JOB_OPTIMIZE_START] jobId=${job.id}, resumeId=${selectedResumeId}`);
+
     // Check billing limits before optimization
     const consumeResponse = await fetch('/api/billing/consume', {
       method: 'POST',
@@ -392,12 +394,16 @@ export default function JobDetailPage() {
       message?: string;
     };
 
+    console.log(`[JOB_OPTIMIZE_CONSUME] ok=${consumeResponse.ok}, success=${consumePayload.success}, allowed=${consumePayload.allowed}, message=${consumePayload.message}`);
+
     if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
       // Show upgrade modal for free users
+      console.log(`[JOB_OPTIMIZE_BLOCKED] Showing upgrade modal`);
       setShowUpgradeModal(true);
       return;
     }
 
+    console.log(`[JOB_OPTIMIZE_ALLOWED] Starting optimization`);
     setOptimizing(true);
 
     try {
