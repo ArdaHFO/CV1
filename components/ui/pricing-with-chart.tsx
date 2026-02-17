@@ -2,21 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { CheckCircleIcon } from 'lucide-react';
-import { CartesianGrid, Line, LineChart, XAxis } from 'recharts';
-
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from '@/components/ui/card';
-import {
-	type ChartConfig,
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-} from '@/components/ui/chart';
 
 interface PricingWithChartProps {
 	isDark?: boolean;
@@ -30,28 +15,28 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 				<h1 className={`text-4xl font-extrabold tracking-tight lg:text-5xl ${
 					isDark ? 'text-white' : 'text-gray-900'
 				}`}>
-					Simple Plans for Every Job Seeker
+					Simple Plans for Focused Job Search
 				</h1>
 				<p className={`mt-4 text-sm md:text-base ${
 					isDark ? 'text-white/70' : 'text-gray-600'
 				}`}>
-					Start free, then upgrade when you need higher limits and advanced AI tools.
+					Start free, then upgrade when you need more searches, optimizations, and tracking.
 				</p>
 			</div>
 
 			{/* Pricing Grid */}
-			<div className={`grid rounded-xl border md:grid-cols-6 ${
-				isDark 
-					? 'bg-white/5 border-white/20 backdrop-blur-md' 
+			<div className={`grid gap-6 rounded-xl border p-6 lg:grid-cols-3 ${
+				isDark
+					? 'bg-white/5 border-white/20 backdrop-blur-md'
 					: 'bg-white border-gray-200 shadow-xl'
 			}`}>
 				{/* Free Plan */}
-				<div className={`flex flex-col justify-between border-b p-6 md:col-span-2 md:border-r md:border-b-0 ${
-					isDark ? 'border-white/20' : 'border-gray-200'
+				<div className={`rounded-xl border p-6 ${
+					isDark ? 'border-white/20 bg-white/5' : 'border-gray-200 bg-white'
 				}`}>
 					<div className="space-y-4">
 						<div>
-							<h2 className={`inline rounded-[2px] p-1 text-xl font-semibold ${
+							<h2 className={`text-xl font-semibold ${
 								isDark ? 'text-white' : 'text-gray-900'
 							}`}>
 								Free
@@ -62,33 +47,25 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 							<p className={`text-sm ${
 								isDark ? 'text-white/60' : 'text-gray-600'
 							}`}>
-								Great for trying CSpark
+								Try CSpark and build your first job-tailored CV.
 							</p>
 						</div>
-
 						<Button asChild variant="outline" className={`w-full ${
-							isDark 
-								? 'border-white/20 bg-white/10 text-white hover:bg-white/20' 
+							isDark
+								? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
 								: 'border-gray-300 hover:bg-gray-50'
 						}`}>
-							<a href="/register">Get Started</a>
+							<a href="/register">Start Free</a>
 						</Button>
-
-						<div className={`my-6 h-px w-full ${
-							isDark ? 'bg-white/20' : 'bg-gray-200'
-						}`} />
-
-						<ul className={`space-y-3 text-sm ${
+						<ul className={`mt-6 space-y-3 text-sm ${
 							isDark ? 'text-white/70' : 'text-gray-600'
 						}`}>
 							{[
+								{ text: '1 LinkedIn job search', bold: true },
 								{ text: '1 CV creation', bold: true },
-								{ text: '1 CV optimization per account', bold: true },
-								{ text: '1 job search (up to 25 results)', bold: false },
-								{ text: 'Manual CV editing', bold: false },
-								{ text: 'Download as PDF', bold: false },
-								{ text: 'Shareable links (7-day expiration)', bold: false },
-								{ text: 'Basic support', bold: false },
+								{ text: '1 CV optimization', bold: true },
+								{ text: 'ATS-friendly templates', bold: false },
+								{ text: 'Shareable CV link + QR', bold: false },
 							].map((item, index) => (
 								<li key={index} className={`flex items-center gap-2 ${
 									item.bold ? 'font-semibold' : ''
@@ -102,157 +79,93 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 				</div>
 
 				{/* Pro Plan */}
-				<div className="z-10 grid gap-8 overflow-hidden p-6 md:col-span-4 lg:grid-cols-2">
-					{/* Pricing + Chart */}
-					<div className="flex flex-col justify-between space-y-6">
-						<div>
+				<div className={`rounded-xl border p-6 ${
+					isDark ? 'border-violet-400/40 bg-white/5' : 'border-violet-200 bg-white'
+				}`}>
+					<div className="space-y-4">
+						<div className="flex items-center justify-between">
 							<h2 className={`text-xl font-semibold ${
 								isDark ? 'text-white' : 'text-gray-900'
 							}`}>
 								Pro
 							</h2>
-							<span className="my-3 block text-3xl font-bold bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent">
-								$19.99<span className={`text-base ml-1 ${isDark ? 'text-white/60' : 'text-gray-600'}`}>/month</span>
+							<span className={`text-xs font-semibold px-2 py-1 rounded-full ${
+								isDark ? 'bg-violet-500/20 text-violet-200' : 'bg-violet-100 text-violet-700'
+							}`}>
+								Most Popular
 							</span>
-							<p className={`text-sm ${
-								isDark ? 'text-white/60' : 'text-gray-600'
-							}`}>
-								or $79.99/year (best value)
-							</p>
-							<p className={`text-sm ${
-								isDark ? 'text-white/60' : 'text-gray-600'
-							}`}>
-								For serious job seekers
-							</p>
 						</div>
-						<div className={`h-fit w-full rounded-lg border p-2 ${
-							isDark 
-								? 'bg-white/5 border-white/20' 
-								: 'bg-gray-50 border-gray-200'
-						}`}>
-							<InterestChart isDark={isDark} />
-						</div>
-					</div>
-					{/* Features */}
-					<div className="relative w-full">
-						<div className={`text-sm font-medium ${
-							isDark ? 'text-white' : 'text-gray-900'
-						}`}>
-							Everything in Free plus:
-						</div>
-						<ul className={`mt-4 space-y-3 text-sm ${
+						<span className="my-3 block text-3xl font-bold bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent">
+							$19.99<span className={`text-base ml-1 ${isDark ? 'text-white/60' : 'text-gray-600'}`}>/month</span>
+						</span>
+						<p className={`text-sm ${
 							isDark ? 'text-white/70' : 'text-gray-600'
 						}`}>
-							{[
-								{ text: 'Unlimited CV creation', bold: true },
-								{ text: 'Unlimited AI-powered CV optimization', bold: true },
-								{ text: '10 job searches per cycle', bold: true },
-								{ text: 'Result limits: 25, 50, or all', bold: false },
-								{ text: 'Job posting-specific tailoring', bold: false },
-								{ text: 'Automatic cover letter generation', bold: false },
-								{ text: 'LinkedIn job search integration', bold: false },
-								{ text: 'Permanent shareable links (no expiration)', bold: false },
-								{ text: 'QR code CV sharing', bold: false },
-								{ text: 'Multiple CV version management', bold: false },
-								{ text: 'Priority support', bold: false },
-							].map((item, index) => (
-								<li key={index} className={`flex items-center gap-2 ${
-									item.bold ? 'font-semibold' : ''
-								}`}>
-									<CheckCircleIcon className="h-4 w-4 text-violet-500" />
-									{item.text}
-								</li>
-							))}
-						</ul>
-
-						{/* Call to Action */}
-						<div className="mt-10 grid w-full grid-cols-2 gap-2.5">
-							<Button
-								asChild
-								className="bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:from-blue-700 hover:to-violet-700"
-							>
-									<a href="/register">Upgrade to Pro</a>
-								</Button>
-								<Button asChild variant="outline" className={
-									isDark 
-										? 'border-white/20 bg-white/10 text-white hover:bg-white/20' 
-										: 'border-gray-300 hover:bg-gray-50'
-								}>
-									<a href="/register">View Plans</a>
-							</Button>
+							$79.99/year ($6.66/mo). Save 60% annually.
+						</p>
+						<Button asChild className="w-full bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:from-blue-700 hover:to-violet-700">
+							<a href="/register">Unlock Pro</a>
+						</Button>
+						<div className={`rounded-lg border p-4 ${
+							isDark ? 'border-white/10 bg-white/5' : 'border-gray-200 bg-gray-50'
+						}`}>
+							<div className={`text-sm font-semibold ${
+								isDark ? 'text-white' : 'text-gray-900'
+							}`}>
+								Pro Unlocks
+							</div>
+							<ul className={`mt-3 space-y-2 text-sm ${
+								isDark ? 'text-white/70' : 'text-gray-600'
+							}`}>
+								{[
+									'Unlimited CV creation and optimization',
+									'10 LinkedIn job searches per cycle',
+									'Job-specific CV versions and history',
+									'Application tracker + interview notes',
+									'Advanced templates and sharing controls',
+								].map((item, index) => (
+									<li key={index} className="flex items-center gap-2">
+										<CheckCircleIcon className="h-4 w-4 text-violet-500" />
+										{item}
+									</li>
+								))}
+							</ul>
 						</div>
+					</div>
+				</div>
+
+				{/* Comparison */}
+				<div className={`rounded-xl border p-6 ${
+					isDark ? 'border-white/20 bg-white/5' : 'border-gray-200 bg-white'
+				}`}>
+					<div className={`text-sm font-semibold ${
+						isDark ? 'text-white' : 'text-gray-900'
+					}`}>
+						Free vs Pro
+					</div>
+					<div className={`mt-4 grid gap-3 text-sm ${
+						isDark ? 'text-white/70' : 'text-gray-600'
+					}`}>
+						{[
+							{ label: 'LinkedIn job searches', free: '1', pro: '10 / cycle' },
+							{ label: 'CV creations', free: '1', pro: 'Unlimited' },
+							{ label: 'CV optimizations', free: '1', pro: 'Unlimited' },
+							{ label: 'Templates', free: 'Basic', pro: 'All' },
+							{ label: 'Shareable links + QR', free: 'Yes', pro: 'Yes + privacy controls' },
+							{ label: 'Version history', free: 'No', pro: 'Yes' },
+							{ label: 'Application tracker', free: 'No', pro: 'Yes' },
+						].map((row, index) => (
+							<div key={index} className={`grid grid-cols-[1.4fr_0.8fr_0.9fr] gap-2 rounded-lg p-2 ${
+								isDark ? 'bg-white/5' : 'bg-gray-50'
+							}`}>
+								<span className={isDark ? 'text-white/90' : 'text-gray-900'}>{row.label}</span>
+								<span className="text-center">{row.free}</span>
+								<span className="text-center font-semibold text-blue-500">{row.pro}</span>
+							</div>
+						))}
 					</div>
 				</div>
 			</div>
 		</div>
-	);
-}
-
-function InterestChart({ isDark = true }: { isDark?: boolean }) {
-	const chartData = [
-		{ month: 'January', interest: 120 },
-		{ month: 'February', interest: 180 },
-		{ month: 'March', interest: 150 },
-		{ month: 'April', interest: 210 },
-		{ month: 'May', interest: 250 },
-		{ month: 'June', interest: 300 },
-		{ month: 'July', interest: 280 },
-		{ month: 'August', interest: 320 },
-		{ month: 'September', interest: 340 },
-		{ month: 'October', interest: 390 },
-		{ month: 'November', interest: 420 },
-		{ month: 'December', interest: 500 },
-	];
-
-	const chartConfig = {
-		interest: {
-			label: 'Users',
-			color: isDark ? 'hsl(250, 70%, 60%)' : 'hsl(250, 70%, 50%)',
-		},
-	} satisfies ChartConfig;
-
-	return (
-		<Card className={
-			isDark 
-				? 'bg-white/5 border-white/10' 
-				: 'bg-white border-gray-200'
-		}>
-			<CardHeader className={`space-y-0 border-b p-3 ${
-				isDark ? 'border-white/10' : 'border-gray-200'
-			}`}>
-				<CardTitle className={`text-lg ${
-					isDark ? 'text-white' : 'text-gray-900'
-				}`}>
-					User Interest
-				</CardTitle>
-				<CardDescription className={`text-xs ${
-					isDark ? 'text-white/60' : 'text-gray-600'
-				}`}>
-					Number of users subscribed to Pro plan in the last 12 months.
-				</CardDescription>
-			</CardHeader>
-			<CardContent className="p-3">
-				<ChartContainer config={chartConfig} className="h-[200px] w-full">
-					<LineChart data={chartData} margin={{ left: 12, right: 12 }}>
-						<CartesianGrid vertical={false} />
-						<XAxis
-							dataKey="month"
-							tickLine={false}
-							axisLine={false}
-							tickMargin={8}
-							tickFormatter={(value) => value.slice(0, 3)}
-						/>
-						<ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-						<Line
-							dataKey="interest"
-							type="monotone"
-							stroke="var(--color-interest)"
-							strokeWidth={2}
-							dot={false}
-						/>
-					</LineChart>
-				</ChartContainer>
-			</CardContent>
-		</Card>
 	);
 }

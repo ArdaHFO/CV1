@@ -13,7 +13,6 @@ import ShaderBackground from '@/components/ui/shader-background';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { PricingWithChart } from '@/components/ui/pricing-with-chart';
 import { GlareCard } from '@/components/ui/glare-card';
-import AnimatedTextCycle from '@/components/ui/animated-text-cycle';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import type { User } from '@/types';
@@ -48,6 +47,72 @@ export default function Home() {
     currentUser?.full_name?.trim() ||
     currentUser?.email?.split('@')[0] ||
     'Dashboard';
+
+  const faqItems = [
+    {
+      q: 'Can I search for LinkedIn jobs in the platform?',
+      a: 'Yes! Our platform integrates with LinkedIn job search. You can browse thousands of job postings directly within our app, and for each job, our AI will automatically analyze the requirements and optimize your CV to match perfectly.',
+    },
+    {
+      q: 'Is CSpark really free?',
+      a: 'Yes. CSpark has a freemium plan with 1 CV creation and 1 job search (up to 25 results). You can upgrade to Pro for 10 job searches, higher result limits (25/50/all), and unlimited CV creation.',
+    },
+    {
+      q: 'How does the AI optimization work?',
+      a: 'Our AI analyzes job descriptions and optimizes your CV content to match required skills and keywords. It suggests improvements and rewrites sections to make them more compelling.',
+    },
+    {
+      q: 'Is my data secure?',
+      a: 'Absolutely. We use bank-level encryption, are GDPR compliant, and never sell your data. You have full control over your information and can delete it anytime.',
+    },
+    {
+      q: 'Can I create multiple CVs?',
+      a: 'On Free, you can create 1 CV. On Pro, you can create unlimited CVs and keep separate versions for different applications.',
+    },
+    {
+      q: 'What export formats do you support?',
+      a: 'You can export your CV as a high-quality PDF. We also provide shareable online links and QR codes for digital sharing.',
+    },
+  ];
+
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'CSpark',
+      description:
+        'AI resume builder with real-time LinkedIn job search, ATS optimization, and job-specific CV tailoring.',
+      applicationCategory: 'CareerApplication',
+      operatingSystem: 'Web',
+      url: 'https://www.cspark.app',
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'Free',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+        {
+          '@type': 'Offer',
+          name: 'Pro',
+          price: '19.99',
+          priceCurrency: 'USD',
+        },
+      ],
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqItems.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: faq.a,
+        },
+      })),
+    },
+  ];
 
   return (
     <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
@@ -93,6 +158,10 @@ export default function Home() {
       </nav>
 
       <main className="relative z-10">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {/* Hero Section */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
           <div className="text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -111,38 +180,22 @@ export default function Home() {
             <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight ${
               isDark ? 'text-white' : 'text-gray-900'
             }`}>
-              Create Your Perfect CV
+              Search LinkedIn jobs and tailor your CV
               <br />
               <span className={`${
                 isDark
                   ? 'text-violet-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]'
                   : 'bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent'
               }`}>
-                10x{' '}
-                <AnimatedTextCycle
-                  words={[
-                    'Smarter',
-                    'Sharper',
-                    'Quicker',
-                    'Better',
-                    'Stronger',
-                  ]}
-                  interval={2600}
-                  className={`${
-                    isDark
-                      ? 'text-fuchsia-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]'
-                      : 'bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent'
-                  }`}
-                />{' '}
-                with AI
+                in one focused workflow
               </span>
             </h1>
 
             <p className={`max-w-3xl mx-auto text-xl leading-relaxed ${
               isDark ? 'text-white/95 drop-shadow-[0_2px_8px_rgba(0,0,0,0.75)]' : 'text-gray-700'
             }`}>
-              Transform your job search with CSpark. Get job-specific CV suggestions for every listing,
-              review each change, and approve only what you want to apply.
+              CSpark combines real-time LinkedIn search with AI CV optimization, so every application
+              is job-specific without copy-paste chaos or scattered tools.
             </p>
 
             {/* AI Badge */}
@@ -170,18 +223,18 @@ export default function Home() {
                 href="/register"
                 className="group px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-105 flex items-center gap-2"
               >
-                Start Building for Free
+                Search LinkedIn Jobs
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="#features"
+                href="#workflow"
                 className={`px-8 py-4 text-lg font-semibold border-2 rounded-xl backdrop-blur-sm transition-all hover:scale-105 ${
                   isDark 
                     ? 'border-white/30 bg-white/10 text-white hover:bg-white/20' 
                     : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
                 }`}
               >
-                Explore Features
+                See CV Tailoring
               </Link>
             </div>
 
@@ -200,7 +253,7 @@ export default function Home() {
         </section>
 
         {/* LinkedIn Integration Highlight */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <section id="workflow" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className={`rounded-3xl p-12 backdrop-blur-md border overflow-hidden relative ${
             isDark 
               ? 'bg-gradient-to-br from-blue-900/30 via-purple-900/30 to-pink-900/30 border-blue-500/20' 
@@ -243,7 +296,6 @@ export default function Home() {
 
                 <div className="space-y-4">
                   {[
-                    { icon: Search, text: 'Search thousands of LinkedIn job postings' },
                     { icon: Sparkles, text: 'AI analyzes job requirements automatically' },
                     { icon: Target, text: 'CV optimized with relevant keywords & skills' },
                     { icon: Target, text: 'See suggested CV edits before applying them' },
@@ -790,32 +842,7 @@ export default function Home() {
           </div>
 
           <div className="space-y-4">
-            {[
-              {
-                q: 'Can I search for LinkedIn jobs in the platform?',
-                a: 'Yes! Our platform integrates with LinkedIn job search. You can browse thousands of job postings directly within our app, and for each job, our AI will automatically analyze the requirements and optimize your CV to match perfectly.',
-              },
-              {
-                q: 'Is CSpark really free?',
-                a: 'Yes. CSpark has a freemium plan with 1 CV creation and 1 job search (up to 25 results). You can upgrade to Pro for 10 job searches, higher result limits (25/50/all), and unlimited CV creation.',
-              },
-              {
-                q: 'How does the AI optimization work?',
-                a: 'Our AI analyzes job descriptions and optimizes your CV content to match required skills and keywords. It suggests improvements and rewrites sections to make them more compelling.',
-              },
-              {
-                q: 'Is my data secure?',
-                a: 'Absolutely. We use bank-level encryption, are GDPR compliant, and never sell your data. You have full control over your information and can delete it anytime.',
-              },
-              {
-                q: 'Can I create multiple CVs?',
-                a: 'On Free, you can create 1 CV. On Pro, you can create unlimited CVs and keep separate versions for different applications.',
-              },
-              {
-                q: 'What export formats do you support?',
-                a: 'You can export your CV as a high-quality PDF. We also provide shareable online links and QR codes for digital sharing.',
-              },
-            ].map((faq, index) => (
+            {faqItems.map((faq, index) => (
               <div
                 key={index}
                 className={`rounded-xl backdrop-blur-md border overflow-hidden ${
@@ -850,6 +877,210 @@ export default function Home() {
                 )}
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Differentiation */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-14">
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
+              isDark
+                ? 'bg-blue-500/20 border-blue-500/30 text-blue-300'
+                : 'bg-blue-100 border-blue-300 text-blue-700'
+            }`}>
+              <Target className="w-4 h-4" />
+              <span className="text-sm font-semibold">Positioning</span>
+            </span>
+            <h2 className={`text-4xl font-bold mb-4 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              LinkedIn-first job search + CV tailoring in one place
+            </h2>
+            <p className={`text-xl max-w-3xl mx-auto ${
+              isDark ? 'text-white/70' : 'text-gray-600'
+            }`}>
+              CSpark replaces the usual tool stack: LinkedIn, docs, and ChatGPT. Search jobs, tailor a CV
+              for each role, track applications, and share the result from one dashboard.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {[
+              {
+                title: 'ResumeWorded',
+                copy: 'Great for static CV scoring, but no embedded job search or job-specific workflow.',
+              },
+              {
+                title: 'Kickresume',
+                copy: 'Template-first builder with limited job targeting and no LinkedIn pipeline.',
+              },
+              {
+                title: 'ChatGPT',
+                copy: 'Powerful writing, but manual copy-paste and no ATS templates or tracking.',
+              },
+            ].map((item) => (
+              <div key={item.title} className={`rounded-2xl border p-6 ${
+                isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
+              }`}>
+                <h3 className={`text-lg font-semibold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {item.title}
+                </h3>
+                <p className={`mt-3 text-sm ${
+                  isDark ? 'text-white/70' : 'text-gray-600'
+                }`}>
+                  {item.copy}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className={`mt-10 rounded-2xl border p-6 ${
+            isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
+          }`}>
+            <div className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              Differentiation Matrix
+            </div>
+            <div className={`mt-4 grid gap-3 text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
+              {[
+                { label: 'LinkedIn job search inside the product', cspark: 'Yes', other: 'No' },
+                { label: 'Job-specific CV tailoring workflow', cspark: 'Yes', other: 'Partial' },
+                { label: 'ATS-ready templates + PDF export', cspark: 'Yes', other: 'Varies' },
+                { label: 'Shareable CV links + QR', cspark: 'Yes', other: 'Rare' },
+                { label: 'Application tracking + notes', cspark: 'Yes', other: 'No' },
+              ].map((row) => (
+                <div key={row.label} className={`grid grid-cols-[1.6fr_0.7fr_0.7fr] gap-2 rounded-lg p-2 ${
+                  isDark ? 'bg-white/5' : 'bg-gray-50'
+                }`}>
+                  <span className={isDark ? 'text-white/90' : 'text-gray-900'}>{row.label}</span>
+                  <span className="text-center font-semibold text-blue-500">{row.cspark}</span>
+                  <span className="text-center">{row.other}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Product Roadmap */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="text-center mb-14">
+            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
+              isDark
+                ? 'bg-purple-500/20 border-purple-500/30 text-purple-300'
+                : 'bg-purple-100 border-purple-300 text-purple-700'
+            }`}>
+              <Rocket className="w-4 h-4" />
+              <span className="text-sm font-semibold">Roadmap Expansion</span>
+            </span>
+            <h2 className={`text-4xl font-bold mb-4 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              Build a complete job application system
+            </h2>
+            <p className={`text-xl max-w-3xl mx-auto ${
+              isDark ? 'text-white/70' : 'text-gray-600'
+            }`}>
+              Product expansion focuses on measurable outcomes: response rate, interviews, and faster hiring cycles.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {[
+              {
+                icon: Database,
+                title: 'Application Tracker',
+                copy: 'Track Applied, Screening, Interview, Offer, Rejected. Add interview notes and reminders.',
+              },
+              {
+                icon: Layers,
+                title: 'CV Change History + A/B',
+                copy: 'Job-specific versions, compare changes, and learn which edits improve response rates.',
+              },
+              {
+                icon: Cpu,
+                title: 'Reusable CV Snippets',
+                copy: 'Save bullet blocks by category and insert them into future tailored CVs in one click.',
+              },
+              {
+                icon: Linkedin,
+                title: 'Chrome Extension (MVP)',
+                copy: 'Autofill Easy Apply, pull job details, and sync application status back to CSpark.',
+              },
+              {
+                icon: TrendingUp,
+                title: 'Analytics Layer',
+                copy: 'Response rate by template, job category, and funnel: Views -> Applications -> Interviews.',
+              },
+              {
+                icon: Shield,
+                title: 'Privacy Controls',
+                copy: 'Public/private links, expiring QR access, view tracking, and instant revocation.',
+              },
+            ].map((item) => (
+              <div key={item.title} className={`rounded-2xl border p-6 ${
+                isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
+              }`}>
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 ${
+                  isDark ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'
+                }`}>
+                  <item.icon className="w-6 h-6" />
+                </div>
+                <h3 className={`text-lg font-semibold ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {item.title}
+                </h3>
+                <p className={`mt-3 text-sm ${
+                  isDark ? 'text-white/70' : 'text-gray-600'
+                }`}>
+                  {item.copy}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Privacy + Platform Scope */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className={`rounded-2xl border p-8 ${
+              isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <Lock className={`w-5 h-5 ${isDark ? 'text-blue-300' : 'text-blue-600'}`} />
+                <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  Privacy controls built for sharing
+                </h3>
+              </div>
+              <ul className={`space-y-3 text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
+                {[
+                  'Public, private, or password-protected CV links',
+                  'Expiring links and QR access windows',
+                  'View tracking and analytics toggles',
+                  'Instant access revocation',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <Eye className="w-4 h-4 text-blue-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className={`rounded-2xl border p-8 ${
+              isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
+            }`}>
+              <div className="flex items-center gap-3 mb-4">
+                <Globe className={`w-5 h-5 ${isDark ? 'text-purple-300' : 'text-purple-600'}`} />
+                <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  LinkedIn-first focus, with expansion built in
+                </h3>
+              </div>
+              <p className={`text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
+                CSpark stays LinkedIn-first to deliver the best job-matching workflow today. The roadmap expands
+                to other platforms without diluting the core promise: find a job and tailor the CV inside one flow.
+              </p>
+            </div>
           </div>
         </section>
 

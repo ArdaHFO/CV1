@@ -14,8 +14,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CSpark",
-  description: "CSpark - AI powered CV builder and career hub",
+  title: "CSpark | AI Resume Builder + LinkedIn Job Search",
+  description:
+    "CSpark is an AI resume builder with real-time LinkedIn job search. Tailor your CV to each job, optimize for ATS, and apply faster with shareable links and QR codes.",
+  keywords: [
+    "AI Resume Builder",
+    "LinkedIn Job Search",
+    "ATS Optimization",
+    "CV Tailoring Tool",
+    "AI CV Optimization",
+    "Resume ATS checker",
+    "LinkedIn resume targeting",
+    "Job application dashboard",
+  ],
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
