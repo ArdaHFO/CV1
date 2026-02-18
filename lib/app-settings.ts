@@ -25,7 +25,6 @@ export interface AppSettings {
     allowAnalytics: boolean;
     dataRetention: '30' | '90' | '180' | '365' | 'forever';
   };
-  language: 'en' | 'tr' | 'es' | 'de' | 'fr';
   integrations: {
     linkedinConnected: boolean;
     googleDriveConnected: boolean;
@@ -62,7 +61,6 @@ export const defaultAppSettings: AppSettings = {
     allowAnalytics: true,
     dataRetention: '90',
   },
-  language: 'en',
   integrations: {
     linkedinConnected: false,
     googleDriveConnected: false,
@@ -92,7 +90,6 @@ export function normalizeAppSettings(raw: Partial<AppSettings> | null | undefine
       ...defaultAppSettings.privacy,
       ...(raw.privacy || {}),
     },
-    language: raw.language || defaultAppSettings.language,
     integrations: {
       ...defaultAppSettings.integrations,
       ...(raw.integrations || {}),
@@ -134,7 +131,6 @@ export function applyAppSettingsToDocument(settings: AppSettings) {
   document.documentElement.style.fontSize = resolveFontSizePx(settings);
   document.body.classList.toggle('compact-mode', settings.appearance.compactMode);
   document.documentElement.setAttribute('data-color-scheme', settings.appearance.colorScheme);
-  document.documentElement.lang = settings.language;
 
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('app-settings-updated'));

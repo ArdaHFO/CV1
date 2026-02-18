@@ -88,7 +88,7 @@ export default function SettingsPage() {
     if (!isLoaded) return;
     applyAppSettingsToDocument(settings);
     setIsDark(resolveIsDarkMode(settings));
-  }, [settings.appearance, settings.language, isLoaded]);
+  }, [settings.appearance, isLoaded]);
 
   useEffect(() => {
     if (!isLoaded || settings.appearance.theme !== 'system') return;
@@ -158,15 +158,6 @@ export default function SettingsPage() {
   const updateSetting = (section: keyof Settings, key: string, value: any) => {
     setSaved(false);
     setSettings((prev) => {
-      // Handle language as a direct value, not an object
-      if (section === 'language') {
-        return {
-          ...prev,
-          [section]: value,
-        };
-      }
-      
-      // Handle object-based sections
       return {
         ...prev,
         [section]: {
@@ -206,7 +197,6 @@ export default function SettingsPage() {
                     { id: 'notifications', label: 'Notifications', icon: Bell },
                     { id: 'privacy', label: 'Privacy', icon: Lock },
                     { id: 'integrations', label: 'Integrations', icon: Globe },
-                    { id: 'language', label: 'Language', icon: Globe },
                   ].map(({ id, label, icon: Icon }) => (
                     <button
                       key={id}
@@ -479,36 +469,7 @@ export default function SettingsPage() {
                 </div>
               )}
 
-              {/* Language */}
-              {activeTab === 'language' && (
-                <div className="border-4 border-black bg-white">
-                  <div className="p-5 border-b-2 border-black">
-                    <p className="text-base font-black uppercase tracking-widest">Language & Localization</p>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Choose your preferred language</p>
-                  </div>
-                  <div className="p-5 space-y-5">
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-black uppercase tracking-widest block">Interface Language</label>
-                      <Select value={settings.language} onValueChange={(v) => updateSetting('language', 'language', v)}>
-                        <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="en">English</SelectItem>
-                          <SelectItem value="tr">Türkçe (Turkish)</SelectItem>
-                          <SelectItem value="es">Español (Spanish)</SelectItem>
-                          <SelectItem value="de">Deutsch (German)</SelectItem>
-                          <SelectItem value="fr">Français (French)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="border-2 border-black bg-[#F2F2F2] p-4">
-                      <p className="text-xs font-black uppercase tracking-widest">Note</p>
-                      <p className="text-[10px] font-bold text-black/60 mt-1">
-                        Language preference is applied immediately and saved automatically.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+
 
               {/* Save row */}
               <div className="mt-6 flex items-center justify-between">
