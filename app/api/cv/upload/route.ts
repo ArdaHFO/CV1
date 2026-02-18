@@ -225,12 +225,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Check CV import billing quota before processing
-    const billingResult = await consumeUsage(userId, 'cv-import');
-    if (!billingResult.allowed) {
-      return NextResponse.json(
-        { success: false, error: billingResult.message, code: 'import_limit_reached' },
-        { status: 403 }
-      );
+    // Wrapped in try-catch: if billing DB is unavailable (e.g. migration not yet run),
+    // we allow the import rather than blocking the user.
+    try {
+      const billingResult = await consumeUsage(userId, 'cv-import');
+      if (!billingResult.allowed) {
+        return NextResponse.json(
+          { success: false, error: billingResult.message, code: 'import_limit_reached' },
+          { status: 403 }
+        );
+      }
+    } catch (billingError) {
+      console.error('[CV_UPLOAD] Billing check failed, allowing import:', billingError);
+      // Fall through – never block a user due to a billing system error
     }
 
     // Validate file type

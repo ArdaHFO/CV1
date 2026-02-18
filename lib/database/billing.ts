@@ -411,7 +411,16 @@ export async function consumeUsage(
       .update(updates)
       .eq('user_id', userId);
 
-    if (error) throw error;
+    // If the update fails (e.g. columns not yet migrated), still allow the import
+    // rather than throwing and blocking the user.
+    if (error) {
+      console.error(`[CONSUME_IMPORT_UPDATE_ERROR] userId=${userId}, columns may not be migrated yet:`, error);
+      return {
+        allowed: true,
+        message: 'CV import allowed (billing tracking temporarily unavailable).',
+        status,
+      };
+    }
 
     console.log(`[CONSUME_IMPORT_SUCCESS] userId=${userId}`);
     return {
