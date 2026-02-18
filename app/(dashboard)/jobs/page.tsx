@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Search, MapPin, Briefcase, ExternalLink } from 'lucide-react';
+import { Search, MapPin, Briefcase, ExternalLink, EyeOff, CheckCircle2, RotateCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
+import { getJobStatus, trackJob, removeTrackedJob, type JobTrackerStatus } from '@/lib/job-tracker';
 import type { Job } from '@/types';
 
 type PlanTier = 'freemium' | 'pro';
@@ -30,7 +31,31 @@ export default function JobsPage() {
   const [remainingSearches, setRemainingSearches] = useState(1);
   const [remainingTokenSearches, setRemainingTokenSearches] = useState(0);
   const [usageMessage, setUsageMessage] = useState('');
+  // job-tracker statuses (jobId → status)
+  const [jobStatuses, setJobStatuses] = useState<Record<string, JobTrackerStatus>>({});
   const { isDark } = useAppDarkModeState();
+
+  // Load tracker statuses from localStorage
+  const refreshStatuses = (jobList: Job[]) => {
+    const statuses: Record<string, JobTrackerStatus> = {};
+    for (const job of jobList) {
+      const s = getJobStatus(job.id);
+      if (s) statuses[job.id] = s;
+    }
+    setJobStatuses(statuses);
+  };
+
+  const handleSkip = (e: React.MouseEvent, job: Job) => {
+    e.stopPropagation();
+    trackJob(job, 'skipped');
+    setJobStatuses((prev) => ({ ...prev, [job.id]: 'skipped' }));
+  };
+
+  const handleUndoTrack = (e: React.MouseEvent, jobId: string) => {
+    e.stopPropagation();
+    removeTrackedJob(jobId);
+    setJobStatuses((prev) => { const next = { ...prev }; delete next[jobId]; return next; });
+  };
 
   const canUseResultLimitOption = (tier: PlanTier, limit: string) => {
     if (tier === 'pro') return true;
@@ -87,6 +112,7 @@ export default function JobsPage() {
           const jobsData = JSON.parse(savedJobs);
           const safeLimit = canUseResultLimitOption(tier, resultLimit) ? resultLimit : '25';
           setJobs(applySelectedLimit(jobsData, safeLimit));
+          refreshStatuses(applySelectedLimit(jobsData, safeLimit));
           setSearched(true);
           console.log('✅ Restored', jobsData.length, 'jobs from localStorage');
         } catch (error) {
@@ -201,6 +227,7 @@ export default function JobsPage() {
 
         const limitedJobs = applySelectedLimit(data.jobs || [], effectiveLimit);
         setJobs(limitedJobs);
+        refreshStatuses(limitedJobs);
         console.log('Jobs state updated with', data.jobs.length, 'jobs');
         // Save to cache
         localStorage.setItem(cacheKey, JSON.stringify(limitedJobs));
@@ -442,12 +469,27 @@ export default function JobsPage() {
           {jobs.map((job) => (
             <div
               key={job.id}
-              className="border-2 border-black bg-white hover:bg-black hover:text-white transition-colors duration-150 cursor-pointer group p-5"
+              className={`border-2 border-black bg-white hover:bg-black hover:text-white transition-colors duration-150 cursor-pointer group p-5 ${
+                jobStatuses[job.id] === 'skipped' ? 'opacity-40' : ''
+              }`}
               onClick={() => router.push(`/jobs/${job.id}`)}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-base font-black uppercase tracking-widest leading-tight mb-1 group-hover:text-white">{job.title}</h3>
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h3 className="text-base font-black uppercase tracking-widest leading-tight group-hover:text-white">{job.title}</h3>
+                    {jobStatuses[job.id] === 'skipped' && (
+                      <span className="flex-shrink-0 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border-2 border-black/40 bg-[#F2F2F2] text-black/50">
+                        Skipped
+                      </span>
+                    )}
+                    {jobStatuses[job.id] === 'applied' && (
+                      <span className="flex-shrink-0 flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border-2 border-green-600 bg-green-50 text-green-700">
+                        <CheckCircle2 className="w-2.5 h-2.5" />
+                        Applied
+                      </span>
+                    )}
+                  </div>
                   <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-widest text-black/60 group-hover:text-white/60">
                     <span>{job.company}</span>
                     {job.location && (
@@ -486,7 +528,39 @@ export default function JobsPage() {
                 </div>
               )}
 
-              <div className="mt-4 flex justify-end">
+              <div className="mt-4 flex items-center justify-between gap-2">
+                {/* Skip / Undo button */}
+                {jobStatuses[job.id] === 'skipped' ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 border-2 border-black/40 text-black/50 text-[10px] font-black uppercase tracking-widest group-hover:text-white group-hover:border-white/40"
+                    onClick={(e) => handleUndoTrack(e, job.id)}
+                  >
+                    <RotateCcw className="w-3 h-3" />
+                    Undo Skip
+                  </Button>
+                ) : jobStatuses[job.id] === 'applied' ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 border-2 border-black/40 text-black/50 text-[10px] font-black uppercase tracking-widest cursor-default group-hover:text-white group-hover:border-white/40"
+                    disabled
+                  >
+                    <CheckCircle2 className="w-3 h-3" />
+                    Tracked
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 border-2 border-black text-[10px] font-black uppercase tracking-widest group-hover:bg-white group-hover:text-black group-hover:border-black"
+                    onClick={(e) => handleSkip(e, job)}
+                  >
+                    <EyeOff className="w-3 h-3" />
+                    Skip
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"

@@ -13,6 +13,9 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  EyeOff,
+  RotateCcw,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +24,7 @@ import { useDashboardStore } from '@/lib/store/dashboard-store';
 import { getCurrentUser } from '@/lib/auth/auth';
 import { createApplication } from '@/lib/database/applications';
 import { getActiveResumeVersion } from '@/lib/database/resumes';
+import { trackJob, getJobStatus, removeTrackedJob, type JobTrackerStatus } from '@/lib/job-tracker';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import type { Job, CVOptimizationResult, Resume, ResumeContent } from '@/types';
 
@@ -345,7 +349,24 @@ export default function JobDetailPage() {
   const [sourceResumeContent, setSourceResumeContent] = useState<ResumeContent | null>(null);
   const [selectedSuggestionIndexes, setSelectedSuggestionIndexes] = useState<number[]>([]);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [trackerStatus, setTrackerStatus] = useState<JobTrackerStatus | null>(null);
   const { isDark } = useAppDarkModeState();
+
+  // Load tracker status for this job
+  useEffect(() => {
+    if (jobId) setTrackerStatus(getJobStatus(jobId));
+  }, [jobId]);
+
+  const handleSkipJob = () => {
+    if (!job) return;
+    trackJob(job, 'skipped');
+    setTrackerStatus('skipped');
+  };
+
+  const handleUndoTrack = () => {
+    removeTrackedJob(jobId);
+    setTrackerStatus(null);
+  };
 
   useEffect(() => {
     // Try to find job from localStorage first (from recent search)
@@ -470,6 +491,8 @@ export default function JobDetailPage() {
     });
 
     if (created) {
+      // Also write to the lightweight localStorage tracker
+      try { trackJob(job, 'applied'); } catch { /* best-effort */ }
       alert('Application tracked! Opening your Application Tracker.');
       router.push('/applications');
     } else {
@@ -561,6 +584,22 @@ export default function JobDetailPage() {
                     <p className="text-sm font-bold uppercase tracking-widest mt-1">{job.company}</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    {trackerStatus === 'skipped' ? (
+                      <Button variant="outline" onClick={handleUndoTrack} className="gap-2 text-black/50">
+                        <RotateCcw className="w-4 h-4" />
+                        Undo Skip
+                      </Button>
+                    ) : trackerStatus === 'applied' ? (
+                      <Button variant="outline" disabled className="gap-2 text-green-700 border-green-600">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Applied
+                      </Button>
+                    ) : (
+                      <Button variant="outline" onClick={handleSkipJob} className="gap-2">
+                        <EyeOff className="w-4 h-4" />
+                        Skip
+                      </Button>
+                    )}
                     <Button variant="outline" onClick={handleTrackApplication} className="gap-2">
                       Track Application
                     </Button>
