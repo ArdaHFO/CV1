@@ -215,6 +215,136 @@
   margin-bottom: 1rem;
 }
 
+/* Swiss Micro-interactions & Animations */
+@keyframes swiss-press {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes swiss-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes swiss-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes swiss-slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes swiss-rotate-cw {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes swiss-border-flash {
+  0% {
+    border-color: var(--swiss-black);
+  }
+  50% {
+    border-color: var(--swiss-accent);
+  }
+  100% {
+    border-color: var(--swiss-black);
+  }
+}
+
+/* Button interactions */
+button, [role="button"] {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:active, [role="button"]:active {
+  animation: swiss-press 0.15s ease-out;
+}
+
+button:focus-visible, [role="button"]:focus-visible {
+  animation: swiss-border-flash 0.6s ease-in-out;
+}
+
+/* Link interactions */
+a {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+a:active {
+  animation: swiss-press 0.15s ease-out;
+}
+
+/* Input focus interaction */
+input:focus, textarea:focus, select:focus {
+  animation: swiss-pulse 0.4s ease-out;
+}
+
+/* Card entry animation */
+[data-slot="card"] {
+  animation: swiss-slide-in-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+/* Icon rotation on interaction */
+.swiss-button svg, button svg {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.swiss-button:hover svg, button:hover svg {
+  transform: rotate(6deg) scale(1.05);
+}
+
+/* Table row hover */
+table tbody tr {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+table tbody tr:hover {
+  background-color: var(--swiss-muted);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dialog enter animation */
+[role="dialog"] {
+  animation: swiss-slide-in-up 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Badge pulse on mount */
+[data-slot="badge"] {
+  animation: swiss-pulse 0.6s ease-out;
+}
+
 /* Print styles for templates */
 @media print {
   :root {
