@@ -83,13 +83,36 @@ export default function JobsPage() {
     return { tier: payload.status.planTier, searchesLeft: payload.status.remaining.jobSearches };
   };
 
-  // Normalize a job from localStorage — skills may be stored as {id,name} objects from older sessions
-  const normalizeJob = (job: Job): Job => ({
-    ...job,
-    skills: (job.skills || []).map((s: unknown) =>
-      typeof s === 'string' ? s : ((s as { name?: string })?.name ?? String(s))
-    ),
-  });
+  // Normalize a job from API/cache/localStorage — older sessions or some sources may store
+  // fields as objects like {id,name}.
+  const normalizeJob = (job: Job): Job => {
+    const toText = (value: unknown, fallback = ''): string => {
+      if (typeof value === 'string') return value;
+      if (value == null) return fallback;
+      if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+      if (typeof value === 'object') {
+        const obj = value as Record<string, unknown>;
+        const picked = obj.name ?? obj.label ?? obj.title ?? obj.description;
+        if (typeof picked === 'string') return picked;
+        return fallback;
+      }
+      return fallback;
+    };
+
+    return {
+      ...job,
+      title: toText((job as any).title, 'No Title'),
+      company: toText((job as any).company, 'Unknown Company'),
+      location: toText((job as any).location, ''),
+      salary_range: toText((job as any).salary_range, ''),
+      posted_date: toText((job as any).posted_date, ''),
+      employment_type: toText((job as any).employment_type, 'full-time') as Job['employment_type'],
+      apply_url: toText((job as any).apply_url, ''),
+      skills: (job.skills || []).map((s: unknown) =>
+        typeof s === 'string' ? s : ((s as { name?: string })?.name ?? String(s))
+      ),
+    };
+  };
 
   const applySelectedLimit = (jobsList: Job[], limitValue: string): Job[] => {
     if (limitValue === 'all') return jobsList;

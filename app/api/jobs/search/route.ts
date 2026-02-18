@@ -213,28 +213,51 @@ async function searchLinkedInJobs(
       
       // Apify LinkedIn Jobs Scraper returns specific fields:
       // id, link, title, companyName, location, salaryInfo, postedAt, descriptionText, employmentType, etc.
+
+      const toText = (value: unknown, fallback = ''): string => {
+        if (typeof value === 'string') return value;
+        if (value == null) return fallback;
+        if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+        if (typeof value === 'object') {
+          const obj = value as Record<string, unknown>;
+          const picked = obj.name ?? obj.label ?? obj.title ?? obj.description;
+          if (typeof picked === 'string') return picked;
+          return fallback;
+        }
+        return fallback;
+      };
       
       const jobId = item.id || `apify-${Date.now()}-${index}`;
-      const title = item.title || 'No Title Available';
-      const company = item.companyName || item.company || 'Unknown Company';
-      const location = item.location || 'Location not specified';
+      const title = toText(item.title, 'No Title Available');
+      const company = toText(item.companyName || item.company, 'Unknown Company');
+      const location = toText(item.location, 'Location not specified');
       
       // Description: prefer text over HTML
-      const description = item.descriptionText || item.descriptionHtml?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || item.description || 'No description available';
+      const rawDesc =
+        item.descriptionText ||
+        item.descriptionHtml ||
+        item.description ||
+        '';
+      const description = (() => {
+        const text = toText(rawDesc, '');
+        if (!text) return 'No description available';
+        return text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'No description available';
+      })();
       
       // Apply URL
-      const url = item.link || item.applyUrl || item.url || '#';
+      const url = toText(item.link || item.applyUrl || item.url, '#');
       
       // Salary: salaryInfo is an array like ["$17.00", "$19.00"]
       let salary = 'Not specified';
       if (Array.isArray(item.salaryInfo) && item.salaryInfo.length > 0) {
-        if (item.salaryInfo.length === 2) {
-          salary = `${item.salaryInfo[0]} - ${item.salaryInfo[1]}`;
+        const parts = (item.salaryInfo as unknown[]).map((p) => toText(p, '')).filter(Boolean);
+        if (parts.length >= 2) {
+          salary = `${parts[0]} - ${parts[1]}`;
         } else {
-          salary = item.salaryInfo[0];
+          salary = parts[0] || 'Not specified';
         }
       } else if (item.salary || item.salaryRange) {
-        salary = item.salary || item.salaryRange;
+        salary = toText(item.salary || item.salaryRange, 'Not specified');
       }
       
       // Skills: extract from jobFunction, industries, or parse from description
@@ -293,11 +316,14 @@ async function searchLinkedInJobs(
       // Employment type normalization
       let employmentType = 'full-time';
       if (item.employmentType) {
-        employmentType = item.employmentType.toLowerCase().replace(/[_\s]/g, '-');
+        employmentType = toText(item.employmentType, 'full-time').toLowerCase().replace(/[_\s]/g, '-');
       }
       
       // Posted date: postedAt format is "2023-08-16"
-      const postedDate = item.postedAt || item.postedDate || item.publishedAt || new Date().toISOString().split('T')[0];
+      const postedDateRaw = item.postedAt || item.postedDate || item.publishedAt || new Date().toISOString().split('T')[0];
+      const postedDate = typeof postedDateRaw === 'string'
+        ? postedDateRaw.split('T')[0]
+        : new Date().toISOString().split('T')[0];
       
       const transformedJob = {
         id: jobId,
