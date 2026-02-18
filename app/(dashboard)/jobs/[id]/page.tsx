@@ -12,13 +12,9 @@ import {
   Sparkles,
   CheckCircle,
   XCircle,
-  AlertCircle,
   Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UpgradeModal } from '@/components/ui/upgrade-modal';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
@@ -518,27 +514,28 @@ export default function JobDetailPage() {
     }
   };
 
-  const getMatchScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600 dark:text-green-400';
-    if (score >= 60) return 'text-yellow-600 dark:text-yellow-400';
-    return 'text-red-600 dark:text-red-400';
+  const getMatchScoreStyle = (score: number) => {
+    if (score >= 80) return 'text-black';
+    if (score >= 60) return 'text-black';
+    return 'text-[#FF3000]';
   };
 
-  const getPriorityColor = (priority: string) => {
-    const colors: Record<string, string> = {
-      high: 'border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950',
-      medium: 'border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-950',
-      low: 'border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950',
+  const getPriorityStyle = (priority: string) => {
+    const styles: Record<string, string> = {
+      high: 'border-l-4 border-l-[#FF3000] border border-black bg-white',
+      medium: 'border-l-4 border-l-black border border-black bg-[#F2F2F2]',
+      low: 'border border-black bg-white',
     };
-    return colors[priority] || '';
+    return styles[priority] || 'border border-black bg-white';
   };
 
   if (!job) {
     return (
       <div className={`min-h-screen relative flex items-center justify-center ${isDark ? 'dark' : ''} bg-white text-black`}>
         <ShaderBackground isDark={isDark} />
-        <div className="relative z-10">
-          <p className="text-zinc-600 dark:text-zinc-400">Job not found</p>
+        <div className="relative z-10 border-4 border-black bg-white p-12 text-center">
+          <p className="text-xs font-black uppercase tracking-widest">Job not found</p>
+          <Button variant="outline" className="mt-4" onClick={() => router.push('/jobs')}>Back to Jobs</Button>
         </div>
       </div>
     );
@@ -550,295 +547,257 @@ export default function JobDetailPage() {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <Button
-          variant="ghost"
-          className="mb-6 -ml-2"
+          variant="outline"
+          className="mb-6 gap-2"
           onClick={() => router.push('/jobs')}
         >
-          <ArrowLeft className="w-4 h-4 mr-2" />
+          <ArrowLeft className="w-4 h-4" />
           Back to Jobs
         </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Job Details */}
+          {/* ── Job Details ── */}
           <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between mb-4">
+
+            {/* Title / Meta */}
+            <div className="border-4 border-black bg-white">
+              <div className="p-6 border-b-2 border-black">
+                <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <CardTitle className="text-2xl mb-2">{job.title}</CardTitle>
-                    <CardDescription className="text-lg">
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                        {job.company}
-                      </span>
-                    </CardDescription>
+                    <h1 className="text-2xl font-black uppercase tracking-widest leading-tight">{job.title}</h1>
+                    <p className="text-sm font-bold uppercase tracking-widest mt-1">{job.company}</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button variant="outline" onClick={handleTrackApplication}>
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" onClick={handleTrackApplication} className="gap-2">
                       Track Application
                     </Button>
                     {job.apply_url && (
-                      <Button asChild>
+                      <Button variant="accent" asChild className="gap-2">
                         <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-2" />
+                          <ExternalLink className="w-4 h-4" />
                           Apply
                         </a>
                       </Button>
                     )}
                   </div>
                 </div>
-
-                <div className="flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-400">
+                <div className="mt-4 flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest text-black/60">
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
+                    <MapPin className="w-3 h-3" />
                     {job.location}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Briefcase className="w-4 h-4" />
+                    <Briefcase className="w-3 h-3" />
                     {job.employment_type}
                   </span>
                   {job.salary_range && (
-                    <span className="flex items-center gap-1 font-medium text-zinc-900 dark:text-zinc-100">
-                      <DollarSign className="w-4 h-4" />
+                    <span className="flex items-center gap-1 text-black">
+                      <DollarSign className="w-3 h-3" />
                       {job.salary_range}
                     </span>
                   )}
                 </div>
-              </CardHeader>
+              </div>
 
-              <CardContent className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Description</h3>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed">
-                    {job.description}
-                  </p>
-                </div>
+              {/* Description */}
+              <div className="p-6 border-b-2 border-black">
+                <h2 className="text-[10px] font-black uppercase tracking-widest mb-3">Description</h2>
+                <p className="text-sm leading-relaxed text-black/80">{job.description}</p>
+              </div>
 
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Requirements</h3>
+              {/* Requirements */}
+              {job.requirements && job.requirements.length > 0 && (
+                <div className="p-6 border-b-2 border-black">
+                  <h2 className="text-[10px] font-black uppercase tracking-widest mb-3">Requirements</h2>
                   <ul className="space-y-2">
                     {job.requirements.map((req, index) => (
-                      <li
-                        key={index}
-                        className="flex items-start gap-2 text-zinc-700 dark:text-zinc-300"
-                      >
-                        <CheckCircle className="w-4 h-4 mt-0.5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                      <li key={index} className="flex items-start gap-2 text-sm text-black/80">
+                        <CheckCircle className="w-4 h-4 mt-0.5 text-black shrink-0" />
                         {req}
                       </li>
                     ))}
                   </ul>
                 </div>
+              )}
 
-                <Separator />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-3">Required Skills</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {job.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
+              {/* Skills */}
+              <div className="p-6">
+                <h2 className="text-[10px] font-black uppercase tracking-widest mb-3">Required Skills</h2>
+                <div className="flex flex-wrap gap-2">
+                  {job.skills.map((skill) => (
+                    <span key={skill} className="px-2 py-0.5 border-2 border-black text-[10px] font-black uppercase tracking-widest">
+                      {skill}
+                    </span>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
-          {/* CV Optimization Panel */}
+          {/* ── CV Optimization Panel ── */}
           <div className="lg:col-span-1">
-            <div className="lg:sticky lg:top-6 space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    CV Optimization
-                  </CardTitle>
-                  <CardDescription>
-                    Optimize your CV to match this job posting
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Select CV</label>
-                    <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose a CV" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableResumes.map((resume) => (
-                          <SelectItem key={resume.id} value={resume.id}>
-                            {resume.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div className="lg:sticky lg:top-6 space-y-4">
 
-                  <Button
-                    className="w-full gap-2"
-                    onClick={handleOptimize}
-                    disabled={!selectedResumeId || optimizing}
-                  >
-                    {optimizing ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Analyze & Optimize
-                      </>
-                    )}
-                  </Button>
-                </CardContent>
-              </Card>
+              {/* Optimize box */}
+              <div className="border-4 border-black bg-white p-5">
+                <div className="mb-4">
+                  <h2 className="text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    CV Optimization
+                  </h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
+                    Optimize your CV to match this job
+                  </p>
+                </div>
+
+                <div className="mb-4">
+                  <label className="text-[10px] font-black uppercase tracking-widest block mb-2">Select CV</label>
+                  <Select value={selectedResumeId} onValueChange={setSelectedResumeId}>
+                    <SelectTrigger className="border-2 border-black font-bold uppercase text-xs tracking-widest">
+                      <SelectValue placeholder="Choose a CV" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableResumes.map((resume) => (
+                        <SelectItem key={resume.id} value={resume.id}>
+                          {resume.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  variant="accent"
+                  className="w-full gap-2"
+                  onClick={handleOptimize}
+                  disabled={!selectedResumeId || optimizing}
+                >
+                  {optimizing ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" />Analyzing...</>
+                  ) : (
+                    <><Sparkles className="w-4 h-4" />Analyze &amp; Optimize</>
+                  )}
+                </Button>
+              </div>
 
               {/* Optimization Results */}
               {optimization && (
                 <>
                   {/* Match Score */}
-                  <Card>
-                    <CardContent className="pt-6 text-center">
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">
-                        Job Match Score
-                      </p>
-                      <p
-                        className={`text-5xl font-bold ${getMatchScoreColor(
-                          optimization.job_match_score
-                        )}`}
-                      >
-                        {optimization.job_match_score}%
-                      </p>
-                    </CardContent>
-                  </Card>
+                  <div className="border-4 border-black bg-white p-5 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-black/60 mb-2">Job Match Score</p>
+                    <p className={`text-6xl font-black ${getMatchScoreStyle(optimization.job_match_score)}`}>
+                      {optimization.job_match_score}%
+                    </p>
+                  </div>
 
-                  {/* Skills Match */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Skills Analysis</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
+                  {/* Skills Analysis */}
+                  <div className="border-4 border-black bg-white">
+                    <div className="px-5 pt-5 pb-3 border-b-2 border-black">
+                      <h2 className="text-[10px] font-black uppercase tracking-widest">Skills Analysis</h2>
+                    </div>
+                    <div className="p-5 space-y-4">
                       {optimization.matching_skills.length > 0 && (
                         <div>
-                          <h4 className="text-sm font-medium mb-2 flex items-center gap-2 text-green-600 dark:text-green-400">
-                            <CheckCircle className="w-4 h-4" />
-                            Matching Skills ({optimization.matching_skills.length})
-                          </h4>
-                          <div className="flex flex-wrap gap-1">
+                          <p className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1 mb-2">
+                            <CheckCircle className="w-3 h-3" />
+                            Matching ({optimization.matching_skills.length})
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
                             {optimization.matching_skills.map((skill) => (
-                              <Badge key={skill} className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                              <span key={skill} className="px-2 py-0.5 border-2 border-black bg-black text-white text-[10px] font-black uppercase tracking-widest">
                                 {skill}
-                              </Badge>
+                              </span>
                             ))}
                           </div>
                         </div>
                       )}
-
                       {optimization.missing_skills.length > 0 && (
                         <div>
-                          <h4 className="text-sm font-medium mb-2 flex items-center gap-2 text-red-600 dark:text-red-400">
-                            <XCircle className="w-4 h-4" />
-                            Missing Skills ({optimization.missing_skills.length})
-                          </h4>
-                          <div className="flex flex-wrap gap-1">
+                          <p className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1 mb-2 text-[#FF3000]">
+                            <XCircle className="w-3 h-3" />
+                            Missing ({optimization.missing_skills.length})
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
                             {optimization.missing_skills.map((skill) => (
-                              <Badge key={skill} className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                              <span key={skill} className="px-2 py-0.5 border-2 border-[#FF3000] text-[#FF3000] text-[10px] font-black uppercase tracking-widest">
                                 {skill}
-                              </Badge>
+                              </span>
                             ))}
                           </div>
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
 
                   {/* Suggestions */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Suggestions</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
+                  <div className="border-4 border-black bg-white">
+                    <div className="px-5 pt-5 pb-3 border-b-2 border-black">
+                      <h2 className="text-[10px] font-black uppercase tracking-widest">Suggestions</h2>
+                    </div>
+                    <div className="p-5 space-y-3">
                       {optimization.suggestions.map((suggestion, index) => (
-                        <div
-                          key={index}
-                          className={`p-3 border rounded-lg ${getPriorityColor(
-                            suggestion.priority
-                          )}`}
-                        >
+                        <div key={index} className={`p-3 ${getPriorityStyle(suggestion.priority)}`}>
                           <div className="flex items-start gap-2 mb-2">
                             <input
                               type="checkbox"
                               checked={selectedSuggestionIndexes.includes(index)}
                               onChange={() => toggleSuggestion(index)}
-                              className="mt-0.5 h-4 w-4"
+                              className="mt-0.5 h-4 w-4 accent-black shrink-0"
                             />
-                            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium capitalize mb-1">
-                                {suggestion.section} Section
-                              </p>
-                              <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                                {suggestion.reason}
-                              </p>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <p className="text-[10px] font-black uppercase tracking-widest">
+                                  {suggestion.section} Section
+                                </p>
+                                <span className="px-1.5 py-0.5 border border-black text-[9px] font-black uppercase tracking-widest shrink-0">
+                                  {suggestion.priority}
+                                </span>
+                              </div>
+                              <p className="text-[10px] font-bold text-black/60 mb-2">{suggestion.reason}</p>
+                              {sourceResumeContent && (
+                                <p className="text-[10px] text-black/50 mb-1 line-clamp-2">
+                                  Current: {getSectionPreview(sourceResumeContent, suggestion.section)}
+                                </p>
+                              )}
+                              <p className="text-xs text-black/80">{suggestion.suggested}</p>
                             </div>
-                            <Badge variant="outline" className="text-xs">
-                              {suggestion.priority}
-                            </Badge>
                           </div>
-                          {sourceResumeContent && (
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400 pl-6 mb-2 line-clamp-2">
-                              Current: {getSectionPreview(sourceResumeContent, suggestion.section)}
-                            </p>
-                          )}
-                          <p className="text-sm text-zinc-700 dark:text-zinc-300 pl-6">
-                            {suggestion.suggested}
-                          </p>
                         </div>
                       ))}
 
                       <Button
-                        className="w-full gap-2"
+                        variant="accent"
+                        className="w-full gap-2 mt-2"
                         onClick={handleApplySelectedChanges}
                         disabled={applyingOptimization || selectedSuggestionIndexes.length === 0}
                       >
                         {applyingOptimization ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Applying selected changes...
-                          </>
+                          <><Loader2 className="w-4 h-4 animate-spin" />Applying...</>
                         ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            Apply Selected Changes ({selectedSuggestionIndexes.length})
-                          </>
+                          <><Sparkles className="w-4 h-4" />Apply Selected ({selectedSuggestionIndexes.length})</>
                         )}
                       </Button>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
 
                   {/* Recommendations */}
                   {optimization.recommended_changes.length > 0 && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Recommendations</CardTitle>
-                      </CardHeader>
-                      <CardContent>
+                    <div className="border-4 border-black bg-white">
+                      <div className="px-5 pt-5 pb-3 border-b-2 border-black">
+                        <h2 className="text-[10px] font-black uppercase tracking-widest">Recommendations</h2>
+                      </div>
+                      <div className="p-5">
                         <ul className="space-y-2">
                           {optimization.recommended_changes.map((change, index) => (
-                            <li
-                              key={index}
-                              className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300"
-                            >
-                              <CheckCircle className="w-4 h-4 mt-0.5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                            <li key={index} className="flex items-start gap-2 text-xs text-black/80">
+                              <CheckCircle className="w-4 h-4 mt-0.5 shrink-0" />
                               {change}
                             </li>
                           ))}
                         </ul>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   )}
                 </>
               )}
