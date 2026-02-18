@@ -628,24 +628,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'
                         }`}
                       >
+                        {/* Badge always on top, outside fade layers */}
+                        {'badge' in plan && plan.badge ? (
+                          <span className="absolute top-1.5 right-1.5 z-10 bg-[#FF3000] text-white text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 leading-none">
+                            {plan.badge}
+                          </span>
+                        ) : null}
                         <div className="transition-opacity duration-200 group-hover:opacity-0">
-                          <div className="flex items-center justify-between">
-                            <p className="text-[11px] font-black uppercase tracking-widest">{plan.name}</p>
-                            {'badge' in plan && plan.badge ? <Badge>{plan.badge}</Badge> : null}
-                          </div>
+                          <p className="text-[11px] font-black uppercase tracking-widest pr-14">{plan.name}</p>
                           <p className="mt-1 text-base font-black uppercase">
                             {plan.price}
                             <span className="ml-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
                           </p>
                           <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{plan.description}</p>
                         </div>
-                        <div className="absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col bg-black text-white overflow-hidden">
-                          <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000] mb-1.5 shrink-0">What you get</p>
-                          <ul className="space-y-0.5 overflow-hidden">
+                        <div className="absolute inset-0 p-2 pt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col bg-black text-white">
+                          <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000] mb-1 shrink-0">What you get</p>
+                          <ul className="space-y-0.5 overflow-y-auto flex-1">
                             {'benefits' in plan && plan.benefits?.map((b) => (
-                              <li key={b} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest leading-tight">
-                                <Check className="h-2.5 w-2.5 shrink-0 text-[#FF3000]" />
-                                <span className="truncate">{b}</span>
+                              <li key={b} className="flex items-start gap-1 text-[9px] font-bold uppercase tracking-widest leading-tight">
+                                <Check className="h-2.5 w-2.5 shrink-0 text-[#FF3000] mt-px" />
+                                <span>{b}</span>
                               </li>
                             ))}
                           </ul>
