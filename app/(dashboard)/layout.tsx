@@ -599,7 +599,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
 
       <Dialog open={upgradeOpen} onOpenChange={setUpgradeOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-[#FF3000]" />
@@ -776,7 +776,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Promo code input */}
             {!isPro && (
-              <div className="border-2 border-black p-3 space-y-2">
+              <div className="border-2 border-black p-2 space-y-1.5">
                 <p className="text-[10px] font-black uppercase tracking-widest">Promo Code</p>
                 <div className="flex gap-2">
                   <input
@@ -790,13 +790,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     }}
                     onKeyDown={(e) => e.key === 'Enter' && handleValidatePromo()}
                     placeholder="e.g. WELCOME10"
-                    className="flex-1 border-2 border-black px-3 py-1.5 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-[#FF3000] bg-white"
+                    className="flex-1 border-2 border-black px-3 py-1 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-[#FF3000] bg-white"
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    className="border-2 border-black text-[10px] font-black uppercase tracking-widest h-9 px-3 flex-shrink-0"
+                    className="border-2 border-black text-[10px] font-black uppercase tracking-widest h-8 px-3 flex-shrink-0"
                     onClick={handleValidatePromo}
                     disabled={promoStatus === 'checking' || !promoCode.trim()}
                   >
