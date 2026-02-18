@@ -599,7 +599,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
 
       <Dialog open={upgradeOpen} onOpenChange={setUpgradeOpen}>
-        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-5xl p-4">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-[#FF3000]" />
@@ -610,159 +610,143 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </DialogDescription>
           </DialogHeader>
 
-            <div className="space-y-2">
-              <p className="text-xs font-black uppercase tracking-widest">Subscriptions</p>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {plans.map((plan) => {
-                const isSelected = selectedPurchaseType === 'plan' && selectedPlanId === plan.id;
-              return (
-                <button
-                  key={plan.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedPurchaseType('plan');
-                    setSelectedPlanId(plan.id);
-                  }}
-                  className={`group relative border-2 border-black p-4 text-left transition-colors overflow-hidden ${
-                    isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'
-                  }`}
-                >
-                  {/* Default view */}
-                  <div className="transition-opacity duration-200 group-hover:opacity-0">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-black uppercase tracking-widest">{plan.name}</p>
-                      {'badge' in plan && plan.badge ? <Badge>{plan.badge}</Badge> : null}
-                    </div>
-                    <p className="mt-2 text-xl font-black uppercase">
-                      {plan.price}
-                      <span className="ml-1 text-xs font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
-                    </p>
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.description}</p>
-                    {isSelected ? (
-                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
-                        <Check className="h-3.5 w-3.5" /> Selected
-                      </div>
-                    ) : null}
-                  </div>
-                  {/* Hover benefits panel */}
-                  <div className="absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col bg-black text-white overflow-hidden">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000] mb-1.5 shrink-0">What you get</p>
-                    <ul className="space-y-0.5 overflow-hidden">
-                      {'benefits' in plan && plan.benefits?.map((b) => (
-                        <li key={b} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest leading-tight">
-                          <Check className="h-2.5 w-2.5 shrink-0 text-[#FF3000]" />
-                          <span className="truncate">{b}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <p className="text-xs font-black uppercase tracking-widest">Subscriptions</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {plans.map((plan) => {
+                    const isSelected = selectedPurchaseType === 'plan' && selectedPlanId === plan.id;
+                    return (
+                      <button
+                        key={plan.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPurchaseType('plan');
+                          setSelectedPlanId(plan.id);
+                        }}
+                        className={`group relative border-2 border-black p-3 text-left transition-colors overflow-hidden ${
+                          isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'
+                        }`}
+                      >
+                        <div className="transition-opacity duration-200 group-hover:opacity-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-[11px] font-black uppercase tracking-widest">{plan.name}</p>
+                            {'badge' in plan && plan.badge ? <Badge>{plan.badge}</Badge> : null}
+                          </div>
+                          <p className="mt-1.5 text-lg font-black uppercase">
+                            {plan.price}
+                            <span className="ml-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
+                          </p>
+                          <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{plan.description}</p>
+                        </div>
+                        <div className="absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col bg-black text-white overflow-hidden">
+                          <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000] mb-1.5 shrink-0">What you get</p>
+                          <ul className="space-y-0.5 overflow-hidden">
+                            {'benefits' in plan && plan.benefits?.map((b) => (
+                              <li key={b} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest leading-tight">
+                                <Check className="h-2.5 w-2.5 shrink-0 text-[#FF3000]" />
+                                <span className="truncate">{b}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-black uppercase tracking-widest">
-              Job Search Tokens <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Current balance: {remainingTokenSearches})</span>
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {tokenPacks.map((pack) => {
-                const isSelected = selectedPurchaseType === 'token-pack' && selectedTokenPackId === pack.id;
-                return (
-                  <button
-                    key={pack.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedPurchaseType('token-pack');
-                      setSelectedTokenPackId(pack.id);
-                    }}
-                    className={`border-2 border-black p-4 text-left transition-colors ${
-                      isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-black uppercase tracking-widest">{pack.name}</p>
-                      {pack.badge ? <Badge>{pack.badge}</Badge> : null}
-                    </div>
-                    <p className="mt-2 text-xl font-black uppercase">{pack.price}</p>
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
-                    {isSelected ? (
-                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
-                        <Check className="h-3.5 w-3.5" /> Selected
-                      </div>
-                    ) : null}
-                  </button>
-                );
-              })}
+              <div className="space-y-1.5">
+                <p className="text-xs font-black uppercase tracking-widest">AI Optimize Credits <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Balance: {quotas ? (quotas.cvOptimizations === 'unlimited' ? '\u221e' : quotas.cvOptimizations) : '...'})</span></p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {aiOptimizePacks.map((pack) => {
+                    const isSelected = selectedPurchaseType === 'ai-optimize-pack' && selectedAiOptimizePackId === pack.id;
+                    return (
+                      <button
+                        key={pack.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPurchaseType('ai-optimize-pack');
+                          setSelectedAiOptimizePackId(pack.id);
+                        }}
+                        className={`border-2 border-black p-3 text-left transition-colors ${
+                          isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-[11px] font-black uppercase tracking-widest">{pack.name}</p>
+                          {'badge' in pack && pack.badge ? <Badge>{pack.badge}</Badge> : null}
+                        </div>
+                        <p className="mt-1.5 text-lg font-black uppercase">{pack.price}</p>
+                        <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-black uppercase tracking-widest">CV Import Credits <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Current balance: {quotas ? (quotas.cvImports === 'unlimited' ? '\u221e' : quotas.cvImports) : '...'})</span></p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {cvImportPacks.map((pack) => {
-                const isSelected = selectedPurchaseType === 'cv-import-pack' && selectedCvImportPackId === pack.id;
-                return (
-                  <button
-                    key={pack.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedPurchaseType('cv-import-pack');
-                      setSelectedCvImportPackId(pack.id);
-                    }}
-                    className={`border-2 border-black p-4 text-left transition-colors ${
-                      isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-black uppercase tracking-widest">{pack.name}</p>
-                      {pack.badge ? <Badge>{pack.badge}</Badge> : null}
-                    </div>
-                    <p className="mt-2 text-xl font-black uppercase">{pack.price}</p>
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
-                    {isSelected ? (
-                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
-                        <Check className="h-3.5 w-3.5" /> Selected
-                      </div>
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <p className="text-xs font-black uppercase tracking-widest">
+                  Job Search Tokens <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Balance: {remainingTokenSearches})</span>
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {tokenPacks.map((pack) => {
+                    const isSelected = selectedPurchaseType === 'token-pack' && selectedTokenPackId === pack.id;
+                    return (
+                      <button
+                        key={pack.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPurchaseType('token-pack');
+                          setSelectedTokenPackId(pack.id);
+                        }}
+                        className={`border-2 border-black p-3 text-left transition-colors ${
+                          isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-[11px] font-black uppercase tracking-widest">{pack.name}</p>
+                          {pack.badge ? <Badge>{pack.badge}</Badge> : null}
+                        </div>
+                        <p className="mt-1.5 text-lg font-black uppercase">{pack.price}</p>
+                        <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <p className="text-xs font-black uppercase tracking-widest">AI Optimize Credits <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Current balance: {quotas ? (quotas.cvOptimizations === 'unlimited' ? '\u221e' : quotas.cvOptimizations) : '...'})</span></p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {aiOptimizePacks.map((pack) => {
-                const isSelected = selectedPurchaseType === 'ai-optimize-pack' && selectedAiOptimizePackId === pack.id;
-                return (
-                  <button
-                    key={pack.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedPurchaseType('ai-optimize-pack');
-                      setSelectedAiOptimizePackId(pack.id);
-                    }}
-                    className={`border-2 border-black p-4 text-left transition-colors ${
-                      isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-black uppercase tracking-widest">{pack.name}</p>
-                      {'badge' in pack && pack.badge ? <Badge>{pack.badge}</Badge> : null}
-                    </div>
-                    <p className="mt-2 text-xl font-black uppercase">{pack.price}</p>
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
-                    {isSelected ? (
-                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
-                        <Check className="h-3.5 w-3.5" /> Selected
-                      </div>
-                    ) : null}
-                  </button>
-                );
-              })}
+              <div className="space-y-1.5">
+                <p className="text-xs font-black uppercase tracking-widest">CV Import Credits <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Balance: {quotas ? (quotas.cvImports === 'unlimited' ? '\u221e' : quotas.cvImports) : '...'})</span></p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {cvImportPacks.map((pack) => {
+                    const isSelected = selectedPurchaseType === 'cv-import-pack' && selectedCvImportPackId === pack.id;
+                    return (
+                      <button
+                        key={pack.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedPurchaseType('cv-import-pack');
+                          setSelectedCvImportPackId(pack.id);
+                        }}
+                        className={`border-2 border-black p-3 text-left transition-colors ${
+                          isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="text-[11px] font-black uppercase tracking-widest">{pack.name}</p>
+                          {pack.badge ? <Badge>{pack.badge}</Badge> : null}
+                        </div>
+                        <p className="mt-1.5 text-lg font-black uppercase">{pack.price}</p>
+                        <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -781,7 +765,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ) : null}
 
             <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <Button type="button" variant="outline" onClick={() => setUpgradeOpen(false)} disabled={processingPayment}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setUpgradeOpen(false)}
+                disabled={processingPayment}
+                className="h-9 border-2 border-black"
+              >
                 Close
               </Button>
 
@@ -827,7 +817,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
               )}
 
-              <Button type="submit" className="gap-2" disabled={processingPayment}>
+              <Button
+                type="submit"
+                className="h-9 gap-2 border-2 border-black bg-green-600 text-white hover:bg-green-700"
+                disabled={processingPayment}
+              >
                 {processingPayment ? 'Redirecting to Stripe...' : `Continue to Stripe (${selectedPrice})`}
               </Button>
             </DialogFooter>
