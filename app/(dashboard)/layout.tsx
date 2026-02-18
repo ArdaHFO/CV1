@@ -225,7 +225,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       const openUpgrade = searchParams.get('openUpgrade');
       if (openUpgrade === 'cv-import') {
         setSelectedPurchaseType('cv-import-pack');
-        setSelectedCvImportPackId('cv-import-1');
+        setSelectedCvImportPackId('cv-import-5');
         setUpgradeOpen(true);
         window.history.replaceState({}, '', window.location.pathname);
       } else if (openUpgrade === 'true' || openUpgrade === '1') {
