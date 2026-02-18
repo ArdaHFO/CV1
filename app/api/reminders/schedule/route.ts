@@ -3,9 +3,14 @@ import { Resend } from 'resend';
 import { getServerUserId } from '@/lib/auth/server-user';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(request: NextRequest) {
+  // Lazy-initialize Resend so a missing env var fails at request time, not at build time
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) {
+    return NextResponse.json({ success: false, error: 'Email service not configured' }, { status: 503 });
+  }
+  const resend = new Resend(resendKey);
+
   try {
     const userId = await getServerUserId();
     if (!userId) {
