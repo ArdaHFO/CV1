@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Marquee } from '@/components/ui/marquee';
+import { MorphingText } from '@/components/ui/morphing-text';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import ImageReveal from '@/components/ui/image-reveal';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
@@ -266,19 +267,24 @@ export default function Home() {
                 01. System
               </div>
               <h1 className="mt-6 text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-[9rem]">
-                Search LinkedIn Jobs.
+                Search{' '}
+                <MorphingText
+                  texts={['LinkedIn', 'Workday', 'CareerOne']}
+                  className="mx-0 inline-block h-[0.9em] w-[9ch] max-w-none align-baseline text-left text-[1em] font-black uppercase leading-[0.9] tracking-tight md:h-[0.9em] md:text-[1em] lg:text-[1em]"
+                />{' '}
+                Jobs.
                 <br />
                 Tailor Your CV.
               </h1>
               <p className="mt-6 max-w-2xl text-lg font-medium uppercase tracking-[0.12em] text-black/80">
                 A precise, job-specific CV workflow powered by Meta Llama 3.3 and
-                real-time LinkedIn search.
+                real-time job search.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Button asChild variant="accent" size="lg">
                   <Link href="/register" className="flex items-center gap-3">
-                    Search LinkedIn Jobs
+                    Search Jobs
                     <ArrowRight className="h-5 w-5" />
                   </Link>
                 </Button>
