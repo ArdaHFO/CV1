@@ -130,7 +130,7 @@ export default function Home() {
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4">
             <Image
-              src="/favicon.png"
+              src={isDark ? '/favicon-white.png' : '/favicon.png'}
               alt="CSpark logo"
               width={88}
               height={88}
