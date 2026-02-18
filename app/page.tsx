@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
+import ImageReveal from '@/components/ui/image-reveal';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import type { User } from '@/types';
@@ -309,69 +310,10 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative border-4 border-black bg-[#F2F2F2] p-6 swiss-grid-pattern">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="aspect-square border-4 border-black bg-white swiss-dots p-4 flex flex-col justify-between">
-                  <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000]">
-                    ATS MATCH
-                  </div>
-                  <div className="text-3xl font-black uppercase">+32%</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-black/70">
-                    Keyword alignment lift
-                  </div>
-                </div>
-                <div className="aspect-square border-4 border-black bg-black p-4 flex flex-col justify-between text-white">
-                  <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000]">
-                    LINKEDIN SIGNAL
-                  </div>
-                  <div className="text-3xl font-black uppercase">24H</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/70">
-                    New roles pulled daily
-                  </div>
-                </div>
-                <div className="aspect-square border-4 border-black bg-white swiss-diagonal p-4 flex flex-col justify-between">
-                  <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000]">
-                    AI OPTIMIZE
-                  </div>
-                  <div className="text-3xl font-black uppercase">4.9</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-black/70">
-                    Candidate satisfaction
-                  </div>
-                </div>
-                <div className="aspect-square border-4 border-black bg-[#FF3000] p-4 flex flex-col justify-between text-white">
-                  <div className="text-[10px] font-black uppercase tracking-[0.3em]">
-                    SHARE READY
-                  </div>
-                  <div className="text-3xl font-black uppercase">PDF</div>
-                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/80">
-                    Link + QR in one click
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6 border-t-4 border-black pt-6">
-                <div className="flex items-center gap-4">
-                  <Image
-                    src="/linkedin.png"
-                    alt="LinkedIn logo"
-                    width={48}
-                    height={48}
-                    className="h-11 w-11 object-contain"
-                  />
-                  <div>
-                    <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
-                      Live LinkedIn feed
-                    </div>
-                    <div className="text-base font-bold uppercase tracking-widest">
-                      Job matches ready
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-black/70">
-                  <Search className="h-4 w-4" />
-                  AI screening + CV diff
-                </div>
-              </div>
-            </div>
+            <ImageReveal
+              size="compact"
+              className="border-4 border-black bg-[#F2F2F2] swiss-grid-pattern"
+            />
           </div>
         </section>
 

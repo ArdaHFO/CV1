@@ -86,6 +86,7 @@ export default function JobsPage() {
   // Normalize a job from API/cache/localStorage — older sessions or some sources may store
   // fields as objects like {id,name}.
   const normalizeJob = (job: Job): Job => {
+    const raw = job as unknown as Record<string, unknown>;
     const toText = (value: unknown, fallback = ''): string => {
       if (typeof value === 'string') return value;
       if (value == null) return fallback;
@@ -101,13 +102,13 @@ export default function JobsPage() {
 
     return {
       ...job,
-      title: toText((job as any).title, 'No Title'),
-      company: toText((job as any).company, 'Unknown Company'),
-      location: toText((job as any).location, ''),
-      salary_range: toText((job as any).salary_range, ''),
-      posted_date: toText((job as any).posted_date, ''),
-      employment_type: toText((job as any).employment_type, 'full-time') as Job['employment_type'],
-      apply_url: toText((job as any).apply_url, ''),
+      title: toText(raw.title, 'No Title'),
+      company: toText(raw.company, 'Unknown Company'),
+      location: toText(raw.location, ''),
+      salary_range: toText(raw.salary_range, ''),
+      posted_date: toText(raw.posted_date, ''),
+      employment_type: toText(raw.employment_type, 'full-time') as Job['employment_type'],
+      apply_url: toText(raw.apply_url, ''),
       skills: (job.skills || []).map((s: unknown) =>
         typeof s === 'string' ? s : ((s as { name?: string })?.name ?? String(s))
       ),
