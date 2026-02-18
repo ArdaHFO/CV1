@@ -238,24 +238,34 @@ async function searchLinkedInJobs(
       }
       
       // Skills: extract from jobFunction, industries, or parse from description
+      // Helper: normalize a skill entry to a plain string
+      const toSkillStr = (s: unknown): string => {
+        if (typeof s === 'string') return s.trim();
+        if (s && typeof s === 'object') {
+          const obj = s as Record<string, unknown>;
+          return String(obj.name || obj.label || obj.title || '').trim();
+        }
+        return '';
+      };
+
       let skills: string[] = [];
       if (item.jobFunction) {
-        skills.push(item.jobFunction);
+        skills.push(toSkillStr(item.jobFunction));
       }
       if (item.industries) {
         // industries might be string or array
         if (typeof item.industries === 'string') {
           skills.push(...item.industries.split(',').map((s: string) => s.trim()));
         } else if (Array.isArray(item.industries)) {
-          skills.push(...item.industries);
+          skills.push(...(item.industries as unknown[]).map(toSkillStr));
         }
       }
       if (Array.isArray(item.skills)) {
-        skills.push(...item.skills);
+        skills.push(...(item.skills as unknown[]).map(toSkillStr));
       }
       // Add benefits as skills if available
       if (Array.isArray(item.benefits)) {
-        skills.push(...item.benefits);
+        skills.push(...(item.benefits as unknown[]).map(toSkillStr));
       }
       // Remove duplicates
       skills = [...new Set(skills)].filter(Boolean);
@@ -549,8 +559,9 @@ async function searchWorkdayJobs(
       const salary = item.salaryRange || item.compensation || item.salary || 'Not specified';
 
       const skills: string[] = [];
-      if (Array.isArray(item.skills)) skills.push(...item.skills);
-      if (item.jobCategory) skills.push(item.jobCategory);
+      const _toStr = (s: unknown) => typeof s === 'string' ? s.trim() : (s && typeof s === 'object' ? String((s as Record<string,unknown>).name || (s as Record<string,unknown>).label || '') : '');
+      if (Array.isArray(item.skills)) skills.push(...(item.skills as unknown[]).map(_toStr).filter(Boolean));
+      if (item.jobCategory) skills.push(typeof item.jobCategory === 'string' ? item.jobCategory : String(item.jobCategory));
       if (item.department) skills.push(item.department);
 
       const requirements: string[] = [];

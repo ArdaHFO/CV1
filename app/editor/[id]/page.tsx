@@ -42,7 +42,29 @@ import { AzurillTemplate } from '@/features/editor/templates/AzurillTemplate';
 import { AcademicTemplate, generateLatexFromContent as generateLatexFromContentHelper } from '@/features/editor/templates/AcademicTemplate';
 import { parseLatexToContent } from '@/features/editor/templates/latexParser';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
-import type { ResumeContent, TemplateType, Job, CVOptimizationResult } from '@/types';
+import type { ResumeContent, TemplateType, Job, CVOptimizationResult, Skill } from '@/types';
+
+// Sanitize CV content loaded from localStorage – older/imported data may have
+// skills in various partial shapes ({name,level}, {id,name}, plain strings).
+function normalizeLoadedContent(raw: ResumeContent): ResumeContent {
+  return {
+    ...raw,
+    skills: (raw.skills || []).map((s): Skill => {
+      if (typeof s === 'string') {
+        return { id: `s-${Math.random().toString(36).slice(2)}`, name: s, category: 'Technical', level: 'intermediate' };
+      }
+      const obj = s as Record<string, unknown>;
+      return {
+        id: (typeof obj.id === 'string' ? obj.id : null) || `s-${Math.random().toString(36).slice(2)}`,
+        name: typeof obj.name === 'string' ? obj.name : '',
+        category: typeof obj.category === 'string' ? obj.category : 'Technical',
+        level: (['beginner', 'intermediate', 'advanced', 'expert'].includes(obj.level as string)
+          ? obj.level
+          : 'intermediate') as Skill['level'],
+      };
+    }),
+  };
+}
 
 export default function EditorPage() {
   const router = useRouter();
@@ -188,7 +210,7 @@ export default function EditorPage() {
       try {
         const storedContent = localStorage.getItem(`resume-content-${resumeId}`);
         if (storedContent) {
-          initialContent = JSON.parse(storedContent) as ResumeContent;
+          initialContent = normalizeLoadedContent(JSON.parse(storedContent) as ResumeContent);
         }
       } catch (error) {
         console.error('Failed to load stored resume content:', error);
