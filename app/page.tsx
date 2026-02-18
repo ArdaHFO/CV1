@@ -18,6 +18,10 @@ import {
   Target,
   Users,
   Zap,
+  X,
+  Tag,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -41,15 +45,30 @@ export default function Home() {
   const { isDark, setIsDark } = useAppDarkModeState();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(true); // start true to avoid flicker
+  const [codeCopied, setCodeCopied] = useState(false);
+
+  const PROMO_CODE = process.env.NEXT_PUBLIC_PROMO_CODE ?? 'WELCOME10';
 
   useEffect(() => {
     const loadCurrentUser = async () => {
       const user = await getCurrentUser();
       setCurrentUser(user);
     };
-
+    setBannerDismissed(localStorage.getItem('promo-banner-dismissed') === '1');
     loadCurrentUser();
   }, []);
+
+  const dismissBanner = () => {
+    setBannerDismissed(true);
+    localStorage.setItem('promo-banner-dismissed', '1');
+  };
+
+  const copyPromoCode = () => {
+    navigator.clipboard.writeText(PROMO_CODE).catch(() => {});
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
+  };
 
   const displayName =
     currentUser?.full_name?.trim() ||
@@ -125,6 +144,56 @@ export default function Home() {
   return (
     <div className={`min-h-screen bg-white text-black ${isDark ? 'dark' : ''}`}>
       <div className="pointer-events-none fixed inset-0 swiss-noise" aria-hidden="true" />
+
+      {/* ── Promo banner ── */}
+      {!bannerDismissed && (
+        <div className="relative z-[60] bg-black text-white">
+          <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
+            <div className="flex flex-1 items-center justify-center gap-3 flex-wrap">
+              <Tag className="w-3.5 h-3.5 text-[#FF3000] flex-shrink-0" />
+              <span className="text-[11px] font-black uppercase tracking-widest">
+                Sign up now and get
+                <span className="text-[#FF3000] mx-1">10% off</span>
+                your first purchase
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">
+                Use code:
+              </span>
+              <button
+                type="button"
+                onClick={copyPromoCode}
+                className="flex items-center gap-1.5 border-2 border-white/30 bg-white/10 hover:bg-white/20 px-2.5 py-0.5 transition-colors"
+              >
+                <span className="text-[11px] font-black uppercase tracking-widest text-[#FF3000]">
+                  {PROMO_CODE}
+                </span>
+                {codeCopied ? (
+                  <Check className="w-3 h-3 text-green-400" />
+                ) : (
+                  <Copy className="w-3 h-3 text-white/60" />
+                )}
+              </button>
+              {codeCopied && (
+                <span className="text-[10px] font-bold tracking-widest text-green-400">Copied!</span>
+              )}
+              <Link
+                href="/register"
+                className="text-[10px] font-black uppercase tracking-widest border-b border-white/40 hover:border-white transition-colors"
+              >
+                Sign up &rarr;
+              </Link>
+            </div>
+            <button
+              type="button"
+              onClick={dismissBanner}
+              className="flex-shrink-0 p-1 text-white/60 hover:text-white transition-colors"
+              aria-label="Dismiss banner"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <nav className="sticky top-0 z-50 border-b-4 border-black bg-white">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">

@@ -343,6 +343,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const selectedTokenPack = tokenPacks.find((pack) => pack.id === selectedTokenPackId) ?? tokenPacks[0];
   const selectedCvImportPack = cvImportPacks.find((pack) => pack.id === selectedCvImportPackId) ?? cvImportPacks[0];
   const selectedAiOptimizePack = aiOptimizePacks.find((pack) => pack.id === selectedAiOptimizePackId) ?? aiOptimizePacks[0];
+  const [promoCode, setPromoCode] = useState('');
+  const [promoStatus, setPromoStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
+  const [promoLabel, setPromoLabel] = useState('');
+  const [promoId, setPromoId] = useState<string | null>(null);
+
+  const handleValidatePromo = async () => {
+    if (!promoCode.trim()) return;
+    setPromoStatus('checking');
+    setPromoLabel('');
+    setPromoId(null);
+    try {
+      const res = await fetch(`/api/payments/validate-promo?code=${encodeURIComponent(promoCode.trim())}`);
+      const data = (await res.json()) as { valid: boolean; promoId?: string; label?: string; error?: string };
+      if (data.valid && data.promoId) {
+        setPromoStatus('valid');
+        setPromoLabel(data.label ?? 'Discount applied');
+        setPromoId(data.promoId);
+      } else {
+        setPromoStatus('invalid');
+        setPromoLabel(data.error ?? 'Invalid or expired promo code.');
+      }
+    } catch {
+      setPromoStatus('invalid');
+      setPromoLabel('Could not validate promo code.');
+    }
+  };
+
   const selectedPrice =
     selectedPurchaseType === 'plan'
       ? selectedPlan.price
@@ -376,12 +403,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         },
         body: JSON.stringify(
           selectedPurchaseType === 'plan'
-            ? { purchaseType: 'plan', planId: selectedPlan.id }
+            ? { purchaseType: 'plan', planId: selectedPlan.id, ...(promoId ? { promoCodeId: promoId } : {}) }
             : selectedPurchaseType === 'cv-import-pack'
-            ? { purchaseType: 'cv-import-pack', cvImportPackId: selectedCvImportPack.id }
+            ? { purchaseType: 'cv-import-pack', cvImportPackId: selectedCvImportPack.id, ...(promoId ? { promoCodeId: promoId } : {}) }
             : selectedPurchaseType === 'ai-optimize-pack'
-            ? { purchaseType: 'ai-optimize-pack', aiOptimizePackId: selectedAiOptimizePack.id }
-            : { purchaseType: 'token-pack', tokenPackId: selectedTokenPack.id }
+            ? { purchaseType: 'ai-optimize-pack', aiOptimizePackId: selectedAiOptimizePack.id, ...(promoId ? { promoCodeId: promoId } : {}) }
+            : { purchaseType: 'token-pack', tokenPackId: selectedTokenPack.id, ...(promoId ? { promoCodeId: promoId } : {}) }
         ),
       });
 
@@ -746,6 +773,48 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span className="font-semibold">{formatReadableDate(subscription.expiresAt)}</span>
               </div>
             ) : null}
+
+            {/* Promo code input */}
+            {!isPro && (
+              <div className="border-2 border-black p-3 space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-widest">Promo Code</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => {
+                      setPromoCode(e.target.value.toUpperCase());
+                      setPromoStatus('idle');
+                      setPromoId(null);
+                      setPromoLabel('');
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && handleValidatePromo()}
+                    placeholder="e.g. WELCOME10"
+                    className="flex-1 border-2 border-black px-3 py-1.5 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-[#FF3000] bg-white"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="border-2 border-black text-[10px] font-black uppercase tracking-widest h-9 px-3 flex-shrink-0"
+                    onClick={handleValidatePromo}
+                    disabled={promoStatus === 'checking' || !promoCode.trim()}
+                  >
+                    {promoStatus === 'checking' ? '...' : 'Apply'}
+                  </Button>
+                </div>
+                {promoStatus === 'valid' && (
+                  <p className="text-[10px] font-black uppercase tracking-widest text-green-700 flex items-center gap-1">
+                    <Check className="w-3 h-3" /> {promoLabel}
+                  </p>
+                )}
+                {promoStatus === 'invalid' && (
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#FF3000]">
+                    {promoLabel}
+                  </p>
+                )}
+              </div>
+            )}
 
             {paymentMessage ? (
               <p className={`text-[10px] font-bold uppercase tracking-widest ${paymentMessage.includes('successful') ? 'text-black' : 'text-[#FF3000]'}`}>

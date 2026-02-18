@@ -88,6 +88,7 @@ export async function POST(request: Request) {
       tokenPackId?: TokenPackId;
       cvImportPackId?: CvImportPackId;
       aiOptimizePackId?: AiOptimizePackId;
+      promoCodeId?: string;
     };
 
     const purchaseType: PurchaseType =
@@ -181,6 +182,7 @@ export async function POST(request: Request) {
         aiOptimizePackId: purchaseType === 'ai-optimize-pack' ? (aiOptimizePackId ?? '') : '',
         userId,
       },
+      ...(body.promoCodeId ? { discounts: [{ promotion_code: body.promoCodeId }] } : {}),
     };
 
     const session = await stripe.checkout.sessions.create(sessionParams);
