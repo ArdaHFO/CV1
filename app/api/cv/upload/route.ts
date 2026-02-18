@@ -6,8 +6,9 @@ import type { ResumeContent } from '@/types';
 
 export const runtime = 'nodejs';
 
+// Use the internal lib directly to avoid pdf-parse's canvas/DOMMatrix polyfill shim
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }>;
+const pdfParse = require('pdf-parse/lib/pdf-parse.js') as (buffer: Buffer, options?: Record<string, unknown>) => Promise<{ text: string }>;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const mammoth = require('mammoth') as { extractRawText: (opts: { buffer: Buffer }) => Promise<{ value: string }> };
 
