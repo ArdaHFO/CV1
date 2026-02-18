@@ -6,14 +6,6 @@ import ShaderBackground from '@/components/ui/shader-background';
 import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -80,7 +72,7 @@ export default function EditorPage() {
   const [applyingOptimization, setApplyingOptimization] = useState(false);
   const { isDark } = useAppDarkModeState();
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern');
-  const [zoomLevel, setZoomLevel] = useState(100);
+  const [zoomLevel, setZoomLevel] = useState(70);
   const [latexCode, setLatexCode] = useState<string>('');
   const [isParsingLatex, setIsParsingLatex] = useState(false);
   const [autoSync, setAutoSync] = useState(false);
@@ -629,7 +621,7 @@ export default function EditorPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-black">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-900 dark:border-zinc-100"></div>
+        <div className="w-10 h-10 border-4 border-black border-t-[#FF3000] animate-spin" />
       </div>
     );
   }
@@ -678,38 +670,37 @@ export default function EditorPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
-              <Button 
-                size="sm" 
-                variant="secondary"
-                className="gap-2" 
-                onClick={handleAIExtractKeywords}
-                disabled={aiLoading}
-              >
+            <div className="flex items-center gap-2 shrink-0">
+              <Button size="sm" variant="secondary" className="gap-2" onClick={() => setOptimizeDialogOpen(true)}>
                 <Sparkles className="w-4 h-4" />
-                Extract Keywords
-              </Button>
-              <Button 
-                size="sm" 
-                variant="secondary"
-                className="gap-2" 
-                onClick={() => setOptimizeDialogOpen(true)}
-              >
-                <Sparkles className="w-4 h-4" />
-                Optimize for Job
+                <span className="hidden md:inline">Optimize</span>
               </Button>
               <Button size="sm" variant="secondary" className="gap-2" onClick={handleDownloadPDF}>
                 <Download className="w-4 h-4" />
-                Download PDF
+                <span className="hidden md:inline">PDF</span>
               </Button>
-              <Button size="sm" variant="secondary" className="gap-2" onClick={handleCopyLink}>
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {copied ? 'Copied' : 'Copy Link'}
-              </Button>
-              <Button size="sm" variant="secondary" className="gap-2" onClick={handleGenerateQR}>
-                <QrCode className="w-4 h-4" />
-                QR Code
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" variant="outline" className="border-2 border-black h-9 w-9 p-0">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={handleAIExtractKeywords} disabled={aiLoading}>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Extract Keywords
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleCopyLink}>
+                    {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+                    {copied ? 'Copied!' : 'Copy Link'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleGenerateQR}>
+                    <QrCode className="mr-2 h-4 w-4" />
+                    QR Code
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button onClick={handleSave} disabled={!isDirty || isSaving} size="sm" variant="accent" className="gap-2">
                 <Save className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Save'}
@@ -724,183 +715,173 @@ export default function EditorPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* AI Features Modal */}
         {aiResult?.type === 'keywords' && (
-          <Card className="mb-8 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                AI Assistant
-              </CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setAiResult(null)}
-                className="ml-auto"
-              >
-                ✕
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-4">
-                {(() => {
-                  try {
-                    const parsed = typeof aiResult.content === 'string'
-                      ? JSON.parse(aiResult.content)
-                      : aiResult.content;
-
-                    const allKeywords = [
-                      ...(parsed.technicalSkills || []),
-                      ...(parsed.softSkills || []),
-                      ...(parsed.tools || []),
-                      ...(parsed.keywords || []),
-                    ];
-
-                    return (
-                      <>
-                        <div>
-                          <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Extracted Keywords:</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {allKeywords.map((keyword, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 rounded-full text-sm font-medium"
-                              >
-                                {keyword}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                        {parsed.summary && (
-                          <div className="bg-zinc-100 dark:bg-zinc-700 p-3 rounded-lg">
-                            <p className="text-sm text-zinc-700 dark:text-zinc-300">
-                              <span className="font-semibold">Summary: </span>
-                              {parsed.summary}
-                            </p>
-                          </div>
-                        )}
-                        <Button
-                          onClick={() => {
-                            const keywordText = allKeywords.join(', ');
-                            navigator.clipboard.writeText(keywordText);
-                            alert('Keywords copied to clipboard!');
-                          }}
-                          variant="outline"
-                          className="w-full gap-2"
-                        >
-                          <Copy className="w-4 h-4" />
-                          Copy Keywords
-                        </Button>
-                      </>
-                    );
-                  } catch (error) {
-                    console.error('Failed to parse keywords:', error);
-                    return (
-                      <div className="text-sm text-zinc-700 dark:text-zinc-300">
-                        Failed to parse keywords. Raw response:
-                        <pre className="mt-2 p-2 bg-white/50 dark:bg-black/20 rounded text-xs overflow-auto">
-                          {aiResult.content}
-                        </pre>
-                      </div>
-                    );
-                  }
-                })()}
+          <div className="mb-8 border-4 border-black bg-white">
+            <div className="p-5 border-b-2 border-black flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#FF3000]" />
+                <p className="text-base font-black uppercase tracking-widest">AI Keywords</p>
               </div>
-            </CardContent>
-          </Card>
-        )}
+              <Button variant="outline" size="sm" className="border-2 border-black h-8 w-8 p-0" onClick={() => setAiResult(null)}>✕</Button>
+            </div>
+            <div className="p-5 space-y-4">
+              {(() => {
+                try {
+                  const parsed = typeof aiResult.content === 'string'
+                    ? JSON.parse(aiResult.content)
+                    : aiResult.content;
 
-        {optimizationResult && (
-                <Card className="mb-8 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950">
-                  <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-blue-600" />
-                        Job Optimization Results
-                      </CardTitle>
-                      {selectedOptimizeJob && (
-                        <CardDescription>
-                          {selectedOptimizeJob.title} at {selectedOptimizeJob.company}
-                        </CardDescription>
-                      )}
-                    </div>
-                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                      Match {optimizationResult.job_match_score}%
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {optimizationResult.missing_skills.length > 0 && (
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Missing Skills</p>
+                  const allKeywords = [
+                    ...(parsed.technicalSkills || []),
+                    ...(parsed.softSkills || []),
+                    ...(parsed.tools || []),
+                    ...(parsed.keywords || []),
+                  ];
+
+                  return (
+                    <>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest mb-3">Extracted Keywords</p>
                         <div className="flex flex-wrap gap-2">
-                          {optimizationResult.missing_skills.map((skill) => (
-                            <Badge key={skill} className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                              {skill}
-                            </Badge>
+                          {allKeywords.map((keyword, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-block px-3 py-1 border-2 border-black bg-[#F2F2F2] text-black text-xs font-bold uppercase tracking-widest"
+                            >
+                              {keyword}
+                            </span>
                           ))}
                         </div>
                       </div>
-                    )}
-
-                    <div className="space-y-3">
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Suggestions</p>
-                      {optimizationResult.suggestions.map((suggestion, index) => (
-                        <div
-                          key={`${suggestion.section}-${index}`}
-                          className="p-3 border rounded-lg border-blue-100 dark:border-blue-900"
-                        >
-                          <div className="flex items-start gap-2 mb-2">
-                            <input
-                              type="checkbox"
-                              checked={selectedSuggestionIndexes.includes(index)}
-                              onChange={() => toggleSuggestion(index)}
-                              className="mt-0.5 h-4 w-4"
-                            />
-                            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium capitalize mb-1">
-                                {suggestion.section} Section
-                              </p>
-                              <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                                {suggestion.reason}
-                              </p>
-                            </div>
-                            <Badge variant="outline" className="text-xs">
-                              {suggestion.priority}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-zinc-700 dark:text-zinc-300 pl-6">
-                            {suggestion.suggested}
+                      {parsed.summary && (
+                        <div className="border-2 border-black bg-[#F2F2F2] p-3">
+                          <p className="text-xs text-black/70">
+                            <span className="font-black uppercase tracking-widest">Summary: </span>
+                            {parsed.summary}
                           </p>
                         </div>
-                      ))}
-
+                      )}
                       <Button
-                        className="w-full gap-2"
-                        onClick={applySelectedOptimizations}
-                        disabled={applyingOptimization || selectedSuggestionIndexes.length === 0}
+                        onClick={() => {
+                          const keywordText = allKeywords.join(', ');
+                          navigator.clipboard.writeText(keywordText);
+                          alert('Keywords copied to clipboard!');
+                        }}
+                        variant="outline"
+                        className="w-full gap-2 border-2 border-black"
                       >
-                        {applyingOptimization ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Applying selected changes...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            Apply Selected Changes ({selectedSuggestionIndexes.length})
-                          </>
-                        )}
+                        <Copy className="w-4 h-4" />
+                        Copy Keywords
                       </Button>
+                    </>
+                  );
+                } catch (error) {
+                  console.error('Failed to parse keywords:', error);
+                  return (
+                    <div className="text-xs text-black/70">
+                      Failed to parse keywords. Raw response:
+                      <pre className="mt-2 p-2 border-2 border-black bg-[#F2F2F2] text-xs overflow-auto">
+                        {aiResult.content}
+                      </pre>
                     </div>
-                  </CardContent>
-                </Card>
+                  );
+                }
+              })()}
+            </div>
+          </div>
+        )}
+
+        {optimizationResult && (
+          <div className="mb-8 border-4 border-black bg-white">
+            <div className="p-5 border-b-2 border-black flex items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-[#FF3000]" />
+                  <p className="text-base font-black uppercase tracking-widest">Job Optimization</p>
+                </div>
+                {selectedOptimizeJob && (
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
+                    {selectedOptimizeJob.title} at {selectedOptimizeJob.company}
+                  </p>
+                )}
+              </div>
+              <span className="border-2 border-black bg-black text-white text-xs font-black uppercase tracking-widest px-2 py-0.5 shrink-0">
+                Match {optimizationResult.job_match_score}%
+              </span>
+            </div>
+            <div className="p-5 space-y-6">
+              {optimizationResult.missing_skills.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest">Missing Skills</p>
+                  <div className="flex flex-wrap gap-2">
+                    {optimizationResult.missing_skills.map((skill) => (
+                      <span key={skill} className="border-2 border-[#FF3000] text-[#FF3000] text-xs font-black uppercase tracking-widest px-2 py-0.5">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               )}
+              <div className="space-y-3">
+                <p className="text-[10px] font-black uppercase tracking-widest">Suggestions</p>
+                {optimizationResult.suggestions.map((suggestion, index) => (
+                  <div
+                    key={`${suggestion.section}-${index}`}
+                    className="p-3 border-2 border-black bg-[#F2F2F2]"
+                  >
+                    <div className="flex items-start gap-2 mb-2">
+                      <input
+                        type="checkbox"
+                        checked={selectedSuggestionIndexes.includes(index)}
+                        onChange={() => toggleSuggestion(index)}
+                        className="mt-0.5 h-4 w-4 accent-black"
+                      />
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs font-black uppercase tracking-widest mb-1">
+                          {suggestion.section} Section
+                        </p>
+                        <p className="text-xs text-black/60">
+                          {suggestion.reason}
+                        </p>
+                      </div>
+                      <span className="border-2 border-black text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 shrink-0">
+                        {suggestion.priority}
+                      </span>
+                    </div>
+                    <p className="text-xs text-black/70 pl-6">
+                      {suggestion.suggested}
+                    </p>
+                  </div>
+                ))}
+                <Button
+                  variant="accent"
+                  className="w-full gap-2"
+                  onClick={applySelectedOptimizations}
+                  disabled={applyingOptimization || selectedSuggestionIndexes.length === 0}
+                >
+                  {applyingOptimization ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Applying selected changes...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Apply Selected Changes ({selectedSuggestionIndexes.length})
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <Dialog open={optimizeDialogOpen} onOpenChange={setOptimizeDialogOpen}>
-          <DialogContent className="sm:max-w-3xl">
+          <DialogContent className="sm:max-w-3xl border-4 border-black">
             <DialogHeader>
-              <DialogTitle>Optimize CV for a Job</DialogTitle>
-              <DialogDescription>
-                Search LinkedIn jobs and pick one to tailor this CV.
+              <DialogTitle className="font-black uppercase tracking-widest">Optimize CV for a Job</DialogTitle>
+              <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+                Search jobs and pick one to tailor this CV.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
@@ -947,23 +928,23 @@ export default function EditorPage() {
                 {optimizeJobs.map((job) => (
                   <div
                     key={job.id}
-                    className={`rounded-lg border p-4 cursor-pointer transition-all ${
+                    className={`border-2 p-4 cursor-pointer transition-colors ${
                       selectedOptimizeJob?.id === job.id
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
-                        : 'border-zinc-200 dark:border-zinc-700'
+                        ? 'border-black bg-black text-white'
+                        : 'border-black bg-white hover:bg-[#F2F2F2]'
                     }`}
                     onClick={() => setSelectedOptimizeJob(job)}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="font-semibold text-zinc-900 dark:text-zinc-100">{job.title}</p>
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                          {job.company} • {job.location}
+                        <p className={`text-sm font-black uppercase tracking-widest ${selectedOptimizeJob?.id === job.id ? 'text-white' : 'text-black'}`}>{job.title}</p>
+                        <p className={`text-xs font-bold uppercase tracking-widest mt-0.5 ${selectedOptimizeJob?.id === job.id ? 'text-white/70' : 'text-black/60'}`}>
+                          {job.company} · {job.location}
                         </p>
                       </div>
-                      <Badge variant="outline">{job.source}</Badge>
+                      <span className={`border text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 shrink-0 ${selectedOptimizeJob?.id === job.id ? 'border-white text-white' : 'border-black text-black'}`}>{job.source}</span>
                     </div>
-                    <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                    <p className={`mt-2 text-xs line-clamp-2 ${selectedOptimizeJob?.id === job.id ? 'text-white/70' : 'text-black/60'}`}>
                       {job.description}
                     </p>
                   </div>
@@ -971,10 +952,9 @@ export default function EditorPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOptimizeDialogOpen(false)}>
-                Cancel
-              </Button>
+              <Button variant="outline" onClick={() => setOptimizeDialogOpen(false)}>Cancel</Button>
               <Button
+                variant="accent"
                 onClick={async () => {
                   if (!selectedOptimizeJob) return;
                   setOptimizeDialogOpen(false);
@@ -988,74 +968,56 @@ export default function EditorPage() {
           </DialogContent>
         </Dialog>
 
-        {/* QR Code Dialog */}
+        {/* QR Code */}
         {showQR && qrUrl && (
-          <Card className="mb-8">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-              <CardTitle>Share Your CV</CardTitle>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowQR(false)}
-                className="ml-auto"
-              >
-                ✕
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-center gap-8">
+          <div className="mb-8 border-4 border-black bg-white">
+            <div className="p-5 border-b-2 border-black flex items-center justify-between">
+              <p className="text-base font-black uppercase tracking-widest">Share Your CV</p>
+              <Button variant="outline" size="sm" className="border-2 border-black h-8 w-8 p-0" onClick={() => setShowQR(false)}>✕</Button>
+            </div>
+            <div className="p-5">
+              <div className="flex flex-wrap items-start gap-8">
                 <div>
-                  <img src={qrUrl} alt="QR Code" className="w-64 h-64 border-2 border-zinc-200 dark:border-zinc-700 rounded-lg" />
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400 text-center mt-4">
-                    Scan to preview your CV
-                  </p>
+                  <img src={qrUrl} alt="QR Code" className="w-64 h-64 border-4 border-black" />
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 text-center mt-3">Scan to preview your CV</p>
                 </div>
-                <div className="max-w-sm">
-                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">Share this CV</h3>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-                    Use this QR code to share your CV with employers or print it on your application materials.
+                <div className="flex-1 min-w-[200px]">
+                  <p className="text-base font-black uppercase tracking-widest mb-2">Share this CV</p>
+                  <p className="text-xs font-bold text-black/60 mb-4">
+                    Share your CV with employers or print it on your application materials.
                   </p>
-                  
-                  {/* Link expiration info */}
                   {linkExpiresAt && !isProUser && (
-                    <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-4">
+                    <div className="border-2 border-black bg-[#F2F2F2] p-3 mb-4">
                       <div className="flex items-start gap-2">
-                        <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                        <Clock className="w-4 h-4 mt-0.5 flex-shrink-0" />
                         <div className="text-xs">
-                          <p className="font-medium text-amber-900 dark:text-amber-100 mb-1">
+                          <p className="font-black uppercase tracking-widest mb-1">
                             Link expires in {Math.ceil((new Date(linkExpiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days
                           </p>
-                          <p className="text-amber-700 dark:text-amber-300">
-                            Upgrade to Pro for permanent links that never expire
-                          </p>
+                          <p className="text-black/60">Upgrade to Pro for permanent links that never expire</p>
                         </div>
                       </div>
                     </div>
                   )}
                   {isProUser && (
-                    <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+                    <div className="border-2 border-black bg-black text-white p-3 mb-4">
                       <div className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
-                        <div className="text-xs">
-                          <p className="font-medium text-blue-900 dark:text-blue-100">
-                            ✨ Permanent Link - Never Expires
-                          </p>
-                        </div>
+                        <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <p className="text-xs font-black uppercase tracking-widest">Permanent Link — Never Expires</p>
                       </div>
                     </div>
                   )}
-                  
-                  <div className="bg-zinc-100 dark:bg-zinc-800 p-3 rounded mb-4 text-xs font-mono break-all text-zinc-700 dark:text-zinc-300">
+                  <div className="border-2 border-black bg-[#F2F2F2] p-3 mb-4 text-xs font-mono break-all text-black">
                     {shareUrl || `${window.location.origin}/share/...`}
                   </div>
-                  <Button onClick={handleDownloadQR} className="w-full gap-2">
+                  <Button onClick={handleDownloadQR} variant="accent" className="w-full gap-2">
                     <Download className="w-4 h-4" />
                     Download QR Code
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1063,27 +1025,27 @@ export default function EditorPage() {
           <div className="space-y-6">
             {selectedTemplate === 'academic' ? (
               // LaTeX Editor for Academic Template
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="border-4 border-black bg-white">
+                <div className="p-5 border-b-2 border-black">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
-                    LaTeX Editor
+                    <p className="text-base font-black uppercase tracking-widest">LaTeX Editor</p>
                     {isParsingLatex && (
-                      <span className="ml-2 text-xs text-blue-600 font-normal">Updating CV...</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-[#FF3000]">Updating...</span>
                     )}
-                  </CardTitle>
-                  <CardDescription>
+                  </div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
                     Write your CV in LaTeX format. Use the sync button to update the preview.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
+                  </p>
+                </div>
+                <div className="p-5">
                   <textarea
                     value={latexCode}
                     onChange={(e) => setLatexCode(e.target.value)}
                     placeholder="Enter your LaTeX code here..."
-                    className="w-full h-[600px] px-4 py-3 rounded-md border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    className="w-full h-[600px] px-4 py-3 border-2 border-black bg-[#F2F2F2] text-black font-mono text-sm focus:outline-none focus:ring-2 focus:ring-[#FF3000] resize-none"
                     spellCheck={false}
                   />
                   <div className="mt-4 space-y-3">
@@ -1095,10 +1057,10 @@ export default function EditorPage() {
                     </div>
                     
                     {/* Auto-sync toggle card */}
-                    <div className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+                    <div className={`flex items-center gap-3 p-3 border-2 border-black transition-all ${
                       autoSync 
-                        ? 'bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800' 
-                        : 'bg-zinc-50 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700'
+                        ? 'bg-black text-white' 
+                        : 'bg-[#F2F2F2]'
                     }`}>
                       <div className="flex items-center">
                         <input
@@ -1106,24 +1068,24 @@ export default function EditorPage() {
                           id="auto-sync"
                           checked={autoSync}
                           onChange={(e) => setAutoSync(e.target.checked)}
-                          className="w-4 h-4 text-blue-600 bg-white border-zinc-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                          className="w-4 h-4 cursor-pointer accent-black"
                         />
                       </div>
                       <label htmlFor="auto-sync" className="flex-1 cursor-pointer">
                         <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                           </svg>
-                          <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                          <span className={`text-xs font-black uppercase tracking-widest ${autoSync ? 'text-white' : 'text-black'}`}>
                             Auto-sync
                           </span>
                           {autoSync && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            <span className="inline-flex items-center px-2 py-0.5 border border-white text-[9px] font-black uppercase tracking-widest text-white">
                               Active
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
+                        <p className={`text-xs mt-0.5 ${autoSync ? 'text-white/70' : 'text-black/60'}`}>
                           {autoSync 
                             ? 'Preview updates automatically after 2s of typing'
                             : 'Use "Sync to CV" button to update preview manually'
@@ -1138,7 +1100,8 @@ export default function EditorPage() {
                     <Button
                       onClick={() => syncLatexToCV(false)}
                       disabled={isParsingLatex}
-                      className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                      variant="accent"
+                      className="gap-2"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -1236,87 +1199,67 @@ export default function EditorPage() {
                       </div>
                     </div>
                   </details>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ) : (
               // Regular Forms for Other Templates
               <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="personal">Personal</TabsTrigger>
-                <TabsTrigger value="experience">Experience</TabsTrigger>
-                <TabsTrigger value="education">Education</TabsTrigger>
-                <TabsTrigger value="skills">Skills</TabsTrigger>
-                <TabsTrigger value="custom">Custom</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-5 h-10 border-2 border-black bg-[#F2F2F2] rounded-none p-0">
+                <TabsTrigger value="personal" className="text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-none">Personal</TabsTrigger>
+                <TabsTrigger value="experience" className="text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-none">Exp.</TabsTrigger>
+                <TabsTrigger value="education" className="text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-none">Edu.</TabsTrigger>
+                <TabsTrigger value="skills" className="text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-none">Skills</TabsTrigger>
+                <TabsTrigger value="custom" className="text-[9px] font-black uppercase tracking-widest rounded-none data-[state=active]:bg-black data-[state=active]:text-white data-[state=active]:shadow-none">Custom</TabsTrigger>
               </TabsList>
 
               <TabsContent value="personal" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Personal Information</CardTitle>
-                    <CardDescription>
-                      Enter your contact information and social media profiles
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <PersonalInfoForm />
-                  </CardContent>
-                </Card>
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Personal Information</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Enter your contact information and social media profiles</p>
+                  </div>
+                  <div className="p-5"><PersonalInfoForm /></div>
+                </div>
               </TabsContent>
 
               <TabsContent value="experience" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Work Experience</CardTitle>
-                    <CardDescription>
-                      Add your professional work experience
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ExperienceForm />
-                  </CardContent>
-                </Card>
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Work Experience</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Add your professional work experience</p>
+                  </div>
+                  <div className="p-5"><ExperienceForm /></div>
+                </div>
               </TabsContent>
 
               <TabsContent value="education" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Education</CardTitle>
-                    <CardDescription>
-                      Add your education background and certificates
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <EducationForm />
-                  </CardContent>
-                </Card>
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Education</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Add your education background and certificates</p>
+                  </div>
+                  <div className="p-5"><EducationForm /></div>
+                </div>
               </TabsContent>
 
               <TabsContent value="skills" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Skills</CardTitle>
-                    <CardDescription>
-                      List your technical and soft skills
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <SkillsForm />
-                  </CardContent>
-                </Card>
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Skills</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">List your technical and soft skills</p>
+                  </div>
+                  <div className="p-5"><SkillsForm /></div>
+                </div>
               </TabsContent>
 
               <TabsContent value="custom" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Custom Sections</CardTitle>
-                    <CardDescription>
-                      Add custom sections like Awards, Volunteer Work, Publications, etc.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <CustomSectionForm />
-                  </CardContent>
-                </Card>
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Custom Sections</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Add sections like Awards, Publications, Volunteer Work, etc.</p>
+                  </div>
+                  <div className="p-5"><CustomSectionForm /></div>
+                </div>
               </TabsContent>
             </Tabs>
             )}
@@ -1324,53 +1267,43 @@ export default function EditorPage() {
 
           {/* Preview */}
           <div className="lg:sticky lg:top-24 h-fit">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <div className="border-4 border-black bg-white">
+              <div className="p-4 border-b-2 border-black flex items-center justify-between">
                 <div>
-                  <CardTitle>Preview</CardTitle>
-                  <CardDescription>Live preview of your CV</CardDescription>
+                  <p className="text-[10px] font-black uppercase tracking-widest">Preview</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black/50 mt-0.5">Live A4 preview</p>
                 </div>
-                
-                {/* Zoom Controls */}
                 <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}
-                    disabled={zoomLevel <= 50}
-                    className="h-8 w-8 p-0"
-                  >
+                  <Button size="sm" variant="outline" onClick={() => setZoomLevel(Math.max(40, zoomLevel - 10))} disabled={zoomLevel <= 40} className="h-8 w-8 p-0 border-2 border-black">
                     <ZoomOut className="w-4 h-4" />
                   </Button>
-                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 min-w-[3rem] text-center">
-                    {zoomLevel}%
-                  </span>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setZoomLevel(Math.min(150, zoomLevel + 10))}
-                    disabled={zoomLevel >= 150}
-                    className="h-8 w-8 p-0"
-                  >
+                  <span className="text-[10px] font-black uppercase tracking-widest min-w-[3rem] text-center">{zoomLevel}%</span>
+                  <Button size="sm" variant="outline" onClick={() => setZoomLevel(Math.min(150, zoomLevel + 10))} disabled={zoomLevel >= 150} className="h-8 w-8 p-0 border-2 border-black">
                     <ZoomIn className="w-4 h-4" />
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setZoomLevel(100)}
-                    className="h-8 px-2 text-xs"
-                  >
-                    Reset
+                  <Button size="sm" variant="outline" onClick={() => setZoomLevel(70)} className="h-8 px-2 text-[10px] border-2 border-black font-black uppercase tracking-widest">
+                    Fit
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-white rounded-lg border border-zinc-200 shadow-sm overflow-auto max-h-[800px]">
-                  <div 
-                    style={{ 
+              </div>
+              <div className="p-4 bg-[#F2F2F2] flex justify-center overflow-auto">
+                <div
+                  style={{
+                    width: Math.round(794 * zoomLevel / 100) + 'px',
+                    height: Math.round(1123 * zoomLevel / 100) + 'px',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    position: 'relative',
+                  }}
+                >
+                  <div
+                    style={{
                       transform: `scale(${zoomLevel / 100})`,
-                      transformOrigin: 'top center',
-                      transition: 'transform 0.2s ease'
+                      transformOrigin: 'top left',
+                      width: '794px',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
                     }}
                   >
                     {content ? (
@@ -1387,15 +1320,15 @@ export default function EditorPage() {
                         <ModernTemplate content={content} />
                       )
                     ) : (
-                      <div className="text-center text-zinc-500 py-32">
-                        <Eye className="w-12 h-12 mx-auto mb-4" />
-                        <p>Waiting for CV content to load...</p>
+                      <div className="flex flex-col items-center justify-center h-[1123px] text-center">
+                        <Eye className="w-12 h-12 mb-4 text-black/30" />
+                        <p className="text-xs font-bold uppercase tracking-widest text-black/40">Waiting for CV content</p>
                       </div>
                     )}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </main>
