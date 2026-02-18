@@ -16,8 +16,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+
 import {
   Dialog,
   DialogContent,
@@ -310,19 +309,19 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Button onClick={() => setUploadDialogOpen(true)} variant="outline">
+          <Button onClick={() => setUploadDialogOpen(true)} variant="outline" className="gap-2">
             <Upload className="w-4 h-4" />
             Import CV
           </Button>
 
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="accent">
+              <Button variant="accent" className="gap-2">
                 <Plus className="w-4 h-4" />
                 Create New CV
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md border-4 border-black">
               <DialogHeader className="space-y-3">
                 <DialogTitle className="text-xl font-black uppercase tracking-widest">Create New CV</DialogTitle>
                 <DialogDescription className="text-sm font-bold uppercase tracking-widest text-black/60">
@@ -378,7 +377,7 @@ export default function DashboardPage() {
 
       {/* Rename Dialog */}
         <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md border-4 border-black">
             <DialogHeader className="space-y-3">
               <DialogTitle className="text-xl font-black uppercase tracking-widest">Rename CV</DialogTitle>
               <DialogDescription className="text-sm font-bold uppercase tracking-widest text-black/60">
@@ -428,84 +427,84 @@ export default function DashboardPage() {
       {/* Stats Cards - Only show if there are resumes */}
       {resumes.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Card className="bg-[#F2F2F2]">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-widest">Total CVs</p>
-                  <p className="text-3xl font-black mt-2">{resumes.length}</p>
-                </div>
-                <div className="border-2 border-black p-2">
-                  <FileText className="w-6 h-6" />
-                </div>
+          <div className="border-4 border-black bg-[#F2F2F2] p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-black/60">Total CVs</p>
+                <p className="text-4xl font-black mt-2 tabular-nums">{resumes.length}</p>
               </div>
-            </CardContent>
-          </Card>
+              <div className="border-2 border-black bg-white p-2 self-start">
+                <FileText className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
 
-          <Card 
-            className={`${defaultResume ? 'cursor-pointer' : 'opacity-60'}`}
+          <div
+            className={`border-4 border-black bg-white p-6 ${defaultResume ? 'cursor-pointer hover:bg-[#F2F2F2]' : 'opacity-60'}`}
             onClick={() => defaultResume && router.push(`/editor/${defaultResume.id}`)}
           >
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1 min-w-0 pr-2">
-                  <p className="text-xs font-black uppercase tracking-widest">Default CV</p>
-                  <p className="text-lg font-black mt-2 truncate">
-                    {defaultResume?.title || 'None'}
-                  </p>
-                  {defaultResume && (
-                    <p className="text-[10px] font-bold uppercase tracking-widest mt-1">Click to edit</p>
-                  )}
-                </div>
-                <div className="border-2 border-black p-2 flex-shrink-0">
-                  <Star className="w-6 h-6" fill="currentColor" />
-                </div>
+            <div className="flex items-center justify-between">
+              <div className="flex-1 min-w-0 pr-3">
+                <p className="text-[10px] font-black uppercase tracking-widest text-black/60">Default CV</p>
+                <p className="text-xl font-black mt-2 truncate">
+                  {defaultResume?.title || 'None'}
+                </p>
+                {defaultResume && (
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black/50 mt-1">Click to edit</p>
+                )}
               </div>
-            </CardContent>
-          </Card>
+              <div className="border-2 border-black p-2 self-start flex-shrink-0">
+                <Star className="w-6 h-6" fill="currentColor" />
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Resumes Grid */}
       {resumes.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center justify-center py-20">
-            <div className="border-2 border-black p-4 mb-6">
-              <FileText className="w-12 h-12" />
-            </div>
-            <h3 className="text-2xl font-black uppercase tracking-widest mb-2">
-              No CVs created yet
-            </h3>
-            <p className="text-xs font-bold uppercase tracking-widest text-black/60 mb-8 text-center max-w-md">
-              Start by creating your first CV. With our AI-powered editor and templates, prepare
-              your professional CV in minutes.
-            </p>
-            <Button onClick={() => setCreateDialogOpen(true)} variant="accent">
-              <Plus className="w-4 h-4" />
-              Create My First CV
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="border-4 border-black bg-white py-20 flex flex-col items-center justify-center">
+          <div className="border-2 border-black p-4 mb-6">
+            <FileText className="w-12 h-12" />
+          </div>
+          <h3 className="text-2xl font-black uppercase tracking-widest mb-2">
+            No CVs created yet
+          </h3>
+          <p className="text-xs font-bold uppercase tracking-widest text-black/60 mb-8 text-center max-w-md">
+            Start by creating your first CV. With our AI-powered editor and templates, prepare
+            your professional CV in minutes.
+          </p>
+          <Button onClick={() => setCreateDialogOpen(true)} variant="accent" className="gap-2">
+            <Plus className="w-4 h-4" />
+            Create My First CV
+          </Button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {resumes.map((resume) => (
-            <Card key={resume.id} className="group">
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                <div className="flex-1 space-y-1">
-                  <CardTitle className="text-lg font-black uppercase tracking-widest">
+            <div key={resume.id} className="border-4 border-black bg-white flex flex-col">
+              {/* Card Header */}
+              <div className="p-5 border-b-2 border-black flex flex-row items-start justify-between gap-2">
+                <div className="flex-1 min-w-0 space-y-1">
+                  <p className="text-base font-black uppercase tracking-widest leading-tight truncate">
                     {resume.title}
-                  </CardTitle>
-                  <CardDescription className="text-[10px] font-bold uppercase tracking-widest">
+                  </p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-black/50">
                     Updated: {new Date(resume.updated_at).toLocaleDateString('en-US', { 
                       month: 'short', 
                       day: 'numeric',
                       year: 'numeric'
                     })}
-                  </CardDescription>
+                  </p>
+                  {resume.is_default && (
+                    <span className="inline-block border-2 border-black bg-black text-white text-[9px] font-black uppercase tracking-widest px-2 py-0.5">
+                      Default
+                    </span>
+                  )}
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9">
+                    <Button variant="outline" size="icon" className="h-8 w-8 shrink-0 border-2 border-black">
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -530,9 +529,7 @@ export default function DashboardPage() {
                       Copy Link
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() =>
-                        window.open(`/preview/username/${resume.slug}`, '_blank')
-                      }
+                      onClick={() => window.open(`/preview/username/${resume.slug}`, '_blank')}
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
                       Preview
@@ -547,31 +544,27 @@ export default function DashboardPage() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-4 text-sm h-6">
-                  {resume.is_default && <Badge variant="destructive">Default</Badge>}
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => router.push(`/editor/${resume.id}`)}
-                  >
-                    <Edit className="w-4 h-4" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => window.open(`/preview/username/${resume.slug}`, '_blank')}
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+              {/* Card Footer */}
+              <div className="p-5 flex items-center gap-2 mt-auto">
+                <Button
+                  variant="accent"
+                  className="flex-1 gap-2"
+                  onClick={() => router.push(`/editor/${resume.id}`)}
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="border-2 border-black h-9 w-9 shrink-0"
+                  onClick={() => window.open(`/preview/username/${resume.slug}`, '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           ))}
         </div>
       )}
