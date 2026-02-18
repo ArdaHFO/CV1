@@ -195,6 +195,42 @@ export default function EditorPage() {
     loadResumeVersion();
   }, [resumeId, router, setCurrentVersion, setContent]);
 
+  // Auto-start review mode if navigated from jobs page with pending optimization
+  useEffect(() => {
+    if (!content || loading) return;
+    const pendingReview = new URLSearchParams(window.location.search).get('pendingReview');
+    if (pendingReview !== '1') return;
+
+    const raw = localStorage.getItem('pendingOptimization');
+    if (!raw) return;
+
+    try {
+      const { optimization, selectedIndexes, jobTitle, jobCompany } = JSON.parse(raw) as {
+        optimization: CVOptimizationResult;
+        selectedIndexes: number[];
+        jobTitle: string;
+        jobCompany: string;
+        resumeId: string;
+      };
+
+      localStorage.removeItem('pendingOptimization');
+
+      // Set up fake job for history saving
+      setSelectedOptimizeJob({ id: 'jobs-page', title: jobTitle, company: jobCompany } as Job);
+      setOptimizationResult(optimization);
+      setSelectedSuggestionIndexes(selectedIndexes);
+
+      // Start step-by-step review
+      setReviewQueue([...selectedIndexes]);
+      setReviewIndex(0);
+      setAcceptedIndexes([]);
+      setReviewMode(true);
+    } catch (e) {
+      console.error('Failed to load pending optimization:', e);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [content, loading]);
+
   // Generate LaTeX code when content changes or academic template is selected
   useEffect(() => {
     if (content && selectedTemplate === 'academic' && !latexCode) {

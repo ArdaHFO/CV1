@@ -495,23 +495,16 @@ export default function JobDetailPage() {
       return;
     }
 
-    setApplyingOptimization(true);
-    try {
-      const optimizedContent = applyOptimizationToResume(
-        sourceResumeContent,
-        optimization,
-        job,
-        selectedSuggestionIndexes
-      );
+    // Save optimization payload for step-by-step review in editor
+    localStorage.setItem('pendingOptimization', JSON.stringify({
+      optimization,
+      selectedIndexes: selectedSuggestionIndexes,
+      jobTitle: job.title,
+      jobCompany: job.company,
+      resumeId: selectedResumeId,
+    }));
 
-      localStorage.setItem(`resume-content-${selectedResumeId}`, JSON.stringify(optimizedContent));
-      localStorage.setItem('lastOptimizedResumeId', selectedResumeId);
-
-      alert('Selected changes applied. Opening editor...');
-      router.push(`/editor/${selectedResumeId}?optimized=1`);
-    } finally {
-      setApplyingOptimization(false);
-    }
+    router.push(`/editor/${selectedResumeId}?pendingReview=1`);
   };
 
   const getMatchScoreStyle = (score: number) => {
