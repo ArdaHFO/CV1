@@ -46,28 +46,68 @@ export async function POST(request: NextRequest) {
       })),
     };
 
-    const prompt = `You are an expert CV optimization assistant. Analyze the following job posting and CV, then provide specific suggestions to optimize the CV for this job.
+    const prompt = `You are a world-class ATS (Applicant Tracking System) expert and professional CV writer. Deeply analyze the job posting and the candidate's CV below, then produce highly specific, actionable optimization suggestions. Your analysis must be genuine—do not produce generic advice.
 
-Job Description:
+=== JOB POSTING ===
 ${jobDescription}
 
-Job Requirements:
+Additional Requirements:
 ${jobRequirements?.join('\n') || 'N/A'}
 
-Required Skills:
+Required/Mentioned Skills:
 ${jobSkills?.join(', ') || 'N/A'}
 
-Current CV:
+=== CANDIDATE CV ===
 ${JSON.stringify(cvSummary, null, 2)}
 
-Provide a JSON response with:
-1. job_match_score: A score from 0-100 indicating how well the CV matches the job
-2. suggestions: Array of specific CV improvement suggestions with section, suggested text, reason, and priority
-3. missing_skills: Skills mentioned in the job that are missing from the CV
-4. matching_skills: Skills from the CV that match the job requirements
-5. recommended_changes: High-level recommendations
+=== YOUR TASK ===
 
-Format your response as valid JSON.`;
+1. READ the job posting carefully. Identify:
+   - The exact job title and seniority level
+   - Must-have technical skills and tools
+   - Soft skills emphasized
+   - Key responsibilities the role involves
+   - Industry-specific terminology and keywords used
+
+2. COMPARE the CV against each requirement above. Look at every section: summary, each experience entry, skills list, education.
+
+3. Return a JSON object with these EXACT fields:
+
+{
+  "job_match_score": <integer 0-100, calculated as: (matched_keywords / total_required_keywords) * 60 + experience_relevance_bonus(0-25) + structure_bonus(0-15)>,
+  "match_breakdown": {
+    "keywords": <0-100, what % of job keywords appear in the CV>,
+    "experience": <0-100, how relevant is the experience level and domain>,
+    "skills": <0-100, how well do skills match>,
+    "summary": <0-100, does the summary speak to this specific role>
+  },
+  "suggestions": [
+    {
+      "section": "<one of: summary | experience | skills | education>",
+      "experience_index": <for experience section: 0-based index of which job entry to modify, or null for skills/summary>,
+      "current": "<the exact current text from that section, or empty string if it needs to be added>",
+      "suggested": "<the FULL improved replacement text—not a vague tip, but the actual new text to use>",
+      "reason": "<one specific sentence: why THIS change improves match with THIS job posting>",
+      "priority": "<high | medium | low>",
+      "impact": "<ATS | Readability | Relevance>"
+    }
+  ],
+  "missing_skills": ["<skill name present in job but absent from CV>"],
+  "matching_skills": ["<skill name present in BOTH job and CV>"],
+  "recommended_changes": ["<high-level strategic suggestion as one sentence>"],
+  "job_title_detected": "<job title as inferred from the posting>",
+  "top_keywords": ["<5-10 most critical keywords from the job posting that must appear in the CV>"]
+}
+
+RULES:
+- suggestions.suggested must be the ACTUAL FULL TEXT to put in the CV, not a description of what to do.
+- For summary section suggestions, write a complete professional summary paragraph tailored to this exact job.
+- For experience section suggestions, write complete bullet points or description text that integrates keywords from the job posting.
+- For skills section, the "suggested" field is the skill name only (e.g. "Kubernetes").
+- Do NOT suggest adding skills the candidate clearly does not have based on their CV—only rephrase or emphasize existing knowledge.
+- missing_skills should only list skills explicitly required by the posting that are truly absent.
+- Provide 3-6 suggestions maximum. Focus on highest impact changes.
+- Respond ONLY with the JSON object. No markdown, no prose, no code fences.`;
 
     try {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -156,13 +196,24 @@ function parseOptimizationResult(rawContent: string): CVOptimizationResult {
 function normalizeOptimizationResult(input: any): CVOptimizationResult {
   return {
     job_match_score: Number(input?.job_match_score ?? input?.matchPercentage ?? 0),
+    match_breakdown: input?.match_breakdown
+      ? {
+          keywords: Number(input.match_breakdown.keywords ?? 0),
+          experience: Number(input.match_breakdown.experience ?? 0),
+          skills: Number(input.match_breakdown.skills ?? 0),
+          summary: Number(input.match_breakdown.summary ?? 0),
+        }
+      : undefined,
     suggestions: Array.isArray(input?.suggestions)
       ? input.suggestions.map((suggestion: any) => ({
           section: mapSuggestionSection(suggestion?.section || suggestion?.category),
+          experience_index:
+            suggestion?.experience_index != null ? Number(suggestion.experience_index) : null,
           current: suggestion?.current,
           suggested: String(suggestion?.suggested || suggestion?.suggestion || ''),
           reason: String(suggestion?.reason || 'AI suggestion'),
           priority: mapSuggestionPriority(suggestion?.priority || suggestion?.priorityScore),
+          impact: mapImpact(suggestion?.impact),
         }))
       : [],
     missing_skills: Array.isArray(input?.missing_skills)
@@ -178,7 +229,19 @@ function normalizeOptimizationResult(input: any): CVOptimizationResult {
     recommended_changes: Array.isArray(input?.recommended_changes)
       ? input.recommended_changes.map(String)
       : [],
+    job_title_detected: input?.job_title_detected ? String(input.job_title_detected) : undefined,
+    top_keywords: Array.isArray(input?.top_keywords)
+      ? input.top_keywords.map(String)
+      : undefined,
   };
+}
+
+function mapImpact(value: any): CVOptimizationSuggestion['impact'] {
+  const normalized = String(value || '').toLowerCase();
+  if (normalized.includes('ats')) return 'ATS';
+  if (normalized.includes('read')) return 'Readability';
+  if (normalized.includes('relev')) return 'Relevance';
+  return 'Relevance';
 }
 
 function mapSuggestionSection(value: any): CVOptimizationSuggestion['section'] {

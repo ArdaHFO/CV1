@@ -511,65 +511,120 @@ export default function EditorPage() {
     );
   };
 
-  const applySelectedOptimizations = () => {
+  const applySelectedOptimizations = async () => {
     if (!content || !optimizationResult) return;
 
-    if (selectedSuggestionIndexes.length === 0) {
-      alert('Please select at least one suggestion to apply.');
-      return;
-    }
+    if (selectedSuggestionIndexes.length === 0) return;
 
     setApplyingOptimization(true);
 
     try {
       const updatedContent: ResumeContent = {
         ...content,
-        experience: [...content.experience],
+        experience: content.experience.map((exp) => ({ ...exp })),
         skills: [...content.skills],
       };
 
-      optimizationResult.suggestions.forEach((suggestion, index) => {
-        if (!selectedSuggestionIndexes.includes(index)) return;
+      for (const index of selectedSuggestionIndexes) {
+        const suggestion = optimizationResult.suggestions[index];
+        if (!suggestion) continue;
 
         if (suggestion.section === 'summary' && suggestion.suggested) {
           updatedContent.summary = suggestion.suggested;
         }
 
-        if (suggestion.section === 'experience' && updatedContent.experience[0]) {
-          const currentDescription = updatedContent.experience[0].description || '';
-          updatedContent.experience[0] = {
-            ...updatedContent.experience[0],
-            description: `${currentDescription}\n- ${suggestion.suggested}`.trim(),
-          };
+        if (suggestion.section === 'experience') {
+          // Use experience_index if AI provided it, otherwise find the best matching entry
+          let targetIndex =
+            suggestion.experience_index != null && suggestion.experience_index >= 0
+              ? suggestion.experience_index
+              : -1;
+
+          // Fallback: find the experience entry whose description most closely matches `suggestion.current`
+          if (targetIndex === -1 && suggestion.current) {
+            const currentLower = suggestion.current.toLowerCase();
+            targetIndex = updatedContent.experience.findIndex(
+              (exp) =>
+                exp.description?.toLowerCase().includes(currentLower.slice(0, 40)) ||
+                exp.position?.toLowerCase().includes(currentLower.slice(0, 20))
+            );
+          }
+
+          // Final fallback: first entry
+          if (targetIndex === -1) targetIndex = 0;
+
+          if (updatedContent.experience[targetIndex]) {
+            updatedContent.experience[targetIndex] = {
+              ...updatedContent.experience[targetIndex],
+              description: suggestion.suggested,
+            };
+          }
         }
 
         if (suggestion.section === 'skills' && suggestion.suggested) {
+          // suggested may be a comma-separated list or a single skill name
+          const newSkillNames = suggestion.suggested
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean);
+
+          for (const skillName of newSkillNames) {
+            const alreadyExists = updatedContent.skills.some(
+              (s) => s.name.toLowerCase() === skillName.toLowerCase()
+            );
+            if (!alreadyExists) {
+              updatedContent.skills = [
+                ...updatedContent.skills,
+                {
+                  id: crypto.randomUUID?.() || `skill-${Date.now()}-${Math.random()}`,
+                  name: skillName,
+                  category: 'Technical',
+                  level: 'intermediate' as const,
+                },
+              ];
+            }
+          }
+        }
+      }
+
+      // Add missing skills (deduplicated)
+      for (const skill of optimizationResult.missing_skills) {
+        const clean = skill.trim();
+        if (!clean) continue;
+        const alreadyExists = updatedContent.skills.some(
+          (s) => s.name.toLowerCase() === clean.toLowerCase()
+        );
+        if (!alreadyExists) {
           updatedContent.skills = [
             ...updatedContent.skills,
             {
-              id: crypto.randomUUID?.() || `skill-${Date.now()}-${index}`,
-              name: suggestion.suggested,
-              category: 'Suggested',
+              id: crypto.randomUUID?.() || `missing-skill-${Date.now()}-${Math.random()}`,
+              name: clean,
+              category: 'Technical',
               level: 'intermediate' as const,
             },
           ];
         }
-      });
-
-      if (optimizationResult.missing_skills.length > 0) {
-        const missingSkills = optimizationResult.missing_skills.map((skill, index) => ({
-          id: crypto.randomUUID?.() || `missing-skill-${Date.now()}-${index}`,
-          name: skill,
-          category: 'Suggested',
-          level: 'beginner' as const,
-        }));
-
-        updatedContent.skills = [...updatedContent.skills, ...missingSkills];
       }
 
       setContent(updatedContent);
       setIsDirty(true);
-      alert('Selected optimizations applied. Review and save your CV.');
+
+      // Auto-save to DB
+      if (currentVersion) {
+        setIsSaving(true);
+        try {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          localStorage.setItem(`resume-content-${resumeId}`, JSON.stringify(updatedContent));
+          setIsDirty(false);
+        } finally {
+          setIsSaving(false);
+        }
+      }
+
+      // Clear optimization panel to reveal the updated editor
+      setOptimizationResult(null);
+      setSelectedSuggestionIndexes([]);
     } finally {
       setApplyingOptimization(false);
     }
@@ -799,11 +854,14 @@ export default function EditorPage() {
 
         {optimizationResult && (
           <div className="mb-8 border-4 border-black bg-white">
+            {/* Header */}
             <div className="p-5 border-b-2 border-black flex items-start justify-between gap-4">
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Sparkles className="w-5 h-5 text-[#FF3000]" />
-                  <p className="text-base font-black uppercase tracking-widest">Job Optimization</p>
+                  <p className="text-base font-black uppercase tracking-widest">
+                    {optimizationResult.job_title_detected ? `Optimized for: ${optimizationResult.job_title_detected}` : 'Job Optimization'}
+                  </p>
                 </div>
                 {selectedOptimizeJob && (
                   <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
@@ -811,74 +869,266 @@ export default function EditorPage() {
                   </p>
                 )}
               </div>
-              <span className="border-2 border-black bg-black text-white text-xs font-black uppercase tracking-widest px-2 py-0.5 shrink-0">
-                Match {optimizationResult.job_match_score}%
-              </span>
+              <div className="flex items-center gap-2 shrink-0">
+                <span
+                  className={`border-2 text-xs font-black uppercase tracking-widest px-2 py-0.5 ${
+                    optimizationResult.job_match_score >= 70
+                      ? 'border-black bg-black text-white'
+                      : optimizationResult.job_match_score >= 40
+                      ? 'border-black bg-[#F2F2F2] text-black'
+                      : 'border-[#FF3000] bg-[#FF3000] text-white'
+                  }`}
+                >
+                  {optimizationResult.job_match_score}% Match
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-2 border-black h-8 w-8 p-0"
+                  onClick={() => { setOptimizationResult(null); setSelectedSuggestionIndexes([]); }}
+                >
+                  ✕
+                </Button>
+              </div>
             </div>
+
             <div className="p-5 space-y-6">
+              {/* Match Breakdown */}
+              {optimizationResult.match_breakdown && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest mb-3">Match Breakdown</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {(
+                      [
+                        { label: 'Keywords', value: optimizationResult.match_breakdown.keywords },
+                        { label: 'Experience', value: optimizationResult.match_breakdown.experience },
+                        { label: 'Skills', value: optimizationResult.match_breakdown.skills },
+                        { label: 'Summary', value: optimizationResult.match_breakdown.summary },
+                      ] as { label: string; value: number }[]
+                    ).map(({ label, value }) => (
+                      <div key={label} className="border-2 border-black p-2">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-black/60 mb-1">{label}</p>
+                        <div className="h-1.5 bg-[#F2F2F2] border border-black mb-1">
+                          <div
+                            className={`h-full ${value >= 70 ? 'bg-black' : value >= 40 ? 'bg-black/50' : 'bg-[#FF3000]'}`}
+                            style={{ width: `${value}%` }}
+                          />
+                        </div>
+                        <p className="text-xs font-black">{value}%</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Top Keywords */}
+              {optimizationResult.top_keywords && optimizationResult.top_keywords.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest">Critical Keywords</p>
+                  <div className="flex flex-wrap gap-2">
+                    {optimizationResult.top_keywords.map((kw) => {
+                      const inCV =
+                        optimizationResult.matching_skills.some(
+                          (s) => s.toLowerCase() === kw.toLowerCase()
+                        ) ||
+                        (content?.summary || '').toLowerCase().includes(kw.toLowerCase()) ||
+                        (content?.experience || []).some((e) =>
+                          e.description?.toLowerCase().includes(kw.toLowerCase())
+                        );
+                      return (
+                        <span
+                          key={kw}
+                          className={`text-xs font-black uppercase tracking-widest px-2 py-0.5 border-2 ${
+                            inCV
+                              ? 'border-black bg-black text-white'
+                              : 'border-[#FF3000] text-[#FF3000]'
+                          }`}
+                        >
+                          {inCV ? '✓ ' : '✗ '}{kw}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Missing Skills */}
               {optimizationResult.missing_skills.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-[10px] font-black uppercase tracking-widest">Missing Skills</p>
                   <div className="flex flex-wrap gap-2">
                     {optimizationResult.missing_skills.map((skill) => (
-                      <span key={skill} className="border-2 border-[#FF3000] text-[#FF3000] text-xs font-black uppercase tracking-widest px-2 py-0.5">
+                      <span
+                        key={skill}
+                        className="border-2 border-[#FF3000] text-[#FF3000] text-xs font-black uppercase tracking-widest px-2 py-0.5"
+                      >
                         {skill}
                       </span>
                     ))}
                   </div>
+                  <p className="text-[10px] font-bold text-black/50 uppercase tracking-widest">
+                    These will be added to your Skills section when you apply changes.
+                  </p>
                 </div>
               )}
+
+              {/* Suggestions */}
               <div className="space-y-3">
-                <p className="text-[10px] font-black uppercase tracking-widest">Suggestions</p>
-                {optimizationResult.suggestions.map((suggestion, index) => (
-                  <div
-                    key={`${suggestion.section}-${index}`}
-                    className="p-3 border-2 border-black bg-[#F2F2F2]"
-                  >
-                    <div className="flex items-start gap-2 mb-2">
-                      <input
-                        type="checkbox"
-                        checked={selectedSuggestionIndexes.includes(index)}
-                        onChange={() => toggleSuggestion(index)}
-                        className="mt-0.5 h-4 w-4 accent-black"
-                      />
-                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="text-xs font-black uppercase tracking-widest mb-1">
-                          {suggestion.section} Section
-                        </p>
-                        <p className="text-xs text-black/60">
-                          {suggestion.reason}
-                        </p>
-                      </div>
-                      <span className="border-2 border-black text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 shrink-0">
-                        {suggestion.priority}
-                      </span>
-                    </div>
-                    <p className="text-xs text-black/70 pl-6">
-                      {suggestion.suggested}
-                    </p>
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-black uppercase tracking-widest">
+                    AI Suggestions ({optimizationResult.suggestions.length})
+                  </p>
+                  <div className="flex gap-2">
+                    <button
+                      className="text-[9px] font-black uppercase tracking-widest underline"
+                      onClick={() =>
+                        setSelectedSuggestionIndexes(
+                          optimizationResult.suggestions.map((_, i) => i)
+                        )
+                      }
+                    >
+                      Select All
+                    </button>
+                    <span className="text-[9px] text-black/30">|</span>
+                    <button
+                      className="text-[9px] font-black uppercase tracking-widest underline"
+                      onClick={() => setSelectedSuggestionIndexes([])}
+                    >
+                      Clear
+                    </button>
                   </div>
-                ))}
-                <Button
-                  variant="accent"
-                  className="w-full gap-2"
-                  onClick={applySelectedOptimizations}
-                  disabled={applyingOptimization || selectedSuggestionIndexes.length === 0}
-                >
-                  {applyingOptimization ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Applying selected changes...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      Apply Selected Changes ({selectedSuggestionIndexes.length})
-                    </>
-                  )}
-                </Button>
+                </div>
+
+                {optimizationResult.suggestions.map((suggestion, index) => {
+                  const isSelected = selectedSuggestionIndexes.includes(index);
+                  const sectionLabel =
+                    suggestion.section === 'experience' && suggestion.experience_index != null
+                      ? `Experience #${suggestion.experience_index + 1}`
+                      : suggestion.section.charAt(0).toUpperCase() + suggestion.section.slice(1);
+                  const impactColors: Record<string, string> = {
+                    ATS: 'border-[#FF3000] text-[#FF3000]',
+                    Readability: 'border-black text-black',
+                    Relevance: 'border-black/50 text-black/50',
+                  };
+                  const impactLabel = suggestion.impact || 'Relevance';
+                  return (
+                    <div
+                      key={`${suggestion.section}-${index}`}
+                      className={`border-2 cursor-pointer transition-colors ${
+                        isSelected ? 'border-black bg-black text-white' : 'border-black bg-[#F2F2F2] text-black'
+                      }`}
+                      onClick={() => toggleSuggestion(index)}
+                    >
+                      <div className="p-3">
+                        <div className="flex items-start gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            readOnly
+                            className="mt-0.5 h-4 w-4 accent-black shrink-0 pointer-events-none"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center flex-wrap gap-2 mb-1">
+                              <span
+                                className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border ${
+                                  isSelected ? 'border-white text-white' : 'border-black text-black'
+                                }`}
+                              >
+                                {sectionLabel}
+                              </span>
+                              <span
+                                className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border ${
+                                  isSelected
+                                    ? 'border-white/60 text-white/70'
+                                    : impactColors[impactLabel]
+                                }`}
+                              >
+                                {impactLabel}
+                              </span>
+                              <span
+                                className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border ${
+                                  suggestion.priority === 'high'
+                                    ? isSelected
+                                      ? 'border-white text-white'
+                                      : 'border-[#FF3000] text-[#FF3000]'
+                                    : isSelected
+                                    ? 'border-white/60 text-white/70'
+                                    : 'border-black/40 text-black/40'
+                                }`}
+                              >
+                                {suggestion.priority}
+                              </span>
+                            </div>
+                            <p
+                              className={`text-[10px] font-bold uppercase tracking-widest mb-2 ${
+                                isSelected ? 'text-white/80' : 'text-black/60'
+                              }`}
+                            >
+                              {suggestion.reason}
+                            </p>
+                            {suggestion.current && (
+                              <div
+                                className={`text-[10px] border-l-2 pl-2 mb-2 ${
+                                  isSelected ? 'border-white/40 text-white/50' : 'border-black/30 text-black/40'
+                                }`}
+                              >
+                                <span className="font-black uppercase">Current: </span>
+                                {suggestion.current.length > 120
+                                  ? suggestion.current.slice(0, 120) + '…'
+                                  : suggestion.current}
+                              </div>
+                            )}
+                            <div
+                              className={`text-xs border-l-2 pl-2 ${
+                                isSelected ? 'border-white text-white' : 'border-black text-black'
+                              }`}
+                            >
+                              <span className="font-black uppercase text-[10px] block mb-0.5">Suggested:</span>
+                              {suggestion.suggested.length > 200
+                                ? suggestion.suggested.slice(0, 200) + '…'
+                                : suggestion.suggested}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
+              {/* Recommended Changes */}
+              {optimizationResult.recommended_changes.length > 0 && (
+                <div className="border-2 border-black bg-[#F2F2F2] p-3 space-y-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest mb-2">
+                    Strategic Recommendations
+                  </p>
+                  {optimizationResult.recommended_changes.map((rec, i) => (
+                    <p key={i} className="text-xs text-black/70 flex gap-2">
+                      <span className="font-black text-black shrink-0">{i + 1}.</span>
+                      {rec}
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              <Button
+                variant="accent"
+                className="w-full gap-2"
+                onClick={applySelectedOptimizations}
+                disabled={applyingOptimization || selectedSuggestionIndexes.length === 0}
+              >
+                {applyingOptimization ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Applying & saving…
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Apply {selectedSuggestionIndexes.length} Change{selectedSuggestionIndexes.length !== 1 ? 's' : ''} & Save
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         )}

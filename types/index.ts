@@ -239,18 +239,29 @@ export interface JobSearchParams {
 
 export interface CVOptimizationSuggestion {
   section: 'summary' | 'experience' | 'skills' | 'education';
+  /** 0-based index of which experience entry to update (null for non-experience sections) */
+  experience_index?: number | null;
   current?: string;
   suggested: string;
   reason: string;
   priority: 'high' | 'medium' | 'low';
+  impact?: 'ATS' | 'Readability' | 'Relevance';
 }
 
 export interface CVOptimizationResult {
   job_match_score: number; // 0-100
+  match_breakdown?: {
+    keywords: number;
+    experience: number;
+    skills: number;
+    summary: number;
+  };
   suggestions: CVOptimizationSuggestion[];
   missing_skills: string[];
   matching_skills: string[];
   recommended_changes: string[];
+  job_title_detected?: string;
+  top_keywords?: string[];
 }
 
 // Application Tracker Types
