@@ -3,7 +3,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
-import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2, MoreVertical, CheckCircle2, XCircle } from 'lucide-react';
+import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2, MoreVertical, CheckCircle2, XCircle, History } from 'lucide-react';
+import { VersionHistoryPanel } from '@/features/editor/components/VersionHistoryPanel';
+import { saveVersion } from '@/lib/version-history';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -91,6 +93,7 @@ export default function EditorPage() {
   const lastParsedLatex = useRef<string>('');
   const cvInnerRef = useRef<HTMLDivElement>(null);
   const [cvNativeHeight, setCvNativeHeight] = useState(1123);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Measure the actual rendered height of the CV inner content so the outer
   // wrapper grows correctly for multi-page CVs.
@@ -334,6 +337,11 @@ export default function EditorPage() {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     localStorage.setItem(`resume-content-${resumeId}`, JSON.stringify(content));
+
+    // Snapshot to version history
+    try {
+      saveVersion(resumeId, content, 'Manual save');
+    } catch { /* best-effort */ }
 
     setIsDirty(false);
     // TODO: Show success toast
@@ -701,6 +709,20 @@ export default function EditorPage() {
         try {
           await new Promise((resolve) => setTimeout(resolve, 300));
           localStorage.setItem(`resume-content-${resumeId}`, JSON.stringify(updatedContent));
+
+          // Snapshot to version history
+          try {
+            const jt = selectedOptimizeJob?.title || 'Unknown Job';
+            const co = selectedOptimizeJob?.company || '';
+            const ms = optimizationResult.job_match_score;
+            saveVersion(
+              resumeId,
+              updatedContent,
+              co ? `Optimized for ${co} – ${jt}` : `Optimized for ${jt}`,
+              { jobTitle: jt, company: co, matchScore: ms }
+            );
+          } catch { /* best-effort */ }
+
           setIsDirty(false);
         } finally {
           setIsSaving(false);
@@ -736,6 +758,21 @@ export default function EditorPage() {
     } finally {
       setApplyingOptimization(false);
     }
+  };
+
+  const handleRestoreVersion = (restoredContent: ResumeContent, versionLabel: string) => {
+    if (!content) return;
+    // Snapshot current state first so the user can undo the restore
+    try {
+      saveVersion(resumeId, content, `Auto-save before restoring "${versionLabel}"`);
+    } catch { /* best-effort */ }
+    setContent(restoredContent);
+    localStorage.setItem(`resume-content-${resumeId}`, JSON.stringify(restoredContent));
+    setIsDirty(false);
+    // Snapshot the restored state too
+    try {
+      saveVersion(resumeId, restoredContent, `Restored: ${versionLabel}`);
+    } catch { /* best-effort */ }
   };
 
   const handleAIOptimize = async () => {
@@ -871,6 +908,15 @@ export default function EditorPage() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-2 border-black gap-2"
+                onClick={() => setShowHistory(true)}
+              >
+                <History className="w-4 h-4" />
+                <span className="hidden md:inline">History</span>
+              </Button>
               <Button onClick={handleSave} disabled={!isDirty || isSaving} size="sm" variant="accent" className="gap-2">
                 <Save className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Save'}
@@ -1791,6 +1837,15 @@ export default function EditorPage() {
         </div>
       </main>
       </div>
+
+      <VersionHistoryPanel
+        open={showHistory}
+        onClose={() => setShowHistory(false)}
+        resumeId={resumeId}
+        currentContent={content}
+        onRestore={handleRestoreVersion}
+        isDark={isDark}
+      />
     </div>
   );
 }
