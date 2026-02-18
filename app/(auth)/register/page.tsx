@@ -145,74 +145,74 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
-      <div className="relative z-10 min-h-screen flex items-center px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mx-auto grid w-full max-w-6xl items-center gap-6 lg:grid-cols-2">
-          <div className="hidden lg:flex flex-col justify-between border-2 border-black bg-white p-8 dark:border-white dark:bg-black">
+      <div className="relative z-10 min-h-screen flex items-center px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto grid w-full max-w-6xl items-center gap-8 lg:grid-cols-2">
+          <div className="hidden lg:flex flex-col justify-between border-4 border-black bg-[#F2F2F2] p-8 swiss-grid-pattern">
             <div>
               <Link href="/" className="flex items-center gap-3 mb-8">
-                <Image src="/cspark-logo.png" alt="CSpark logo" width={64} height={64} className="w-16 h-16 object-contain" />
-                <span className="text-3xl font-black text-black dark:text-white">
-                  cspark
-                </span>
+                <Image src="/favicon.png" alt="CSpark logo" width={64} height={64} className="w-16 h-16 object-contain border-4 border-black" />
+                <span className="text-2xl font-black uppercase tracking-widest">CSpark</span>
               </Link>
 
-              <p className="text-5xl font-black leading-none text-black dark:text-white mb-4">
-                START STRONG
+              <p className="text-4xl font-black uppercase leading-tight">
+                Start strong.
+                <span className="block text-sm font-bold uppercase tracking-widest text-black/70">
+                  Create your account and tailor every CV with confidence.
+                </span>
               </p>
-              <p className="text-base leading-relaxed text-black dark:text-white">Create your account and tailor every CV with confidence.</p>
 
               <div className="mt-8 space-y-4">
                 {steps.map(({ icon: Icon, title, description }) => (
-                  <div key={title} className="flex items-start gap-3 border-2 border-black bg-white p-4 dark:border-white dark:bg-black hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
-                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center font-black border border-black dark:border-white">
+                  <div key={title} className="flex items-start gap-3 border-2 border-black bg-white p-4">
+                    <div className="border-2 border-black bg-white p-2">
                       <Icon className="h-4 w-4" />
                     </div>
                     <div>
-                      <p className="text-sm font-black uppercase text-black dark:text-white">{title}</p>
-                      <p className="text-xs leading-snug text-black dark:text-white">{description}</p>
+                      <p className="text-xs font-black uppercase tracking-widest">{title}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">{description}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <p className="text-sm text-black dark:text-white font-black uppercase">SET UP ONCE, THEN ADAPT FAST FOR EVERY APPLICATION FLOW</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-black/60">
+              Set up once, then adapt fast for every application flow.
+            </p>
           </div>
 
           <div className="flex items-center justify-center">
-            <Card className="w-full max-w-md border-2 border-black bg-white dark:border-white dark:bg-black">
-              <CardHeader className="space-y-3 pb-2 border-b-2 border-black dark:border-white">
+            <Card className="w-full max-w-md border-4 border-black bg-white hover:bg-white hover:text-black">
+              <CardHeader className="space-y-3 pb-2">
                 <div className="flex items-center justify-center lg:hidden">
                   <Link href="/" className="flex items-center gap-3">
-                    <Image src="/cspark-logo.png" alt="CSpark logo" width={56} height={56} className="w-14 h-14 object-contain" />
-                    <span className="text-2xl font-black text-black dark:text-white">
-                      cspark
-                    </span>
+                    <Image src="/favicon.png" alt="CSpark logo" width={56} height={56} className="w-14 h-14 object-contain border-4 border-black" />
+                    <span className="text-xl font-black uppercase tracking-widest">CSpark</span>
                   </Link>
                 </div>
-                <CardTitle className="text-3xl font-black uppercase text-black dark:text-white">CREATE ACCOUNT</CardTitle>
-                <CardDescription className="text-black dark:text-white font-medium">
-                  BUILD YOUR ACCOUNT AND START CRAFTING JOB-READY CVS
+                <CardTitle className="text-2xl uppercase tracking-widest">Create Account</CardTitle>
+                <CardDescription>
+                  Build your account and start crafting job-ready CVs.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
-                <div className="border-2 border-red-500 bg-white dark:bg-black text-red-500 dark:text-red-400 p-3 text-sm font-medium">
+                <div className="border-2 border-black bg-white p-3 text-xs font-bold uppercase tracking-widest text-[#FF3000]">
                   {error}
                 </div>
               )}
 
               {successMessage && (
-                <div className="border-2 border-green-500 bg-white dark:bg-black text-green-500 dark:text-green-400 p-3 text-sm font-medium">
+                <div className="border-2 border-black bg-white p-3 text-xs font-bold uppercase tracking-widest text-black">
                   {successMessage}
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="font-black uppercase text-black dark:text-white">FULL NAME</Label>
+                <Label htmlFor="fullName">Full Name</Label>
                 <Input
                   id="fullName"
                   type="text"
@@ -221,12 +221,11 @@ export default function RegisterPage() {
                   onChange={(e) => setFullName(e.target.value)}
                   required
                   disabled={loading}
-                  className="border-2 border-black bg-white text-black placeholder:text-black/50 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-white/50"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="username" className="font-black uppercase text-black dark:text-white">USERNAME</Label>
+                <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
                   type="text"
@@ -235,15 +234,14 @@ export default function RegisterPage() {
                   onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ''))}
                   required
                   disabled={loading}
-                  className="border-2 border-black bg-white text-black placeholder:text-black/50 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-white/50"
                 />
-                <p className="text-xs text-black dark:text-white font-medium">
-                  THIS WILL BE USED IN YOUR CV LINK: CV.SITE/{username.toUpperCase()}/CV-NAME
+                <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+                  This will be used in your CV link: cv.site/{username}/cv-name
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-black uppercase text-black dark:text-white">EMAIL</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -252,12 +250,11 @@ export default function RegisterPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
-                  className="border-2 border-black bg-white text-black placeholder:text-black/50 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-white/50"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="font-black uppercase text-black dark:text-white">PASSWORD</Label>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -267,12 +264,11 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                   minLength={6}
-                  className="border-2 border-black bg-white text-black placeholder:text-black/50 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-white/50"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="font-black uppercase text-black dark:text-white">CONFIRM PASSWORD</Label>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -282,11 +278,10 @@ export default function RegisterPage() {
                   required
                   disabled={loading}
                   minLength={6}
-                  className="border-2 border-black bg-white text-black placeholder:text-black/50 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-white/50"
                 />
               </div>
 
-              <Button type="submit" className="w-full gap-2 border-2 border-black bg-black text-white hover:bg-white hover:text-black font-black uppercase dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white" disabled={loading}>
+              <Button type="submit" variant="accent" className="w-full gap-2" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -303,7 +298,7 @@ export default function RegisterPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full gap-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black font-black uppercase"
+                className="w-full gap-2"
                 onClick={handleGoogleSignIn}
                 disabled={googleLoading || loading}
               >
@@ -311,18 +306,18 @@ export default function RegisterPage() {
                 Continue with Google
               </Button>
 
-              <div className="text-center text-sm font-black uppercase text-black dark:text-white">
+              <div className="text-center text-xs font-bold uppercase tracking-widest text-black/70">
                 Already have an account?{' '}
                 <Link
                   href="/login"
-                  className="underline hover:no-underline"
+                  className="font-black text-black hover:text-[#FF3000]"
                 >
                   Sign In
                 </Link>
               </div>
 
-              <p className="text-center text-xs font-black uppercase text-black dark:text-white">
-                YOUR ACCOUNT IS CREATED SECURELY AND READY FOR IMMEDIATE CV BUILDING
+              <p className="text-center text-[10px] font-bold uppercase tracking-widest text-black/60">
+                Your account is created securely and ready for immediate CV building.
               </p>
             </form>
               </CardContent>

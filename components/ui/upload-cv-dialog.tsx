@@ -104,13 +104,13 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600">
-              <Upload className="h-6 w-6 text-white" />
+            <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-white">
+              <Upload className="h-6 w-6 text-black" />
             </div>
-            <Sparkles className="h-8 w-8 text-violet-500" />
+            <Sparkles className="h-8 w-8 text-[#FF3000]" />
           </div>
-          <DialogTitle className="text-2xl font-bold">Upload Your CV</DialogTitle>
-          <DialogDescription className="text-base">
+          <DialogTitle className="text-2xl font-black uppercase tracking-widest">Upload Your CV</DialogTitle>
+          <DialogDescription className="text-base uppercase tracking-widest">
             Upload your existing CV and we'll use AI to extract and optimize the content
           </DialogDescription>
         </DialogHeader>
@@ -119,7 +119,7 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
           {/* Upload Area */}
           <div
             onClick={handleFileSelect}
-            className="relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg cursor-pointer transition-all hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-950/20"
+            className="relative flex flex-col items-center justify-center p-8 border-2 border-dashed border-black bg-white cursor-pointer transition-colors hover:bg-[#F2F2F2]"
           >
             <input
               ref={fileInputRef}
@@ -132,23 +132,23 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
 
             {uploading ? (
               <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+                <Loader2 className="h-12 w-12 animate-spin text-black" />
                 <div className="text-center">
-                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                  <p className="text-xs font-black uppercase tracking-widest">
                     Processing your CV...
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  <p className="text-xs font-bold uppercase tracking-widest text-black/60 mt-1">
                     Processing your CV file...
                   </p>
                 </div>
               </div>
             ) : (
               <>
-                <FileText className="h-12 w-12 text-gray-400 mb-3" />
-                <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+                <FileText className="h-12 w-12 text-black/40 mb-3" />
+                <p className="text-sm font-black uppercase tracking-widest mb-1">
                   Click to upload your CV
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-xs font-bold uppercase tracking-widest text-black/60">
                   PDF or DOCX • Max 5MB
                 </p>
               </>
@@ -160,21 +160,21 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
             <div
               className={`flex items-start gap-3 p-4 rounded-lg ${
                 uploadStatus.type === 'success'
-                  ? 'bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800'
-                  : 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800'
+                  ? 'bg-[#F2F2F2] border-2 border-black'
+                  : 'bg-white border-2 border-black'
               }`}
             >
               {uploadStatus.type === 'success' ? (
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-[#FF3000] flex-shrink-0 mt-0.5" />
               ) : (
-                <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-[#FF3000] flex-shrink-0 mt-0.5" />
               )}
               <div>
                 <p
                   className={`text-sm font-medium ${
                     uploadStatus.type === 'success'
-                      ? 'text-green-900 dark:text-green-100'
-                      : 'text-red-900 dark:text-red-100'
+                      ? 'text-black'
+                      : 'text-black'
                   }`}
                 >
                   {uploadStatus.message}
@@ -184,31 +184,31 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
           )}
 
           {/* Features */}
-          <div className="rounded-lg border border-gray-200 dark:border-gray-800 p-4">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+          <div className="border-2 border-black bg-[#F2F2F2] p-4">
+            <h4 className="text-xs font-black uppercase tracking-widest mb-3 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-[#FF3000]" />
               Import Your CV
             </h4>
-            <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <ul className="space-y-2 text-xs font-bold uppercase tracking-widest text-black/70">
               <li className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-[#FF3000] flex-shrink-0" />
                 <span>Upload PDF or DOCX files (max 5MB)</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-[#FF3000] flex-shrink-0" />
                 <span>Creates a new CV with editable template</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-[#FF3000] flex-shrink-0" />
                 <span>Fill in your information in the editor</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400 flex-shrink-0" />
+                <CheckCircle className="h-4 w-4 text-[#FF3000] flex-shrink-0" />
                 <span>Download and share when ready</span>
               </li>
             </ul>
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 flex items-start gap-1">
-              <AlertCircle className="h-3 w-3 flex-shrink-0 mt-0.5" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-black/70 mt-3 flex items-start gap-1">
+              <AlertCircle className="h-3 w-3 flex-shrink-0 mt-0.5 text-[#FF3000]" />
               <span>Note: AI content extraction coming soon. Manual entry required for now.</span>
             </p>
           </div>
@@ -225,7 +225,7 @@ export function UploadCVDialog({ open, onOpenChange, userId }: UploadCVDialogPro
             </Button>
             <Button
               onClick={handleFileSelect}
-              className="flex-1 bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:from-blue-700 hover:to-violet-700"
+              className="flex-1"
               disabled={uploading}
             >
               {uploading ? (

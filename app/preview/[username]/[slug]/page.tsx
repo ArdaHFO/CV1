@@ -201,7 +201,7 @@ export default function PreviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+      <div className="min-h-screen flex items-center justify-center bg-white text-black">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-900 dark:border-zinc-100"></div>
       </div>
     );
@@ -209,7 +209,7 @@ export default function PreviewPage() {
 
   if (!cvData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+      <div className="min-h-screen flex items-center justify-center bg-white text-black">
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle>CV Not Found</CardTitle>
@@ -225,7 +225,7 @@ export default function PreviewPage() {
   }
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

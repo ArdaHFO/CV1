@@ -270,14 +270,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10">
         {/* Mobile Header */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/85 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-700/70 flex items-center justify-between px-4 z-50 shadow-sm">
+        <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b-4 border-black flex items-center justify-between px-4 z-50">
         <div className="flex items-center gap-3">
-          <Image src="/cspark-logo.png" alt="CSpark logo" width={40} height={40} className="w-10 h-10 object-contain" />
-          <span className="text-xl font-bold text-zinc-900 dark:text-zinc-100">CSpark</span>
+          <Image src="/favicon.png" alt="CSpark logo" width={40} height={40} className="w-10 h-10 object-contain border-2 border-black" />
+          <span className="text-sm font-black uppercase tracking-widest">CSpark</span>
         </div>
         <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
           <Menu className="w-6 h-6" />
@@ -286,24 +286,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-64 bg-white/85 dark:bg-zinc-900/80 backdrop-blur-2xl border-r border-zinc-200/80 dark:border-zinc-700/70 shadow-2xl transform transition-transform lg:translate-x-0 z-40 ${
+        className={`fixed top-0 left-0 h-full w-64 bg-white border-r-4 border-black transform transition-transform lg:translate-x-0 z-40 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="h-20 flex items-center px-6 border-b border-zinc-200/80 dark:border-zinc-700/70">
+          <div className="h-20 flex items-center px-6 border-b-4 border-black">
             <Link href="/" className="flex items-center gap-3">
-              <Image src="/cspark-logo.png" alt="CSpark logo" width={48} height={48} className="w-12 h-12 object-contain" />
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-violet-500 to-indigo-600 bg-clip-text text-transparent dark:from-blue-400 dark:via-violet-300 dark:to-indigo-400">
-                CSpark
-              </span>
+              <Image src="/favicon.png" alt="CSpark logo" width={48} height={48} className="w-12 h-12 object-contain border-2 border-black" />
+              <span className="text-sm font-black uppercase tracking-widest">CSpark</span>
             </Link>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
-            <p className="px-3 pt-1 pb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+            <p className="px-3 pt-1 pb-2 text-[10px] font-black uppercase tracking-[0.3em] text-black/60">
               Navigation
             </p>
             {navigation.map((item) => {
@@ -313,23 +311,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+                  className={`group flex items-center gap-3 px-3 py-2 border-2 border-black transition-colors ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-600 to-violet-600 text-white shadow-lg shadow-blue-500/20'
-                      : 'text-zinc-700 hover:bg-zinc-100/80 dark:text-zinc-300 dark:hover:bg-zinc-800/80'
+                      ? 'bg-black text-white'
+                      : 'bg-white text-black hover:bg-[#FF3000] hover:text-white'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
                   <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                    className={`flex h-8 w-8 items-center justify-center border-2 border-black transition-colors ${
                       isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-zinc-200/70 text-zinc-600 group-hover:bg-zinc-300/80 dark:bg-zinc-700/80 dark:text-zinc-300 dark:group-hover:bg-zinc-600/90'
+                        ? 'bg-white text-black'
+                        : 'bg-[#F2F2F2] text-black group-hover:bg-white'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
                   </div>
-                  <span className="font-medium tracking-tight">{item.name}</span>
+                  <span className="text-xs font-black uppercase tracking-widest">{item.name}</span>
                 </Link>
               );
             })}
@@ -338,12 +336,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="px-4 pb-4">
             <Button
               onClick={() => setUpgradeOpen(true)}
-              className="w-full justify-start gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600"
+              variant="accent"
+              className="w-full justify-start gap-2"
             >
               <Crown className="h-4 w-4" />
               {isPro ? 'Manage Plan' : 'Upgrade to Pro'}
             </Button>
-            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-black/60">
               {isPro
                 ? `${subscription?.planName || 'Pro'} active until ${formatReadableDate(subscription?.expiresAt)}`
                 : 'Unlock premium CV tools and advanced optimization.'}
@@ -351,20 +350,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* User Menu */}
-          <div className="p-4 border-t border-zinc-200/80 dark:border-zinc-700/70">
+          <div className="p-4 border-t-4 border-black">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 w-full p-3 rounded-xl border border-zinc-200/80 dark:border-zinc-700/80 bg-white/70 dark:bg-zinc-800/70 hover:bg-zinc-100/90 dark:hover:bg-zinc-700/80 transition-all">
+                <button className="flex items-center gap-3 w-full p-3 border-2 border-black bg-white transition-colors hover:bg-[#F2F2F2]">
                   <Avatar>
                     <AvatarFallback>
                       {user?.full_name?.charAt(0).toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                    <p className="text-xs font-black uppercase tracking-widest">
                       {user?.full_name || 'User'}
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">{user?.email}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">{user?.email}</p>
                   </div>
                 </button>
               </DropdownMenuTrigger>
@@ -401,7 +400,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-amber-500" />
+              <Crown className="h-5 w-5 text-[#FF3000]" />
               Upgrade Your Plan
             </DialogTitle>
             <DialogDescription>
@@ -410,7 +409,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </DialogHeader>
 
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Subscriptions</p>
+              <p className="text-xs font-black uppercase tracking-widest">Subscriptions</p>
           <div className="grid gap-3 sm:grid-cols-2">
             {plans.map((plan) => {
                 const isSelected = selectedPurchaseType === 'plan' && selectedPlanId === plan.id;
@@ -422,23 +421,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     setSelectedPurchaseType('plan');
                     setSelectedPlanId(plan.id);
                   }}
-                  className={`rounded-xl border p-4 text-left transition-all ${
-                    isSelected
-                      ? 'border-blue-500 bg-blue-50/70 dark:border-blue-400 dark:bg-blue-900/20'
-                      : 'border-zinc-200 bg-white/70 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900/40 dark:hover:border-zinc-600'
+                  className={`border-2 border-black p-4 text-left transition-colors ${
+                    isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{plan.name}</p>
+                    <p className="text-xs font-black uppercase tracking-widest">{plan.name}</p>
                     {plan.badge ? <Badge>{plan.badge}</Badge> : null}
                   </div>
-                  <p className="mt-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                  <p className="mt-2 text-xl font-black uppercase">
                     {plan.price}
-                    <span className="ml-1 text-sm font-medium text-zinc-500 dark:text-zinc-400">{plan.period}</span>
+                    <span className="ml-1 text-xs font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
                   </p>
-                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{plan.description}</p>
+                  <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.description}</p>
                   {isSelected ? (
-                    <div className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-blue-700 dark:text-blue-300">
+                    <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
                       <Check className="h-3.5 w-3.5" /> Selected
                     </div>
                   ) : null}
@@ -449,8 +446,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="space-y-2">
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Job Search Tokens <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">(Current balance: {remainingTokenSearches})</span>
+            <p className="text-xs font-black uppercase tracking-widest">
+              Job Search Tokens <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Current balance: {remainingTokenSearches})</span>
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
               {tokenPacks.map((pack) => {
@@ -463,20 +460,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       setSelectedPurchaseType('token-pack');
                       setSelectedTokenPackId(pack.id);
                     }}
-                    className={`rounded-xl border p-4 text-left transition-all ${
-                      isSelected
-                        ? 'border-indigo-500 bg-indigo-50/70 dark:border-indigo-400 dark:bg-indigo-900/20'
-                        : 'border-zinc-200 bg-white/70 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900/40 dark:hover:border-zinc-600'
+                    className={`border-2 border-black p-4 text-left transition-colors ${
+                      isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{pack.name}</p>
+                      <p className="text-xs font-black uppercase tracking-widest">{pack.name}</p>
                       {pack.badge ? <Badge>{pack.badge}</Badge> : null}
                     </div>
-                    <p className="mt-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">{pack.price}</p>
-                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{pack.description}</p>
+                    <p className="mt-2 text-xl font-black uppercase">{pack.price}</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
                     {isSelected ? (
-                      <div className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-indigo-700 dark:text-indigo-300">
+                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
                         <Check className="h-3.5 w-3.5" /> Selected
                       </div>
                     ) : null}
@@ -488,14 +483,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           <form className="space-y-3" onSubmit={handlePayment}>
             {isPro && subscription ? (
-              <div className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs text-green-700 dark:border-green-800/70 dark:bg-green-900/20 dark:text-green-300">
+              <div className="border-2 border-black bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-black">
                 Current Plan: <span className="font-semibold">{subscription.planName}</span> · Valid until{' '}
                 <span className="font-semibold">{formatReadableDate(subscription.expiresAt)}</span>
               </div>
             ) : null}
 
             {paymentMessage ? (
-              <p className={`text-xs ${paymentMessage.includes('successful') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              <p className={`text-[10px] font-bold uppercase tracking-widest ${paymentMessage.includes('successful') ? 'text-black' : 'text-[#FF3000]'}`}>
                 {paymentMessage}
               </p>
             ) : null}
@@ -510,8 +505,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </DialogFooter>
           </form>
 
-          <div className="flex items-center gap-2 rounded-lg border border-zinc-200/70 bg-zinc-50 px-3 py-2 text-xs text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-300">
-            <Sparkles className="h-3.5 w-3.5" />
+          <div className="flex items-center gap-2 border-2 border-black bg-[#F2F2F2] px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-black/70">
+            <Sparkles className="h-3.5 w-3.5 text-[#FF3000]" />
             Premium includes unlimited CV versions, advanced optimization, and priority processing.
           </div>
         </DialogContent>

@@ -628,47 +628,48 @@ export default function EditorPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+      <div className="min-h-screen flex items-center justify-center bg-white text-black">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-900 dark:border-zinc-100"></div>
       </div>
     );
   }
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
+      <header className="sticky top-0 z-50 bg-white border-b-4 border-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Button 
                 onClick={() => router.push('/dashboard')} 
                 size="sm"
-                className="gap-2 bg-zinc-700 hover:bg-zinc-800 text-white"
+                variant="outline"
+                className="gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </Button>
               <div>
-                <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                <h1 className="text-lg font-black uppercase tracking-widest">
                   Edit CV
                 </h1>
                 {isDirty && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400">Unsaved changes</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF3000]">Unsaved changes</p>
                 )}
               </div>
               
               {/* Template Selector */}
               <div className="flex items-center gap-2 ml-4">
-                <label htmlFor="template-select" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                <label htmlFor="template-select" className="text-xs font-black uppercase tracking-widest">
                   Template:
                 </label>
                 <select
                   id="template-select"
                   value={selectedTemplate}
                   onChange={(e) => setSelectedTemplate(e.target.value as TemplateType)}
-                  className="px-3 py-1.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-1.5 text-xs font-black uppercase tracking-widest border-2 border-black bg-white text-black focus:outline-none focus:ring-2 focus:ring-[#FF3000]"
                 >
                   <option value="modern">Modern</option>
                   <option value="azurill">Azurill</option>

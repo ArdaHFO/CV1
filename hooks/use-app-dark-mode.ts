@@ -1,6 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import {
+  APP_SETTINGS_STORAGE_KEY,
+  applyAppSettingsToDocument,
+  defaultAppSettings,
+  normalizeAppSettings,
+} from '@/lib/app-settings';
 
 function readDarkFromDocument() {
   if (typeof document === 'undefined') return true;
@@ -33,5 +39,32 @@ export function useAppDarkModeState() {
     };
   }, []);
 
-  return { isDark, setIsDark };
+  const updateDarkMode = (nextIsDark: boolean) => {
+    if (typeof window === 'undefined') {
+      setIsDark(nextIsDark);
+      return;
+    }
+
+    const rawSettings = window.localStorage.getItem(APP_SETTINGS_STORAGE_KEY);
+    const currentSettings = rawSettings
+      ? normalizeAppSettings(JSON.parse(rawSettings))
+      : defaultAppSettings;
+
+    const updatedSettings = {
+      ...currentSettings,
+      appearance: {
+        ...currentSettings.appearance,
+        theme: nextIsDark ? ('dark' as const) : ('light' as const),
+      },
+    };
+
+    window.localStorage.setItem(
+      APP_SETTINGS_STORAGE_KEY,
+      JSON.stringify(updatedSettings)
+    );
+    applyAppSettingsToDocument(updatedSettings);
+    setIsDark(nextIsDark);
+  };
+
+  return { isDark, setIsDark: updateDarkMode };
 }

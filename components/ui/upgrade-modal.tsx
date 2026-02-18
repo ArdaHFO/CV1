@@ -58,10 +58,10 @@ export function UpgradeModal({
       <DialogContent className="sm:max-w-[525px]">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-2xl">
+            <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-white text-2xl">
               {config.icon}
             </div>
-            <Crown className="h-8 w-8 text-yellow-500" />
+            <Crown className="h-8 w-8 text-[#FF3000]" />
           </div>
           <DialogTitle className="text-2xl font-bold">
             {title || config.title}
@@ -72,12 +72,12 @@ export function UpgradeModal({
         </DialogHeader>
 
         <div className="my-6 space-y-4">
-          <div className="rounded-lg border border-violet-200 bg-gradient-to-br from-blue-50 to-violet-50 p-4 dark:border-violet-800 dark:from-blue-950/30 dark:to-violet-950/30">
+          <div className="border-2 border-black bg-[#F2F2F2] p-4">
             <div className="mb-3 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-              <h4 className="font-semibold text-gray-900 dark:text-white">Pro Plan Benefits</h4>
+              <Sparkles className="h-5 w-5 text-[#FF3000]" />
+              <h4 className="text-xs font-black uppercase tracking-widest">Pro Plan Benefits</h4>
             </div>
-            <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+            <ul className="space-y-2 text-xs font-bold uppercase tracking-widest text-black/70">
               {[
                 'Unlimited CV creation',
                 'Unlimited AI-powered CV optimization',
@@ -87,18 +87,16 @@ export function UpgradeModal({
                 'Priority support',
               ].map((item, index) => (
                 <li key={index} className="flex items-center gap-2">
-                  <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-violet-600 dark:text-violet-400" />
+                  <CheckCircleIcon className="h-4 w-4 flex-shrink-0 text-[#FF3000]" />
                   <span>{item}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-black/70">
             <span>Starting at</span>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
-              $19.99
-            </span>
+            <span className="text-2xl font-black text-[#FF3000]">$19.99</span>
             <span>/month</span>
           </div>
         </div>
@@ -113,7 +111,7 @@ export function UpgradeModal({
           </Button>
           <Button
             onClick={handleUpgrade}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:from-blue-700 hover:to-violet-700"
+            className="flex-1"
           >
             <Crown className="mr-2 h-4 w-4" />
             Upgrade to Pro

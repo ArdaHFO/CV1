@@ -535,7 +535,7 @@ export default function JobDetailPage() {
 
   if (!job) {
     return (
-      <div className={`min-h-screen relative flex items-center justify-center ${isDark ? 'dark' : ''}`}>
+      <div className={`min-h-screen relative flex items-center justify-center ${isDark ? 'dark' : ''} bg-white text-black`}>
         <ShaderBackground isDark={isDark} />
         <div className="relative z-10">
           <p className="text-zinc-600 dark:text-zinc-400">Job not found</p>
@@ -545,7 +545,7 @@ export default function JobDetailPage() {
   }
 
   return (
-    <div className={`min-h-screen relative py-8 ${isDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen relative py-8 ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}

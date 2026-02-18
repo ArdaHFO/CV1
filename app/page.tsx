@@ -1,19 +1,26 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { 
-  FileText, Sparkles, Globe, Zap, Shield, Lock, Eye, Download,
-  CheckCircle, ArrowRight, Users, TrendingUp, Clock, Star,
-  Lightbulb, Target, Rocket, ChevronDown, Code, Database,
-  Cpu, Layers, Linkedin, Search, Link2, QrCode, Upload, PlusSquare
+import Link from 'next/link';
+import {
+  ArrowRight,
+  CheckCircle,
+  Download,
+  FileText,
+  Linkedin,
+  PlusSquare,
+  QrCode,
+  Search,
+  Shield,
+  Sparkles,
+  Star,
+  Target,
+  Users,
+  Zap,
 } from 'lucide-react';
-import ShaderBackground from '@/components/ui/shader-background';
+import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { PricingWithChart } from '@/components/ui/pricing-with-chart';
-import { GlareCard } from '@/components/ui/glare-card';
-import AnimatedTextCycle from '@/components/ui/animated-text-cycle';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import type { User } from '@/types';
@@ -21,8 +28,8 @@ import type { User } from '@/types';
 function MetaLogo({ className }: { className?: string }) {
   return (
     <Image
-      src="/icons8-meta-50.png"
-      alt="Meta logo"
+      src="/meta-llama.png"
+      alt="Meta Llama logo"
       width={50}
       height={50}
       className={`object-contain shrink-0 ${className ?? ''}`}
@@ -52,27 +59,27 @@ export default function Home() {
   const faqItems = [
     {
       q: 'Can I search for LinkedIn jobs in the platform?',
-      a: 'Yes! Our platform integrates with LinkedIn job search. You can browse thousands of job postings directly within our app, and for each job, our AI will automatically analyze the requirements and optimize your CV to match perfectly.',
+      a: 'Yes. Search LinkedIn jobs inside CSpark and get an AI-optimized CV matched to each role.',
     },
     {
       q: 'Is CSpark really free?',
-      a: 'Yes. CSpark has a freemium plan with 1 CV creation and 1 job search (up to 25 results). You can upgrade to Pro for 10 job searches, higher result limits (25/50/all), and unlimited CV creation.',
+      a: 'CSpark has a freemium plan with 1 CV and 1 job search (up to 25 results). Pro unlocks more searches and unlimited CVs.',
     },
     {
       q: 'How does the AI optimization work?',
-      a: 'Our AI analyzes job descriptions and optimizes your CV content to match required skills and keywords. It suggests improvements and rewrites sections to make them more compelling.',
+      a: 'AI analyzes job requirements and refines your CV sections to match keywords and priorities.',
     },
     {
       q: 'Is my data secure?',
-      a: 'Absolutely. We use bank-level encryption, are GDPR compliant, and never sell your data. You have full control over your information and can delete it anytime.',
+      a: 'We use encryption, are GDPR compliant, and you control your data and exports.',
     },
     {
       q: 'Can I create multiple CVs?',
-      a: 'On Free, you can create 1 CV. On Pro, you can create unlimited CVs and keep separate versions for different applications.',
+      a: 'Free includes 1 CV. Pro includes unlimited versions for different roles.',
     },
     {
       q: 'What export formats do you support?',
-      a: 'You can export your CV as a high-quality PDF. We also provide shareable online links and QR codes for digital sharing.',
+      a: 'Export to PDF, share with a link, or generate a QR code.',
     },
   ];
 
@@ -116,133 +123,354 @@ export default function Home() {
   ];
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
-      <ShaderBackground isDark={isDark} />
-      
-      {/* Navigation */}
-      <nav className="border-b-4 border-black sticky top-0 z-50 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex items-center gap-3.5">
-              <Image src="/cspark-logo.png" alt="CSpark logo" width={68} height={68} className="w-[68px] h-[68px] object-contain shrink-0 ml-1" />
-              <span className="text-3xl leading-none font-black text-black uppercase">
-                cspark
+    <div className={`min-h-screen bg-white text-black ${isDark ? 'dark' : ''}`}>
+      <div className="pointer-events-none fixed inset-0 swiss-noise" aria-hidden="true" />
+
+      <nav className="sticky top-0 z-50 border-b-4 border-black bg-white">
+        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4">
+            <Image
+              src="/favicon.png"
+              alt="CSpark logo"
+              width={88}
+              height={88}
+              className="h-20 w-20 object-contain"
+            />
+            <div className="flex flex-col leading-none">
+              <span className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                CSpark
+              </span>
+              <span className="text-base font-black uppercase tracking-[0.2em]">
+                LinkedIn CV Lab
               </span>
             </div>
-            <div className="flex gap-4 items-center">
-              <Link
-                href={currentUser ? '/dashboard' : '/login'}
-                className="px-4 py-2 text-sm font-black uppercase tracking-wider text-black hover:border-b-4 hover:border-black transition-all"
-              >
-                {currentUser ? displayName : 'SIGN IN'}
-              </Link>
-              {!currentUser && (
-                <Link
-                  href="/register"
-                  className="px-6 py-2.5 text-sm font-black uppercase tracking-wider border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] transition-all"
-                >
-                  GET STARTED
-                </Link>
-              )}
-            </div>
+          </div>
+          <div className="hidden items-center gap-6 lg:flex">
+            <Link
+              href="#method"
+              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000]"
+            >
+              Method
+            </Link>
+            <Link
+              href="#pricing"
+              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000]"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="#faq"
+              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000]"
+            >
+              FAQ
+            </Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
+            <Link
+              href={currentUser ? '/dashboard' : '/login'}
+              className="text-sm font-bold uppercase tracking-widest text-black transition-colors hover:text-[#FF3000]"
+            >
+              {currentUser ? displayName : 'Sign In'}
+            </Link>
+            {!currentUser && (
+              <Button asChild variant="accent" size="sm">
+                <Link href="/register">Start Free</Link>
+              </Button>
+            )}
           </div>
         </div>
       </nav>
 
-      <main className="relative z-10 bg-white">
+      <main className="relative z-10">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* Hero Section - ACME Style */}
-        <section className="min-h-screen bg-white border-b-4 border-black flex items-center">
-          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-20">
-            <div className="grid grid-cols-2 gap-12 items-center">
-              {/* Left: Massive Text */}
-              <div className="space-y-12">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-4 py-2 border-2 border-black bg-white">
-                  <span className="text-xs font-black uppercase tracking-widest text-[#FF3000]">NEW</span>
-                  <span className="text-xs font-black uppercase tracking-widest text-black">TRUSTED BY 50,000+ PROFESSIONALS</span>
-                </div>
 
-                {/* Main Headline */}
-                <div className="space-y-6">
-                  <h1 className="text-9xl font-black leading-none text-black uppercase">
-                    Transform<br/>the way<br/>your team<br/>works
-                  </h1>
-                  <p className="text-xl font-bold text-black leading-tight">
-                    Acme Platform brings your team together
-                  </p>
-                </div>
+        <section className="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-[7fr_5fr]">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                01. System
+              </div>
+              <h1 className="mt-6 text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-[9rem]">
+                Search LinkedIn Jobs.
+                <br />
+                Tailor Your CV.
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg font-medium uppercase tracking-[0.12em] text-black/80">
+                A precise, job-specific CV workflow powered by Meta Llama 3.3 and
+                real-time LinkedIn search.
+              </p>
 
-                {/* CTA */}
-                <div className="flex gap-4 pt-8">
-                  <Link
-                    href="/register"
-                    className="px-8 py-4 text-sm font-black uppercase tracking-wider border-4 border-black bg-[#FF3000] text-white hover:scale-105 transition-transform"
-                  >
-                    GET STARTED
+              <div className="mt-8 flex flex-wrap items-center gap-4">
+                <Button asChild variant="accent" size="lg">
+                  <Link href="/register" className="flex items-center gap-3">
+                    Search LinkedIn Jobs
+                    <ArrowRight className="h-5 w-5" />
                   </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link href="#method">See CV Tailoring</Link>
+                </Button>
+              </div>
+
+              <div className="mt-10 flex flex-wrap items-center gap-6">
+                <div className="flex items-center gap-2 border-2 border-black bg-white px-4 py-2 text-xs font-bold uppercase tracking-widest">
+                  <CheckCircle className="h-4 w-4" />
+                  50,000+ professionals
+                </div>
+                <div className="flex items-center gap-2 border-2 border-black bg-[#F2F2F2] px-4 py-2 text-xs font-bold uppercase tracking-widest">
+                  <Star className="h-4 w-4" />
+                  4.9/5 from 12,000 reviews
                 </div>
               </div>
 
-              {/* Right: Geometric Shapes */}
-              <div className="relative h-96 flex items-center justify-end pr-12">
-                {/* Thick Black Rectangle */}
-                <div className="absolute w-32 h-80 bg-black border-4 border-black left-0 top-0"></div>
-                
-                {/* Red Circle */}
-                <div className="absolute w-48 h-48 rounded-full bg-[#FF3000] border-4 border-[#FF3000] right-24 top-12"></div>
-                
-                {/* Small Red Line */}
-                <div className="absolute w-1 h-24 bg-[#FF3000] right-8 center"></div>
+              <div className="mt-8 flex items-center gap-4 border-4 border-black bg-[#F2F2F2] px-6 py-4">
+                <MetaLogo className="h-10 w-10" />
+                <div>
+                  <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                    Powered by Meta
+                  </div>
+                  <div className="text-base font-bold uppercase tracking-widest">
+                    LLAMA 3.3 70B
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative border-4 border-black bg-[#F2F2F2] p-6 swiss-grid-pattern">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="aspect-square border-4 border-black bg-white swiss-dots p-4 flex flex-col justify-between">
+                  <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                    ATS MATCH
+                  </div>
+                  <div className="text-3xl font-black uppercase">+32%</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-black/70">
+                    Keyword alignment lift
+                  </div>
+                </div>
+                <div className="aspect-square border-4 border-black bg-black p-4 flex flex-col justify-between text-white">
+                  <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                    LINKEDIN SIGNAL
+                  </div>
+                  <div className="text-3xl font-black uppercase">24H</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/70">
+                    New roles pulled daily
+                  </div>
+                </div>
+                <div className="aspect-square border-4 border-black bg-white swiss-diagonal p-4 flex flex-col justify-between">
+                  <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                    AI OPTIMIZE
+                  </div>
+                  <div className="text-3xl font-black uppercase">4.9</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-black/70">
+                    Candidate satisfaction
+                  </div>
+                </div>
+                <div className="aspect-square border-4 border-black bg-[#FF3000] p-4 flex flex-col justify-between text-white">
+                  <div className="text-[10px] font-black uppercase tracking-[0.3em]">
+                    SHARE READY
+                  </div>
+                  <div className="text-3xl font-black uppercase">PDF</div>
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-white/80">
+                    Link + QR in one click
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 border-t-4 border-black pt-6">
+                <div className="flex items-center gap-4">
+                  <Image
+                    src="/linkedin.png"
+                    alt="LinkedIn logo"
+                    width={48}
+                    height={48}
+                    className="h-11 w-11 object-contain"
+                  />
+                  <div>
+                    <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                      Live LinkedIn feed
+                    </div>
+                    <div className="text-base font-bold uppercase tracking-widest">
+                      Job matches ready
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-black/70">
+                  <Search className="h-4 w-4" />
+                  AI screening + CV diff
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Workflow Section */}
-        <section id="workflow" className="bg-white border-b-4 border-black py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-7xl font-black text-black uppercase mb-16">
-              How it works
-            </h2>
-            
-            <div className="grid grid-cols-3 gap-8">
+        <section
+          id="method"
+          className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8"
+        >
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-12 lg:grid-cols-[5fr_7fr]">
+              <div>
+                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                  02. Method
+                </div>
+                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                  From job post to ATS-ready CV in minutes.
+                </h2>
+                <p className="mt-6 text-lg font-medium uppercase tracking-[0.12em] text-black/80">
+                  Structured pipeline, visible every step. Search, analyze,
+                  optimize, and deliver.
+                </p>
+                <div className="mt-8 grid gap-4">
+                  {[
+                    {
+                      icon: Linkedin,
+                      title: 'LinkedIn search inside CSpark',
+                    },
+                    {
+                      icon: Sparkles,
+                      title: 'AI extracts role requirements',
+                    },
+                    {
+                      icon: FileText,
+                      title: 'CV sections refined for ATS',
+                    },
+                    {
+                      icon: Target,
+                      title: 'Preview diffs before applying',
+                    },
+                  ].map((item, index) => (
+                    <div
+                      key={item.title}
+                      className="flex items-center gap-4 border-2 border-black bg-[#F2F2F2] px-5 py-4"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-white">
+                        <item.icon className="h-6 w-6" />
+                      </div>
+                      <div className="text-sm font-bold uppercase tracking-widest">
+                        {String(index + 1).padStart(2, '0')}. {item.title}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-4 border-black bg-[#F2F2F2] p-8 swiss-dots">
+                <div className="grid gap-6 md:grid-cols-2">
+                  {[
+                    {
+                      icon: Search,
+                      title: 'Job intelligence',
+                      text: 'Fetch real LinkedIn listings and match keyword density.',
+                    },
+                    {
+                      icon: Zap,
+                      title: 'Rapid tailoring',
+                      text: 'Rewrite summaries and bullet points to align with roles.',
+                    },
+                    {
+                      icon: Shield,
+                      title: 'Secure data',
+                      text: 'Encryption and GDPR-first handling for every profile.',
+                    },
+                    {
+                      icon: QrCode,
+                      title: 'Instant sharing',
+                      text: 'Publish links, PDFs, and QR codes on demand.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.title}
+                      className="border-2 border-black bg-white p-6 transition-colors hover:bg-black hover:text-white"
+                    >
+                      <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2]">
+                        <item.icon className="h-6 w-6" />
+                      </div>
+                      <h3 className="mt-4 text-lg font-black uppercase tracking-widest">
+                        {item.title}
+                      </h3>
+                      <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70">
+                        {item.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="faq" className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-[7fr_5fr]">
+              <div>
+                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                  03. Advantages
+                </div>
+                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                  Measurable outcomes for every application.
+                </h2>
+              </div>
+              <div className="border-4 border-black bg-[#F2F2F2] p-6 swiss-diagonal">
+                <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                  Performance
+                </div>
+                <div className="mt-4 text-4xl font-black uppercase">+38%</div>
+                <div className="mt-2 text-sm font-bold uppercase tracking-widest text-black/70">
+                  Higher callback rate
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
               {[
-                { num: '01', title: 'Search', desc: 'Browse LinkedIn jobs' },
-                { num: '02', title: 'Optimize', desc: 'AI tailors your CV' },
-                { num: '03', title: 'Apply', desc: 'Apply with confidence' },
-              ].map((step, i) => (
-                <div key={i} className="border-4 border-black p-8 bg-white">
-                  <div className="text-5xl font-black text-[#FF3000] mb-4">{step.num}</div>
-                  <h3 className="text-2xl font-black text-black uppercase mb-2">{step.title}</h3>
-                  <p className="text-base font-bold text-black">{step.desc}</p>
+                {
+                  title: 'LinkedIn sync',
+                  text: 'Live role imports, zero copy paste.',
+                  icon: Linkedin,
+                },
+                {
+                  title: 'ATS optimized',
+                  text: 'Structured for parsing + keyword density.',
+                  icon: Target,
+                },
+                {
+                  title: 'Instant export',
+                  text: 'PDF, link, QR, all from one workflow.',
+                  icon: Download,
+                },
+              ].map((item) => (
+                <div
+                  key={item.title}
+                  className="border-4 border-black bg-white p-6 transition-all hover:bg-[#FF3000] hover:text-white"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2]">
+                    <item.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-5 text-lg font-black uppercase tracking-widest">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70">
+                    {item.text}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
 
-        {/* Stats Section */}
-        <section className="bg-white border-b-4 border-black py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
               {[
-                { value: '50,000+', label: 'PROFESSIONALS' },
-                { value: '485,000+', label: 'CVS CREATED' },
-                { value: '91%', label: 'MATCH RATE' },
-                { value: '<5MIN', label: 'AVG TIME' },
-              ].map((stat, index) => (
+                { label: 'Profiles optimized', value: '124k' },
+                { label: 'Jobs scanned weekly', value: '52k' },
+                { label: 'Hiring teams reached', value: '8.4k' },
+              ].map((stat) => (
                 <div
-                  key={index}
-                  className="p-8 border-4 border-black bg-white hover:bg-black hover:text-white transition-all"
+                  key={stat.label}
+                  className="border-4 border-black bg-[#F2F2F2] p-6 text-center"
                 >
-                  <div className="text-4xl font-black text-black hover:text-white">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs font-black uppercase tracking-widest text-black hover:text-white mt-2">
+                  <div className="text-4xl font-black uppercase">{stat.value}</div>
+                  <div className="mt-2 text-xs font-bold uppercase tracking-[0.3em] text-black/70">
                     {stat.label}
                   </div>
                 </div>
@@ -251,863 +479,214 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-20">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
-              isDark 
-                ? 'bg-blue-500/20 border-blue-500/30 text-blue-300' 
-                : 'bg-blue-100 border-blue-300 text-blue-700'
-            }`}>
-              <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-semibold">Powerful Features</span>
-            </span>
-            <h2 className={`text-5xl font-bold mb-6 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Everything You Need to Land Your Dream Job
-            </h2>
-            <p className={`text-xl max-w-3xl mx-auto ${
-              isDark ? 'text-white/70' : 'text-gray-600'
-            }`}>
-              Our AI-powered platform helps you create tailored CVs for every job, optimize your application, and stand out to recruiters
-            </p>
-          </div>
-
-          {/* Primary/Core Features - 6 most important */}
-          <div className="mb-20">
-            <h3 className={`text-2xl font-bold mb-8 text-center ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Core Features
-            </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: Linkedin,
-                  title: 'LinkedIn Job Search',
-                  description: 'Search and browse LinkedIn job postings directly in our platform. Find your perfect role without leaving the app.',
-                  gradient: 'from-blue-600 to-blue-800',
-                  badge: 'Popular'
-                },
-                {
-                  icon: MetaLogo,
-                  title: 'AI-Powered Optimization',
-                  description: 'Get AI suggestions tailored to each job posting, then approve selected edits before they are applied to your CV.',
-                  gradient: 'from-blue-500 to-cyan-500',
-                  badge: 'AI'
-                },
-                {
-                  icon: Target,
-                  title: 'Job-Specific Tailoring',
-                  description: 'CSpark highlights missing skills and suggests targeted updates so you can customize every CV version faster than ever.',
-                  gradient: 'from-purple-500 to-pink-500',
-                  badge: 'Featured'
-                },
-                {
-                  icon: PlusSquare,
-                  title: 'Custom Sections',
-                  description: 'Add personalized sections like Awards, Volunteer Work, or Publications to showcase your unique achievements and stand out.',
-                  gradient: 'from-violet-500 to-purple-600',
-                  badge: 'New'
-                },
-                {
-                  icon: Upload,
-                  title: 'Import Existing CV',
-                  description: 'Upload your PDF or DOCX resume to quickly get started. Create a new CV in seconds and start editing.',
-                  gradient: 'from-blue-600 to-indigo-700',
-                  badge: 'New'
-                },
-                {
-                  icon: Layers,
-                  title: 'Multiple CV Versions',
-                  description: 'Create and manage different CV versions for various positions. Switch between them effortlessly and keep them organized.',
-                  gradient: 'from-green-500 to-emerald-500',
-                  badge: ''
-                },
-              ].map((feature, index) => (
-                <GlareCard key={index} className="h-full">
-                  <div className={`backdrop-blur-md rounded-2xl p-6 h-full flex flex-col shadow-lg transition-all border hover:scale-105 hover:shadow-2xl ${
-                    isDark 
-                      ? 'bg-zinc-950/55 border-white/20 hover:bg-zinc-950/65' 
-                      : 'bg-white/90 border-gray-200 hover:border-gray-300'
-                  }`}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg flex-shrink-0`}>
-                        <feature.icon className="w-6 h-6 text-white" />
-                      </div>
-                      {feature.badge && (
-                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                          feature.badge === 'New' 
-                            ? 'bg-green-500/20 text-green-400' 
-                            : feature.badge === 'Featured'
-                            ? 'bg-yellow-500/20 text-yellow-400'
-                            : 'bg-blue-500/20 text-blue-400'
-                        }`}>
-                          {feature.badge}
-                        </span>
-                      )}
-                    </div>
-                    <h3 className={`text-lg font-bold mb-2 ${
-                      isDark ? 'text-white' : 'text-gray-900'
-                    }`}>
-                      {feature.title}
-                    </h3>
-                    <p className={`text-sm leading-relaxed ${
-                      isDark ? 'text-white/85' : 'text-gray-600'
-                    }`}>
-                      {feature.description}
-                    </p>
-                  </div>
-                </GlareCard>
-              ))}
-            </div>
-          </div>
-
-          {/* Additional Features - Supporting/Secondary */}
-          <div>
-            <h3 className={`text-2xl font-bold mb-8 text-center ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Supporting Features
-            </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                {
-                  icon: Code,
-                  title: 'Professional Templates',
-                  description: 'Modern, academic, or minimalist templates. All ATS-friendly.',
-                  gradient: 'from-orange-500 to-red-500'
-                },
-                {
-                  icon: Download,
-                  title: 'Export & Share',
-                  description: 'Download as PDF or share with custom URLs and QR codes.',
-                  gradient: 'from-indigo-500 to-purple-500'
-                },
-                {
-                  icon: Zap,
-                  title: 'Real-Time Preview',
-                  description: 'See changes instantly. WYSIWYG editor with live preview.',
-                  gradient: 'from-yellow-500 to-orange-500'
-                },
-                {
-                  icon: Lightbulb,
-                  title: 'Smart Suggestions',
-                  description: 'AI-powered recommendations for better descriptions.',
-                  gradient: 'from-pink-500 to-rose-500'
-                },
-                {
-                  icon: Link2,
-                  title: 'Shareable Links',
-                  description: 'Generate links that never expire (Pro) or last 7 days (Free).',
-                  gradient: 'from-sky-500 to-blue-700'
-                },
-                {
-                  icon: QrCode,
-                  title: 'QR Codes',
-                  description: 'Create scannable QR codes for portfolios and business cards.',
-                  gradient: 'from-fuchsia-500 to-violet-600'
-                },
-                {
-                  icon: Database,
-                  title: 'Cloud Storage',
-                  description: 'Secure cloud storage. Access CVs from anywhere, anytime.',
-                  gradient: 'from-cyan-500 to-blue-500'
-                },
-                {
-                  icon: Globe,
-                  title: 'Digital Portfolio',
-                  description: 'Online link for emails and LinkedIn profiles.',
-                  gradient: 'from-teal-500 to-green-500'
-                },
-              ].map((feature, index) => (
-                <div 
-                  key={index} 
-                  className={`rounded-xl p-4 backdrop-blur-md border transition-all hover:scale-105 ${
-                    isDark 
-                      ? 'bg-zinc-950/40 border-white/10 hover:bg-zinc-950/60' 
-                      : 'bg-white/70 border-gray-200 hover:bg-white/90'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-3 shadow-lg`}>
-                    <feature.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <h4 className={`font-semibold mb-1 text-sm ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    {feature.title}
-                  </h4>
-                  <p className={`text-xs leading-snug ${
-                    isDark ? 'text-white/75' : 'text-gray-600'
-                  }`}>
-                    {feature.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-16">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
-              isDark 
-                ? 'bg-violet-500/20 border-violet-500/30 text-violet-300' 
-                : 'bg-violet-100 border-violet-300 text-violet-700'
-            }`}>
-              <Rocket className="w-4 h-4" />
-              <span className="text-sm font-semibold">Quick Start</span>
-            </span>
-            <h2 className={`text-4xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              From Zero to Hired in 3 Steps
-            </h2>
-            <p className={`text-xl max-w-2xl mx-auto ${
-              isDark ? 'text-white/70' : 'text-gray-600'
-            }`}>
-              Create a professional CV and start applying to jobs in less than 10 minutes - guaranteed
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 md:gap-4">
-            {[
-              {
-                step: '01',
-                title: 'Choose Your Template',
-                description: 'Select from our professionally designed templates that suit your industry and style.',
-                icon: FileText
-              },
-              {
-                step: '02',
-                title: 'Fill in Your Details',
-                description: 'Add your experience, education, and skills. Our AI helps you write compelling descriptions.',
-                icon: MetaLogo
-              },
-              {
-                step: '03',
-                title: 'Download & Share',
-                description: 'Export as PDF or share online with a custom link and QR code. Update anytime for free.',
-                icon: Rocket
-              },
-            ].map((step, index) => (
-              <div
-                key={index}
-                className="relative"
-              >
-                <div className={`rounded-2xl p-8 backdrop-blur-md border transition-all hover:scale-105 h-full ${
-                  isDark 
-                    ? 'bg-white/5 border-white/10 hover:bg-white/10' 
-                    : 'bg-white/80 border-gray-200 hover:shadow-2xl'
-                }`}>
-                  <div className={`text-7xl font-black mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent ${
-                    isDark ? 'drop-shadow-lg' : ''
-                  }`}>
-                    {step.step}
-                  </div>
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-6 shadow-lg`}>
-                    <step.icon className="w-7 h-7 text-white" />
-                  </div>
-                  <h3 className={`text-2xl font-bold mb-3 ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    {step.title}
-                  </h3>
-                  <p className={isDark ? 'text-white/70' : 'text-gray-600'}>
-                    {step.description}
-                  </p>
-                </div>
-                {index < 2 && (
-                  <div className={`hidden md:flex absolute -right-6 top-1/2 -translate-y-1/2 z-10 items-center justify-center w-12 h-12 rounded-full border-2 ${
-                    isDark 
-                      ? 'bg-zinc-900 border-white/20 text-white/40' 
-                      : 'bg-white border-gray-300 text-gray-400'
-                  }`}>
-                    <ArrowRight className="w-5 h-5" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Security & Privacy Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className={`rounded-3xl p-12 backdrop-blur-md border ${
-            isDark 
-              ? 'bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-blue-500/20' 
-              : 'bg-gradient-to-br from-blue-50 to-purple-50 border-blue-200'
-          }`}>
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 mb-6 shadow-xl">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-              <h2 className={`text-4xl font-bold mb-4 ${
-                isDark ? 'text-white' : 'text-gray-900'
-              }`}>
-                Your Data, Your Control
-              </h2>
-              <p className={`text-xl max-w-2xl mx-auto ${
-                isDark ? 'text-white/70' : 'text-gray-600'
-              }`}>
-                Enterprise-grade security and privacy protection for your personal information
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                {
-                  icon: Lock,
-                  title: 'End-to-End Encryption',
-                  description: 'All your data is encrypted using industry-standard AES-256 encryption both in transit and at rest.',
-                },
-                {
-                  icon: Shield,
-                  title: 'GDPR Compliant',
-                  description: 'Fully compliant with GDPR, CCPA, and other data protection regulations worldwide.',
-                },
-                {
-                  icon: Eye,
-                  title: 'Privacy First',
-                  description: 'We never sell your data. You control who can view your CV and can delete your data anytime.',
-                },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className={`p-6 rounded-xl backdrop-blur-md border ${
-                    isDark 
-                      ? 'bg-white/5 border-white/10' 
-                      : 'bg-white/80 border-gray-200'
-                  }`}
-                >
-                  <item.icon className={`w-10 h-10 mb-4 ${
-                    isDark ? 'text-green-400' : 'text-green-600'
-                  }`} />
-                  <h3 className={`text-lg font-bold mb-2 ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    {item.title}
-                  </h3>
-                  <p className={`text-sm ${
-                    isDark ? 'text-white/70' : 'text-gray-600'
-                  }`}>
-                    {item.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className={`mt-8 p-6 rounded-xl border ${
-              isDark 
-                ? 'bg-white/5 border-white/10' 
-                : 'bg-white/80 border-gray-200 backdrop-blur-md'
-            }`}>
-              <h4 className={`font-semibold mb-3 flex items-center gap-2 ${
-                isDark ? 'text-white' : 'text-gray-900'
-              }`}>
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                Our Security Commitments
-              </h4>
-              <ul className={`grid md:grid-cols-2 gap-2 text-sm ${
-                isDark ? 'text-white/70' : 'text-gray-600'
-              }`}>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  Regular security audits by third-party experts
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  SOC 2 Type II certified infrastructure
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  24/7 threat monitoring and response
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
-                  Data backup and disaster recovery
-                </li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-12">
-            <h2 className={`text-4xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-4">
-            {faqItems.map((faq, index) => (
-              <div
-                key={index}
-                className={`rounded-xl backdrop-blur-md border overflow-hidden ${
-                  isDark 
-                    ? 'bg-white/5 border-white/10' 
-                    : 'bg-white/80 border-gray-200'
-                }`}
-              >
-                <button
-                  onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                  className={`w-full p-6 text-left flex items-center justify-between transition-colors ${
-                    isDark ? 'hover:bg-white/5' : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <span className={`font-semibold ${
-                    isDark ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    {faq.q}
-                  </span>
-                  <ChevronDown
-                    className={`w-5 h-5 transition-transform ${
-                      expandedFaq === index ? 'rotate-180' : ''
-                    } ${isDark ? 'text-white/60' : 'text-gray-600'}`}
-                  />
-                </button>
-                {expandedFaq === index && (
-                  <div className={`px-6 pb-6 ${
-                    isDark ? 'text-white/70' : 'text-gray-600'
-                  }`}>
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Differentiation */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-14">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
-              isDark
-                ? 'bg-blue-500/20 border-blue-500/30 text-blue-300'
-                : 'bg-blue-100 border-blue-300 text-blue-700'
-            }`}>
-              <Target className="w-4 h-4" />
-              <span className="text-sm font-semibold">Positioning</span>
-            </span>
-            <h2 className={`text-4xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              LinkedIn-first job search + CV tailoring in one place
-            </h2>
-            <p className={`text-xl max-w-3xl mx-auto ${
-              isDark ? 'text-white/70' : 'text-gray-600'
-            }`}>
-              CSpark replaces the usual tool stack: LinkedIn, docs, and ChatGPT. Search jobs, tailor a CV
-              for each role, track applications, and share the result from one dashboard.
-            </p>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            {[
-              {
-                title: 'ResumeWorded',
-                copy: 'Great for static CV scoring, but no embedded job search or job-specific workflow.',
-              },
-              {
-                title: 'Kickresume',
-                copy: 'Template-first builder with limited job targeting and no LinkedIn pipeline.',
-              },
-              {
-                title: 'ChatGPT',
-                copy: 'Powerful writing, but manual copy-paste and no ATS templates or tracking.',
-              },
-            ].map((item) => (
-              <div key={item.title} className={`rounded-2xl border p-6 ${
-                isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
-              }`}>
-                <h3 className={`text-lg font-semibold ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                  {item.title}
-                </h3>
-                <p className={`mt-3 text-sm ${
-                  isDark ? 'text-white/70' : 'text-gray-600'
-                }`}>
-                  {item.copy}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          <div className={`mt-10 rounded-2xl border p-6 ${
-            isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
-          }`}>
-            <div className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              Differentiation Matrix
-            </div>
-            <div className={`mt-4 grid gap-3 text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
-              {[
-                { label: 'LinkedIn job search inside the product', cspark: 'Yes', other: 'No' },
-                { label: 'Job-specific CV tailoring workflow', cspark: 'Yes', other: 'Partial' },
-                { label: 'ATS-ready templates + PDF export', cspark: 'Yes', other: 'Varies' },
-                { label: 'Shareable CV links + QR', cspark: 'Yes', other: 'Rare' },
-                { label: 'Application tracking + notes', cspark: 'Yes', other: 'No' },
-              ].map((row) => (
-                <div key={row.label} className={`grid grid-cols-[1.6fr_0.7fr_0.7fr] gap-2 rounded-lg p-2 ${
-                  isDark ? 'bg-white/5' : 'bg-gray-50'
-                }`}>
-                  <span className={isDark ? 'text-white/90' : 'text-gray-900'}>{row.label}</span>
-                  <span className="text-center font-semibold text-blue-500">{row.cspark}</span>
-                  <span className="text-center">{row.other}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Product Roadmap */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-14">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
-              isDark
-                ? 'bg-purple-500/20 border-purple-500/30 text-purple-300'
-                : 'bg-purple-100 border-purple-300 text-purple-700'
-            }`}>
-              <Rocket className="w-4 h-4" />
-              <span className="text-sm font-semibold">Roadmap Expansion</span>
-            </span>
-            <h2 className={`text-4xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Build a complete job application system
-            </h2>
-            <p className={`text-xl max-w-3xl mx-auto ${
-              isDark ? 'text-white/70' : 'text-gray-600'
-            }`}>
-              Product expansion focuses on measurable outcomes: response rate, interviews, and faster hiring cycles.
-            </p>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            {[
-              {
-                icon: Database,
-                title: 'Application Tracker',
-                copy: 'Track Applied, Screening, Interview, Offer, Rejected. Add interview notes and reminders.',
-              },
-              {
-                icon: Layers,
-                title: 'CV Change History + A/B',
-                copy: 'Job-specific versions, compare changes, and learn which edits improve response rates.',
-              },
-              {
-                icon: Cpu,
-                title: 'Reusable CV Snippets',
-                copy: 'Save bullet blocks by category and insert them into future tailored CVs in one click.',
-              },
-              {
-                icon: Linkedin,
-                title: 'Chrome Extension (MVP)',
-                copy: 'Autofill Easy Apply, pull job details, and sync application status back to CSpark.',
-              },
-              {
-                icon: TrendingUp,
-                title: 'Analytics Layer',
-                copy: 'Response rate by template, job category, and funnel: Views -> Applications -> Interviews.',
-              },
-              {
-                icon: Shield,
-                title: 'Privacy Controls',
-                copy: 'Public/private links, expiring QR access, view tracking, and instant revocation.',
-              },
-            ].map((item) => (
-              <div key={item.title} className={`rounded-2xl border p-6 ${
-                isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
-              }`}>
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 ${
-                  isDark ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'
-                }`}>
-                  <item.icon className="w-6 h-6" />
-                </div>
-                <h3 className={`text-lg font-semibold ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                  {item.title}
-                </h3>
-                <p className={`mt-3 text-sm ${
-                  isDark ? 'text-white/70' : 'text-gray-600'
-                }`}>
-                  {item.copy}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Privacy + Platform Scope */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div className={`rounded-2xl border p-8 ${
-              isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
-            }`}>
-              <div className="flex items-center gap-3 mb-4">
-                <Lock className={`w-5 h-5 ${isDark ? 'text-blue-300' : 'text-blue-600'}`} />
-                <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  Privacy controls built for sharing
-                </h3>
-              </div>
-              <ul className={`space-y-3 text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
-                {[
-                  'Public, private, or password-protected CV links',
-                  'Expiring links and QR access windows',
-                  'View tracking and analytics toggles',
-                  'Instant access revocation',
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <Eye className="w-4 h-4 text-blue-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className={`rounded-2xl border p-8 ${
-              isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'
-            }`}>
-              <div className="flex items-center gap-3 mb-4">
-                <Globe className={`w-5 h-5 ${isDark ? 'text-purple-300' : 'text-purple-600'}`} />
-                <h3 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  LinkedIn-first focus, with expansion built in
-                </h3>
-              </div>
-              <p className={`text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
-                CSpark stays LinkedIn-first to deliver the best job-matching workflow today. The roadmap expands
-                to other platforms without diluting the core promise: find a job and tailor the CV inside one flow.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center mb-16">
-            <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
-              isDark 
-                ? 'bg-green-500/20 border-green-500/30 text-green-300' 
-                : 'bg-green-100 border-green-300 text-green-700'
-            }`}>
-              <TrendingUp className="w-4 h-4" />
-              <span className="text-sm font-semibold">Transparent Pricing</span>
-            </span>
-            <h2 className={`text-4xl font-bold mb-4 ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              Simple, Honest Pricing
-            </h2>
-            <p className={`text-xl max-w-2xl mx-auto ${
-              isDark ? 'text-white/70' : 'text-gray-600'
-            }`}>
-              Start free, upgrade only when you need more. No hidden fees, cancel anytime.
-            </p>
-          </div>
-          <PricingWithChart isDark={isDark} />
-        </section>
-
-        {/* Final CTA */}
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className={`rounded-3xl p-12 md:p-20 text-center backdrop-blur-md border bg-gradient-to-br overflow-hidden relative ${
-            isDark 
-              ? 'from-blue-900/40 via-purple-900/40 to-blue-900/40 border-blue-500/30' 
-              : 'from-blue-50 via-purple-50 to-blue-50 border-blue-300'
-          }`}>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent dark:via-white/5 pointer-events-none" />
-            
-            <div className="relative z-10 space-y-8">
+        <section id="pricing" className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-[5fr_7fr]">
               <div>
-                <h2 className={`text-5xl md:text-6xl font-bold mb-6 leading-tight ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                  Start Your Journey to<br/>
-                  <span className={`${
-                    isDark
-                      ? 'text-blue-300'
-                      : 'bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent'
-                  }`}>
-                    Your Dream Job
-                  </span>
+                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                  04. Pricing
+                </div>
+                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                  Free for starters. Pro for volume.
+                </h2>
+                <p className="mt-6 text-lg font-medium uppercase tracking-[0.12em] text-black/80">
+                  Pro unlocks unlimited CV creation, advanced optimization, and
+                  higher LinkedIn search limits.
+                </p>
+                <div className="mt-8 border-4 border-black bg-[#F2F2F2] p-6">
+                  <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                    Pro benefits
+                  </div>
+                  <ul className="mt-4 space-y-3 text-xs font-bold uppercase tracking-widest text-black/70">
+                    <li>Unlimited CV versions</li>
+                    <li>Unlimited AI optimizations</li>
+                    <li>10 LinkedIn job searches per cycle</li>
+                    <li>Permanent share links + QR codes</li>
+                    <li>Priority processing + support</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="border-4 border-black bg-white">
+                <div className="border-b-4 border-black px-6 py-4">
+                  <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                    Free vs Pro
+                  </div>
+                  <div className="mt-2 text-lg font-black uppercase tracking-widest">
+                    Plan comparison
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs font-bold uppercase tracking-widest">
+                    <thead className="border-b-4 border-black">
+                      <tr>
+                        <th className="px-6 py-4">Feature</th>
+                        <th className="px-6 py-4">Free</th>
+                        <th className="px-6 py-4 text-[#FF3000]">Pro</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { feature: 'CV creations', free: '1', pro: 'Unlimited' },
+                        { feature: 'AI optimizations', free: '1', pro: 'Unlimited' },
+                        { feature: 'LinkedIn searches', free: '1 (25 results)', pro: '10 (50/all)' },
+                        { feature: 'Shareable links', free: '7 days', pro: 'Permanent' },
+                        { feature: 'QR codes', free: 'Limited', pro: 'Unlimited' },
+                        { feature: 'Support', free: 'Standard', pro: 'Priority' },
+                      ].map((row) => (
+                        <tr key={row.feature} className="border-b-2 border-black">
+                          <td className="px-6 py-4">{row.feature}</td>
+                          <td className="px-6 py-4">{row.free}</td>
+                          <td className="px-6 py-4">{row.pro}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-6">
+                  <div className="text-xs font-black uppercase tracking-[0.3em]">
+                    Pro starts at
+                  </div>
+                  <div className="text-3xl font-black uppercase text-[#FF3000]">
+                    $19.99
+                  </div>
+                  <Button asChild variant="accent" size="lg">
+                    <Link href="/register" className="flex items-center gap-3">
+                      Get Started
+                      <ArrowRight className="h-5 w-5" />
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-[5fr_7fr]">
+              <div>
+                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                  05. Journal
+                </div>
+                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                  Precision feedback from teams and candidates.
+                </h2>
+                <div className="mt-6 flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-black/70">
+                  <Users className="h-4 w-4" />
+                  Trusted by hiring managers in 120+ companies
+                </div>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                {[
+                  {
+                    quote:
+                      'The workflow is brutally efficient. We get a polished CV per role in minutes.',
+                    name: 'Talent Partner, Berlin',
+                  },
+                  {
+                    quote:
+                      'LinkedIn sync + AI rewrite is exactly what a high-volume team needs.',
+                    name: 'Hiring Lead, Amsterdam',
+                  },
+                  {
+                    quote:
+                      'The ATS formatting is the cleanest we have seen.',
+                    name: 'Recruiter, London',
+                  },
+                  {
+                    quote:
+                      'Our candidates share QR codes instantly after optimization.',
+                    name: 'Career Coach, Paris',
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.name}
+                    className="border-4 border-black bg-white p-6 transition-transform hover:-translate-y-1"
+                  >
+                    <p className="text-sm font-medium uppercase tracking-widest text-black/80">
+                      {item.quote}
+                    </p>
+                    <div className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                      {item.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-[5fr_7fr]">
+              <div>
+                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                  06. FAQ
+                </div>
+                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                  Straight answers. Zero noise.
                 </h2>
               </div>
-              
-              <p className={`text-xl mb-10 max-w-2xl mx-auto leading-relaxed ${
-                isDark ? 'text-white/80' : 'text-gray-700'
-              }`}>
-                Create a professional CV in minutes, get AI-optimized suggestions for every job application, and land more interviews.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <Link
-                  href="/register"
-                  className="inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl hover:shadow-2xl transition-all hover:scale-105 whitespace-nowrap"
-                >
-                  Get Started Free
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link
-                  href="#features"
-                  className={`inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-xl border transition-all hover:scale-105 whitespace-nowrap ${
-                    isDark
-                      ? 'border-blue-400/50 text-blue-300 hover:bg-blue-500/10'
-                      : 'border-blue-300 text-blue-700 hover:bg-blue-50'
-                  }`}
-                >
-                  Explore Features
-                  <ChevronDown className="w-5 h-5 -rotate-90" />
-                </Link>
+              <div className="grid gap-4">
+                {faqItems.map((faq, index) => (
+                  <div
+                    key={faq.q}
+                    className="border-4 border-black bg-white"
+                  >
+                    <button
+                      type="button"
+                      className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                      onClick={() =>
+                        setExpandedFaq(expandedFaq === index ? null : index)
+                      }
+                    >
+                      <span className="text-sm font-bold uppercase tracking-widest">
+                        {faq.q}
+                      </span>
+                      <PlusSquare
+                        className={`h-5 w-5 transition-transform ${
+                          expandedFaq === index ? 'rotate-90' : 'rotate-0'
+                        }`}
+                      />
+                    </button>
+                    {expandedFaq === index && (
+                      <div className="border-t-4 border-black bg-[#F2F2F2] px-6 py-5">
+                        <p className="text-sm font-medium uppercase tracking-widest text-black/70">
+                          {faq.a}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-              
-              <p className={`text-sm mt-8 ${
-                isDark ? 'text-white/60' : 'text-gray-600'
-              }`}>
-                ✓ No credit card required  •  ✓ Takes less than 2 minutes  •  ✓ Start creating immediately
-              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t-4 border-black bg-[#F2F2F2] px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-6 border-4 border-black bg-white p-8 md:flex-row md:items-center">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                07. Start
+              </div>
+              <h2 className="mt-4 text-4xl font-black uppercase leading-tight sm:text-5xl">
+                Build a job-specific CV today.
+              </h2>
+            </div>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <Button asChild variant="accent" size="lg">
+                <Link href="/register" className="flex items-center gap-3">
+                  Start for Free
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/login">Return to Dashboard</Link>
+              </Button>
             </div>
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className={`border-t ${
-        isDark ? 'border-white/10 bg-black/20' : 'border-gray-200 bg-gray-50'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <Image src="/cspark-logo.png" alt="CSpark logo" width={56} height={56} className="w-14 h-14 object-contain" />
-                <span className={`text-xl font-bold ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                  CSpark
-                </span>
-              </div>
-              <p className={`text-sm ${
-                isDark ? 'text-white/60' : 'text-gray-600'
-              }`}>
-                Create professional CVs powered by AI in minutes.
-              </p>
-            </div>
-
-            <div>
-              <h3 className={`font-semibold mb-4 ${
-                isDark ? 'text-white' : 'text-gray-900'
-              }`}>
-                Product
-              </h3>
-              <ul className="space-y-2">
-                {['Features', 'Templates', 'Pricing', 'FAQ'].map((item) => (
-                  <li key={item}>
-                    <Link
-                      href="#"
-                      className={`text-sm transition-colors ${
-                        isDark 
-                          ? 'text-white/60 hover:text-white' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className={`font-semibold mb-4 ${
-                isDark ? 'text-white' : 'text-gray-900'
-              }`}>
-                Company
-              </h3>
-              <ul className="space-y-2">
-                {['About', 'Blog', 'Careers', 'Contact'].map((item) => (
-                  <li key={item}>
-                    <Link
-                      href="#"
-                      className={`text-sm transition-colors ${
-                        isDark 
-                          ? 'text-white/60 hover:text-white' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h3 className={`font-semibold mb-4 ${
-                isDark ? 'text-white' : 'text-gray-900'
-              }`}>
-                Legal
-              </h3>
-              <ul className="space-y-2">
-                {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR'].map((item) => (
-                  <li key={item}>
-                    <Link
-                      href="#"
-                      className={`text-sm transition-colors ${
-                        isDark 
-                          ? 'text-white/60 hover:text-white' 
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className={`pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 ${
-            isDark ? 'border-white/10' : 'border-gray-200'
-          }`}>
-            <p className={`text-sm ${
-              isDark ? 'text-white/60' : 'text-gray-600'
-            }`}>
-              © 2026 CSpark. All rights reserved.
-            </p>
-            <div className="flex items-center gap-2">
-              <span className={`text-sm ${
-                isDark ? 'text-white/80' : 'text-gray-700'
-              }`}>
-                Powered by
-              </span>
-              <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                isDark 
-                  ? 'bg-blue-500/20 text-blue-100 border border-blue-400/40 shadow-md shadow-blue-500/20' 
-                  : 'bg-blue-100 text-blue-800 border border-blue-300'
-              }`}>
-                <MetaLogo className="h-3.5 w-3.5" />
-                Meta LLAMA 3.3 70B
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-
-      <style jsx global>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }

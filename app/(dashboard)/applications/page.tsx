@@ -262,7 +262,7 @@ export default function ApplicationsPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen relative flex items-center justify-center ${isDark ? 'dark' : ''}`}>
+      <div className={`min-h-screen relative flex items-center justify-center ${isDark ? 'dark' : ''} bg-white text-black`}>
         <ShaderBackground isDark={isDark} />
         <div className="relative z-10">
           <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent" />
@@ -272,7 +272,7 @@ export default function ApplicationsPage() {
   }
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">

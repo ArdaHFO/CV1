@@ -276,9 +276,9 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="relative">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-zinc-200 dark:border-zinc-800"></div>
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent absolute top-0 left-0"></div>
+        <div className="flex items-center gap-3 border-2 border-black bg-white px-4 py-3">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-black border-t-transparent"></div>
+          <span className="text-xs font-black uppercase tracking-widest">Loading dashboard</span>
         </div>
       </div>
     );
@@ -287,66 +287,51 @@ export default function DashboardPage() {
   const defaultResume = resumes.find(r => r.is_default);
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''}`}>
-      <style jsx global>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10 space-y-8 px-4 py-8">
         <div className="space-y-8 max-w-7xl mx-auto">
-      {/* Header with Animation */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
+      <div className="flex flex-col gap-6 border-4 border-black bg-white p-6 swiss-grid-pattern">
         <div className="space-y-2">
-          <h1 className="text-7xl font-black text-black leading-none">
-            my cvs
-          </h1>
-          <p className="text-base font-bold text-black mt-4">
+          <h1 className="text-3xl font-black uppercase tracking-widest">My CVs</h1>
+          <p className="text-xs font-bold uppercase tracking-widest text-black/70">
             Manage and edit all your CV versions
           </p>
-          <p className="text-xs font-bold uppercase tracking-widest text-black mt-2">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">
             {planTier === 'pro'
               ? 'Pro plan: Unlimited CV creation'
               : `Freemium plan: ${remainingCvCreations}/1 CV creation remaining`}
           </p>
-          {cvLimitMessage && <p className="text-xs font-bold text-[#FF3000] mt-2">{cvLimitMessage}</p>}
+          {cvLimitMessage && (
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#FF3000]">
+              {cvLimitMessage}
+            </p>
+          )}
         </div>
 
-        <div className="flex gap-3">
-          <Button 
-            onClick={() => setUploadDialogOpen(true)}
-            variant="outline"
-            className="gap-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
-          >
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => setUploadDialogOpen(true)} variant="outline">
             <Upload className="w-4 h-4" />
             Import CV
           </Button>
 
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider">
+              <Button variant="accent">
                 <Plus className="w-4 h-4" />
                 Create New CV
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md border-2 border-black">
+            <DialogContent className="sm:max-w-md">
               <DialogHeader className="space-y-3">
-                <DialogTitle className="text-2xl font-black text-black">Create New CV</DialogTitle>
-                <DialogDescription className="text-base font-bold text-black">
+                <DialogTitle className="text-xl font-black uppercase tracking-widest">Create New CV</DialogTitle>
+                <DialogDescription className="text-sm font-bold uppercase tracking-widest text-black/60">
                   Enter a title for your CV. For example: "Frontend Developer", "Project Manager"
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-sm font-black uppercase tracking-widest">CV Title</Label>
+                <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest">CV Title</Label>
                 <Input
                   id="title"
                   placeholder="e.g., Frontend Developer"
@@ -357,7 +342,6 @@ export default function DashboardPage() {
                       handleCreateResume();
                     }
                   }}
-                  className="h-11 border-2 border-black bg-white text-black font-bold"
                   autoFocus
                 />
               </div>
@@ -367,23 +351,22 @@ export default function DashboardPage() {
                 variant="outline"
                 onClick={() => setCreateDialogOpen(false)}
                 disabled={creating}
-                className="border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
               >
                 Cancel
               </Button>
               <Button 
+                variant="accent"
                 onClick={handleCreateResume} 
                 disabled={creating || !newResumeTitle.trim() || (planTier === 'freemium' && remainingCvCreations <= 0)}
-                className="border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider"
               >
                 {creating ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                     Creating...
                   </>
                 ) : (
                   <>
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4" />
                     Create
                   </>
                 )}
@@ -395,16 +378,16 @@ export default function DashboardPage() {
 
       {/* Rename Dialog */}
         <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
-          <DialogContent className="sm:max-w-md border-2 border-black">
+          <DialogContent className="sm:max-w-md">
             <DialogHeader className="space-y-3">
-              <DialogTitle className="text-2xl font-black text-black">Rename CV</DialogTitle>
-              <DialogDescription className="text-base font-bold text-black">
+              <DialogTitle className="text-xl font-black uppercase tracking-widest">Rename CV</DialogTitle>
+              <DialogDescription className="text-sm font-bold uppercase tracking-widest text-black/60">
                 Enter a new title for your CV
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="rename-title" className="text-sm font-black uppercase tracking-widest">CV Title</Label>
+                <Label htmlFor="rename-title" className="text-xs font-black uppercase tracking-widest">CV Title</Label>
                 <Input
                   id="rename-title"
                   placeholder="e.g., Frontend Developer"
@@ -415,7 +398,6 @@ export default function DashboardPage() {
                       handleRenameSubmit();
                     }
                   }}
-                  className="h-11 border-2 border-black bg-white text-black font-bold"
                   autoFocus
                 />
               </div>
@@ -428,14 +410,13 @@ export default function DashboardPage() {
                   setRenamingResume(null);
                   setRenameTitle('');
                 }}
-                className="border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
               >
                 Cancel
               </Button>
               <Button 
+                variant="accent"
                 onClick={handleRenameSubmit}
                 disabled={!renameTitle.trim()}
-                className="border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider disabled:opacity-50"
               >
                 Rename
               </Button>
@@ -446,38 +427,38 @@ export default function DashboardPage() {
 
       {/* Stats Cards - Only show if there are resumes */}
       {resumes.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-          <Card className="bg-white text-black border-3 border-black hover:bg-black hover:text-white transition-all">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card className="bg-[#F2F2F2]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-black uppercase tracking-widest">Total CVs</p>
-                  <p className="text-5xl font-black mt-4">{resumes.length}</p>
+                  <p className="text-xs font-black uppercase tracking-widest">Total CVs</p>
+                  <p className="text-3xl font-black mt-2">{resumes.length}</p>
                 </div>
-                <div className="w-16 h-16 border-3 border-black flex items-center justify-center">
-                  <FileText className="w-8 h-8" />
+                <div className="border-2 border-black p-2">
+                  <FileText className="w-6 h-6" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card 
-            className={`bg-white border-3 border-black transition-all ${defaultResume ? 'cursor-pointer hover:bg-black hover:text-white' : 'opacity-60'}`}
+            className={`${defaultResume ? 'cursor-pointer' : 'opacity-60'}`}
             onClick={() => defaultResume && router.push(`/editor/${defaultResume.id}`)}
           >
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0 pr-2">
-                  <p className="text-sm font-black uppercase tracking-widest">Default CV</p>
-                  <p className="text-2xl font-black mt-4 truncate">
+                  <p className="text-xs font-black uppercase tracking-widest">Default CV</p>
+                  <p className="text-lg font-black mt-2 truncate">
                     {defaultResume?.title || 'None'}
                   </p>
                   {defaultResume && (
-                    <p className="text-xs font-bold uppercase tracking-widest mt-3">Click to edit</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Click to edit</p>
                   )}
                 </div>
-                <div className="w-16 h-16 border-3 border-black flex items-center justify-center flex-shrink-0">
-                  <Star className="w-8 h-8" fill="currentColor" />
+                <div className="border-2 border-black p-2 flex-shrink-0">
+                  <Star className="w-6 h-6" fill="currentColor" />
                 </div>
               </div>
             </CardContent>
@@ -487,47 +468,34 @@ export default function DashboardPage() {
 
       {/* Resumes Grid */}
       {resumes.length === 0 ? (
-        <Card className="border-3 border-black bg-[#F2F2F2] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+        <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-20">
-            <div className="w-24 h-24 border-3 border-black flex items-center justify-center mb-6">
+            <div className="border-2 border-black p-4 mb-6">
               <FileText className="w-12 h-12" />
             </div>
-            <h3 className="text-4xl font-black text-black mb-4">
-              No CVs yet
+            <h3 className="text-2xl font-black uppercase tracking-widest mb-2">
+              No CVs created yet
             </h3>
-            <p className="text-black font-bold mb-8 text-center max-w-md">
+            <p className="text-xs font-bold uppercase tracking-widest text-black/60 mb-8 text-center max-w-md">
               Start by creating your first CV. With our AI-powered editor and templates, prepare
               your professional CV in minutes.
             </p>
-            <Button 
-              onClick={() => setCreateDialogOpen(true)} 
-              className="gap-2 border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider"
-            >
+            <Button onClick={() => setCreateDialogOpen(true)} variant="accent">
               <Plus className="w-4 h-4" />
               Create My First CV
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-          {resumes.map((resume, index) => (
-            <Card 
-              key={resume.id} 
-              className="border-3 border-black bg-white hover:bg-black hover:text-white transition-all"
-              style={{
-                animationName: 'fadeInUp',
-                animationDuration: '0.6s',
-                animationTimingFunction: 'ease-out',
-                animationFillMode: 'forwards',
-                animationDelay: `${index * 100}ms`,
-              }}
-            >
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2 border-b-2 border-black">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {resumes.map((resume) => (
+            <Card key={resume.id} className="group">
+              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
                 <div className="flex-1 space-y-1">
-                  <CardTitle className="text-xl font-black">
+                  <CardTitle className="text-lg font-black uppercase tracking-widest">
                     {resume.title}
                   </CardTitle>
-                  <CardDescription className="text-xs font-bold uppercase tracking-widest">
+                  <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
                     Updated: {new Date(resume.updated_at).toLocaleDateString('en-US', { 
                       month: 'short', 
                       day: 'numeric',
@@ -537,15 +505,11 @@ export default function DashboardPage() {
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 border-2 border-black hover:bg-black hover:text-white"
-                    >
+                    <Button variant="ghost" size="icon" className="h-9 w-9">
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 border-2 border-black">
+                  <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem onClick={() => router.push(`/editor/${resume.id}`)}>
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
@@ -584,28 +548,23 @@ export default function DashboardPage() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </CardHeader>
-              <CardContent className="space-y-4 pt-4">
+              <CardContent className="space-y-4">
                 <div className="flex items-center gap-4 text-sm h-6">
-                  {resume.is_default && (
-                    <div className="border-2 border-black px-3 py-1 bg-black text-white font-black uppercase tracking-wider text-xs">
-                      Default
-                    </div>
-                  )}
+                  {resume.is_default && <Badge variant="destructive">Default</Badge>}
                 </div>
                 
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
-                    className="flex-1 border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
+                    className="flex-1"
                     onClick={() => router.push(`/editor/${resume.id}`)}
                   >
-                    <Edit className="w-4 h-4 mr-2" />
+                    <Edit className="w-4 h-4" />
                     Edit
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
-                    className="border-2 border-black bg-white text-black hover:bg-black hover:text-white"
                     onClick={() => window.open(`/preview/username/${resume.slug}`, '_blank')}
                   >
                     <ExternalLink className="w-4 h-4" />
