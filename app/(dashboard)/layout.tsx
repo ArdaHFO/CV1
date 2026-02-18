@@ -193,15 +193,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       name: 'Pro Monthly',
       price: '$19.99',
       period: '/month',
-      description: 'Great for active job seekers needing flexible monthly billing.',
+      description: 'Flexible monthly billing for active job seekers.',
+      benefits: [
+        'Unlimited CV versions',
+        'Unlimited AI optimizations',
+        'Advanced ATS scoring',
+        'Priority support',
+        'Shareable links (permanent)',
+        'Unlimited QR codes',
+      ],
     },
     {
       id: 'pro-yearly' as const,
       name: 'Pro Yearly',
       price: '$199.99',
       period: '/year',
-      description: 'Best value with priority feature access and unlimited tools.',
+      description: 'Best value — save vs monthly with priority access.',
       badge: 'Best Value',
+      benefits: [
+        'Everything in Monthly',
+        '~17% savings vs monthly',
+        'Unlimited CV versions',
+        'Unlimited AI optimizations',
+        'Advanced ATS scoring',
+        'Priority support',
+      ],
     },
   ];
 
@@ -209,13 +225,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     {
       id: 'job-search-5' as const,
       name: '5 Job Search Tokens',
-      price: '$4.99',
+      price: '$9.99',
       description: 'Add 5 extra job searches.',
     },
     {
       id: 'job-search-10' as const,
       name: '10 Job Search Tokens',
-      price: '$19.99',
+      price: '$14.99',
       description: 'Add 10 extra job searches.',
       badge: 'Best Value',
     },
@@ -421,24 +437,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     setSelectedPurchaseType('plan');
                     setSelectedPlanId(plan.id);
                   }}
-                  className={`border-2 border-black p-4 text-left transition-colors ${
-                    isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                  className={`group relative border-2 border-black p-4 text-left transition-colors overflow-hidden ${
+                    isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <p className="text-xs font-black uppercase tracking-widest">{plan.name}</p>
-                    {plan.badge ? <Badge>{plan.badge}</Badge> : null}
-                  </div>
-                  <p className="mt-2 text-xl font-black uppercase">
-                    {plan.price}
-                    <span className="ml-1 text-xs font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
-                  </p>
-                  <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.description}</p>
-                  {isSelected ? (
-                    <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
-                      <Check className="h-3.5 w-3.5" /> Selected
+                  {/* Default view */}
+                  <div className="transition-opacity duration-200 group-hover:opacity-0">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-black uppercase tracking-widest">{plan.name}</p>
+                      {'badge' in plan && plan.badge ? <Badge>{plan.badge}</Badge> : null}
                     </div>
-                  ) : null}
+                    <p className="mt-2 text-xl font-black uppercase">
+                      {plan.price}
+                      <span className="ml-1 text-xs font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
+                    </p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.description}</p>
+                    {isSelected ? (
+                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
+                        <Check className="h-3.5 w-3.5" /> Selected
+                      </div>
+                    ) : null}
+                  </div>
+                  {/* Hover benefits panel */}
+                  <div className="absolute inset-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-center bg-black text-white">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#FF3000] mb-2">What you get</p>
+                    <ul className="space-y-1">
+                      {'benefits' in plan && plan.benefits?.map((b) => (
+                        <li key={b} className="flex items-start gap-1.5 text-[10px] font-bold uppercase tracking-widest">
+                          <Check className="h-3 w-3 mt-0.5 flex-shrink-0 text-[#FF3000]" />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </button>
               );
             })}

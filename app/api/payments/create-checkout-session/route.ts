@@ -18,12 +18,12 @@ const PLAN_CONFIG = {
 const TOKEN_PACK_CONFIG = {
   'job-search-5': {
     name: 'CSpark Job Search Tokens (5)',
-    amount: 499,
+    amount: 999,
     tokenCount: 5,
   },
   'job-search-10': {
     name: 'CSpark Job Search Tokens (10)',
-    amount: 1999,
+    amount: 1499,
     tokenCount: 10,
   },
 } as const;
