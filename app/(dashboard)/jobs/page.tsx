@@ -379,20 +379,23 @@ export default function JobsPage() {
 
               {/* Remote Only + Clear — fixed height row, no layout shift */}
               <div className="flex items-center gap-2 h-10">
-                <label className="flex items-center gap-2 cursor-pointer select-none h-10 px-3 border-2 border-black bg-white flex-1">
-                  <input
-                    type="checkbox"
-                    checked={remoteOnly}
-                    onChange={(e) => setRemoteOnly(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  {/* Swiss toggle: simple square toggle */}
-                  <span className="relative inline-flex h-5 w-9 shrink-0 items-center">
-                    <span className="absolute inset-0 border-2 border-black bg-white transition-colors peer-checked:bg-black" />
-                    <span className="absolute left-0.5 top-0.5 h-3.5 w-3.5 bg-black transition-transform peer-checked:translate-x-4 peer-checked:bg-white" />
+                <button
+                  type="button"
+                  onClick={() => setRemoteOnly((v) => !v)}
+                  className={`flex items-center gap-2 cursor-pointer select-none h-10 px-3 border-2 border-black flex-1 transition-colors ${
+                    remoteOnly ? 'bg-black text-white' : 'bg-white text-black'
+                  }`}
+                >
+                  {/* Swiss square toggle */}
+                  <span className={`relative inline-flex h-5 w-9 shrink-0 items-center border-2 transition-colors ${
+                    remoteOnly ? 'border-white bg-black' : 'border-black bg-white'
+                  }`}>
+                    <span className={`absolute top-0.5 h-3 w-3 transition-transform duration-150 ${
+                      remoteOnly ? 'translate-x-4 bg-white' : 'translate-x-0.5 bg-black'
+                    }`} />
                   </span>
                   <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Remote</span>
-                </label>
+                </button>
                 {(employmentType !== 'all' || experienceLevel !== 'all' || datePosted !== 'all' || resultLimit !== '25' || remoteOnly) && (
                   <Button
                     variant="outline"

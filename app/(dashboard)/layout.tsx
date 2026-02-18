@@ -39,8 +39,9 @@ type SubscriptionData = {
 };
 
 type TokenPackId = 'job-search-5' | 'job-search-10';
-type CvImportPackId = 'cv-import-1' | 'cv-import-10';
-type PurchaseType = 'plan' | 'token-pack' | 'cv-import-pack';
+type CvImportPackId = 'cv-import-5' | 'cv-import-10';
+type AiOptimizePackId = 'ai-optimize-5' | 'ai-optimize-10';
+type PurchaseType = 'plan' | 'token-pack' | 'cv-import-pack' | 'ai-optimize-pack';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -50,7 +51,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [selectedPlanId, setSelectedPlanId] = useState<'pro-monthly' | 'pro-yearly'>('pro-yearly');
   const [selectedPurchaseType, setSelectedPurchaseType] = useState<PurchaseType>('plan');
   const [selectedTokenPackId, setSelectedTokenPackId] = useState<TokenPackId>('job-search-5');
-  const [selectedCvImportPackId, setSelectedCvImportPackId] = useState<CvImportPackId>('cv-import-1');
+  const [selectedCvImportPackId, setSelectedCvImportPackId] = useState<CvImportPackId>('cv-import-5');
+  const [selectedAiOptimizePackId, setSelectedAiOptimizePackId] = useState<AiOptimizePackId>('ai-optimize-5');
   const [processingPayment, setProcessingPayment] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState('');
   const [isPro, setIsPro] = useState(false);
@@ -286,10 +288,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const cvImportPacks = [
     {
-      id: 'cv-import-1' as const,
-      name: '1 CV Import',
+      id: 'cv-import-5' as const,
+      name: '5 CV Imports',
       price: '$9.99',
-      description: 'Import 1 additional CV.',
+      description: 'Import 5 additional CVs.',
     },
     {
       id: 'cv-import-10' as const,
@@ -300,14 +302,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     },
   ];
 
+  const aiOptimizePacks = [
+    {
+      id: 'ai-optimize-5' as const,
+      name: '5 AI Optimizations',
+      price: '$9.99',
+      description: 'Run 5 more AI CV optimizations.',
+    },
+    {
+      id: 'ai-optimize-10' as const,
+      name: '10 AI Optimizations',
+      price: '$14.99',
+      description: 'Run 10 more AI CV optimizations.',
+      badge: 'Best Value',
+    },
+  ];
+
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans[0];
   const selectedTokenPack = tokenPacks.find((pack) => pack.id === selectedTokenPackId) ?? tokenPacks[0];
   const selectedCvImportPack = cvImportPacks.find((pack) => pack.id === selectedCvImportPackId) ?? cvImportPacks[0];
+  const selectedAiOptimizePack = aiOptimizePacks.find((pack) => pack.id === selectedAiOptimizePackId) ?? aiOptimizePacks[0];
   const selectedPrice =
     selectedPurchaseType === 'plan'
       ? selectedPlan.price
       : selectedPurchaseType === 'cv-import-pack'
       ? selectedCvImportPack.price
+      : selectedPurchaseType === 'ai-optimize-pack'
+      ? selectedAiOptimizePack.price
       : selectedTokenPack.price;
 
   const handlePayment = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -337,6 +358,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ? { purchaseType: 'plan', planId: selectedPlan.id }
             : selectedPurchaseType === 'cv-import-pack'
             ? { purchaseType: 'cv-import-pack', cvImportPackId: selectedCvImportPack.id }
+            : selectedPurchaseType === 'ai-optimize-pack'
+            ? { purchaseType: 'ai-optimize-pack', aiOptimizePackId: selectedAiOptimizePack.id }
             : { purchaseType: 'token-pack', tokenPackId: selectedTokenPack.id }
         ),
       });
@@ -613,7 +636,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-black uppercase tracking-widest">CV Import Credits</p>
+            <p className="text-xs font-black uppercase tracking-widest">CV Import Credits <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Current balance: {quotas ? (quotas.cvImports === 'unlimited' ? '\u221e' : quotas.cvImports) : '...'})</span></p>
             <div className="grid gap-3 sm:grid-cols-2">
               {cvImportPacks.map((pack) => {
                 const isSelected = selectedPurchaseType === 'cv-import-pack' && selectedCvImportPackId === pack.id;
@@ -632,6 +655,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <div className="flex items-center justify-between">
                       <p className="text-xs font-black uppercase tracking-widest">{pack.name}</p>
                       {pack.badge ? <Badge>{pack.badge}</Badge> : null}
+                    </div>
+                    <p className="mt-2 text-xl font-black uppercase">{pack.price}</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
+                    {isSelected ? (
+                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
+                        <Check className="h-3.5 w-3.5" /> Selected
+                      </div>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-black uppercase tracking-widest">AI Optimize Credits <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Current balance: {quotas ? (quotas.cvOptimizations === 'unlimited' ? '\u221e' : quotas.cvOptimizations) : '...'})</span></p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {aiOptimizePacks.map((pack) => {
+                const isSelected = selectedPurchaseType === 'ai-optimize-pack' && selectedAiOptimizePackId === pack.id;
+                return (
+                  <button
+                    key={pack.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPurchaseType('ai-optimize-pack');
+                      setSelectedAiOptimizePackId(pack.id);
+                    }}
+                    className={`border-2 border-black p-4 text-left transition-colors ${
+                      isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-black uppercase tracking-widest">{pack.name}</p>
+                      {'badge' in pack && pack.badge ? <Badge>{pack.badge}</Badge> : null}
                     </div>
                     <p className="mt-2 text-xl font-black uppercase">{pack.price}</p>
                     <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
