@@ -56,6 +56,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [processingPayment, setProcessingPayment] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState('');
   const [isPro, setIsPro] = useState(false);
+  const [proInfoOpen, setProInfoOpen] = useState(false);
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [remainingTokenSearches, setRemainingTokenSearches] = useState(0);
   const [quotas, setQuotas] = useState<{
@@ -508,12 +509,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             )}
             <Button
-              onClick={() => setUpgradeOpen(true)}
+              onClick={() => isPro ? setProInfoOpen(true) : setUpgradeOpen(true)}
               variant="accent"
               className="w-full justify-start gap-2"
             >
               <Crown className="h-4 w-4" />
-              {isPro ? 'Manage Plan' : 'Upgrade to Pro'}
+              {isPro ? 'Pro Subscription' : 'Upgrade to Pro'}
             </Button>
             <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-black/60">
               {isPro
@@ -767,6 +768,79 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Pro Subscription Info Dialog */}
+      <Dialog open={proInfoOpen} onOpenChange={setProInfoOpen}>
+        <DialogContent className="border-4 border-black bg-white p-0 max-w-sm">
+          <DialogHeader className="border-b-4 border-black p-5">
+            <div className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-[#FF3000]" />
+              <DialogTitle className="text-sm font-black uppercase tracking-widest">Pro Subscription</DialogTitle>
+            </div>
+            <DialogDescription className="text-[11px] font-bold uppercase tracking-widest text-black/60 mt-1">
+              Your current plan details
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-5 space-y-3">
+            {/* Status badge */}
+            <div className="flex items-center justify-between border-2 border-black bg-[#F2F2F2] px-3 py-2">
+              <span className="text-[10px] font-black uppercase tracking-widest">Status</span>
+              <span className="text-[10px] font-black uppercase tracking-widest bg-black text-white px-2 py-0.5">Active</span>
+            </div>
+
+            {/* Plan name */}
+            <div className="flex items-center justify-between border-2 border-black bg-[#F2F2F2] px-3 py-2">
+              <span className="text-[10px] font-black uppercase tracking-widest">Plan</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">{subscription?.planName || 'Pro'}</span>
+            </div>
+
+            {/* Amount */}
+            {subscription?.amount && (
+              <div className="flex items-center justify-between border-2 border-black bg-[#F2F2F2] px-3 py-2">
+                <span className="text-[10px] font-black uppercase tracking-widest">Amount Paid</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{subscription.amount}</span>
+              </div>
+            )}
+
+            {/* Paid at */}
+            {subscription?.paidAt && (
+              <div className="flex items-center justify-between border-2 border-black bg-[#F2F2F2] px-3 py-2">
+                <span className="text-[10px] font-black uppercase tracking-widest">Purchased</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{formatReadableDate(subscription.paidAt)}</span>
+              </div>
+            )}
+
+            {/* Expires at */}
+            <div className="flex items-center justify-between border-2 border-black bg-[#F2F2F2] px-3 py-2">
+              <span className="text-[10px] font-black uppercase tracking-widest">Valid Until</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#FF3000]">{formatReadableDate(subscription?.expiresAt)}</span>
+            </div>
+
+            {/* Features */}
+            <div className="border-2 border-black bg-[#F2F2F2] px-3 py-2 space-y-1.5">
+              <p className="text-[9px] font-black uppercase tracking-widest text-black/60 mb-2">Included Features</p>
+              {['Unlimited CV Versions', 'Unlimited AI Optimization', 'Unlimited Job Searches', 'Unlimited CV Imports', 'Priority Processing'].map((feature) => (
+                <div key={feature} className="flex items-center gap-2">
+                  <Check className="h-3 w-3 text-black shrink-0" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{feature}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <DialogFooter className="border-t-4 border-black p-4">
+            <Button
+              onClick={() => setProInfoOpen(false)}
+              variant="accent"
+              className="w-full"
+            >
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       </div>
     </div>
   );
