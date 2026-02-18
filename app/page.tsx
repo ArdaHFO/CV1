@@ -120,32 +120,28 @@ export default function Home() {
       <ShaderBackground isDark={isDark} />
       
       {/* Navigation */}
-      <nav className={`border-b sticky top-0 z-50 ${
-        isDark 
-          ? 'border-white/10 bg-black/30 backdrop-blur-md' 
-          : 'border-gray-200 bg-white/80 backdrop-blur-md shadow-sm'
-      }`}>
+      <nav className="border-b-4 border-black sticky top-0 z-50 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3.5">
               <Image src="/cspark-logo.png" alt="CSpark logo" width={68} height={68} className="w-[68px] h-[68px] object-contain shrink-0 ml-1" />
-              <span className={`text-3xl leading-none font-black text-black`}>
+              <span className="text-3xl leading-none font-black text-black uppercase">
                 cspark
               </span>
             </div>
             <div className="flex gap-4 items-center">
               <Link
                 href={currentUser ? '/dashboard' : '/login'}
-                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider text-black hover:bg-black hover:text-white transition-all`}
+                className="px-4 py-2 text-sm font-black uppercase tracking-wider text-black hover:border-b-4 hover:border-black transition-all"
               >
-                {currentUser ? displayName : 'Sign In'}
+                {currentUser ? displayName : 'SIGN IN'}
               </Link>
               {!currentUser && (
                 <Link
                   href="/register"
-                  className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] transition-all"
+                  className="px-6 py-2.5 text-sm font-black uppercase tracking-wider border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] transition-all"
                 >
-                  Sign Up
+                  GET STARTED
                 </Link>
               )}
             </div>
@@ -153,255 +149,105 @@ export default function Home() {
         </div>
       </nav>
 
-      <main className="relative z-10">
+      <main className="relative z-10 bg-white">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        {/* Hero Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-          <div className="text-left space-y-12">
-            {/* Trust Badge */}
-            <div className="flex items-center">
-              <div className={`inline-flex items-center gap-2 px-6 py-3 border-2 border-black bg-white`}>
-                <span className="text-xs font-black uppercase tracking-widest text-[#FF3000]">NEW</span>
-                <span className="text-sm font-bold text-black">Trusted by 50,000+ professionals</span>
+        {/* Hero Section - ACME Style */}
+        <section className="min-h-screen bg-white border-b-4 border-black flex items-center">
+          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-20">
+            <div className="grid grid-cols-2 gap-12 items-center">
+              {/* Left: Massive Text */}
+              <div className="space-y-12">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 border-2 border-black bg-white">
+                  <span className="text-xs font-black uppercase tracking-widest text-[#FF3000]">NEW</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-black">TRUSTED BY 50,000+ PROFESSIONALS</span>
+                </div>
+
+                {/* Main Headline */}
+                <div className="space-y-6">
+                  <h1 className="text-9xl font-black leading-none text-black uppercase">
+                    Transform<br/>the way<br/>your team<br/>works
+                  </h1>
+                  <p className="text-xl font-bold text-black leading-tight">
+                    Acme Platform brings your team together
+                  </p>
+                </div>
+
+                {/* CTA */}
+                <div className="flex gap-4 pt-8">
+                  <Link
+                    href="/register"
+                    className="px-8 py-4 text-sm font-black uppercase tracking-wider border-4 border-black bg-[#FF3000] text-white hover:scale-105 transition-transform"
+                  >
+                    GET STARTED
+                  </Link>
+                </div>
               </div>
-            </div>
 
-            <div className="max-w-4xl space-y-6">
-              <h1 className={`text-9xl font-black leading-none lowercase text-black`}>
-                search<br/>jobs at scale
-              </h1>
-              <p className="text-2xl font-bold text-black">
-                Browse LinkedIn job postings. AI tailors your CV to match each position instantly. Apply with precision.
-              </p>
-            </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start pt-8">
-              <Link
-                href="/register"
-                className="group px-8 py-4 text-lg font-black uppercase tracking-wider border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] transition-all flex items-center gap-2"
-              >
-                Start Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                href="#workflow"
-                className={`px-8 py-4 text-lg font-black uppercase tracking-wider border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all`}
-              >
-                See Demo
-              </Link>
-            </div>
-
-            {/* Social Proof */}
-            <div className="pt-12 flex items-center gap-8">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-black text-black" />
-                ))}
-                <span className={`ml-3 text-sm font-bold text-black`}>
-                  4.9/5 from thousands
-                </span>
+              {/* Right: Geometric Shapes */}
+              <div className="relative h-96 flex items-center justify-end pr-12">
+                {/* Thick Black Rectangle */}
+                <div className="absolute w-32 h-80 bg-black border-4 border-black left-0 top-0"></div>
+                
+                {/* Red Circle */}
+                <div className="absolute w-48 h-48 rounded-full bg-[#FF3000] border-4 border-[#FF3000] right-24 top-12"></div>
+                
+                {/* Small Red Line */}
+                <div className="absolute w-1 h-24 bg-[#FF3000] right-8 center"></div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* LinkedIn Integration Highlight */}
-        <section id="workflow" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className={`rounded-3xl p-12 backdrop-blur-md border overflow-hidden relative ${
-            isDark 
-              ? 'bg-gradient-to-br from-blue-900/30 via-purple-900/30 to-pink-900/30 border-blue-500/20' 
-              : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 border-blue-300'
-          }`}>
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute inset-0" style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-              }}></div>
-            </div>
-
-            <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border mb-6 ${
-                  isDark 
-                    ? 'bg-blue-500/20 border-blue-500/30 text-blue-300' 
-                    : 'bg-blue-100 border-blue-300 text-blue-700'
-                }`}>
-                  <Linkedin className="w-4 h-4" />
-                  <span className="text-sm font-medium">LinkedIn Integration</span>
+        {/* Workflow Section */}
+        <section id="workflow" className="bg-white border-b-4 border-black py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 className="text-7xl font-black text-black uppercase mb-16">
+              How it works
+            </h2>
+            
+            <div className="grid grid-cols-3 gap-8">
+              {[
+                { num: '01', title: 'Search', desc: 'Browse LinkedIn jobs' },
+                { num: '02', title: 'Optimize', desc: 'AI tailors your CV' },
+                { num: '03', title: 'Apply', desc: 'Apply with confidence' },
+              ].map((step, i) => (
+                <div key={i} className="border-4 border-black p-8 bg-white">
+                  <div className="text-5xl font-black text-[#FF3000] mb-4">{step.num}</div>
+                  <h3 className="text-2xl font-black text-black uppercase mb-2">{step.title}</h3>
+                  <p className="text-base font-bold text-black">{step.desc}</p>
                 </div>
-                
-                <h2 className={`text-4xl font-bold mb-6 ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                  Search Jobs on LinkedIn,
-                  <br />
-                  <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-                    Get AI-Optimized CVs
-                  </span>
-                </h2>
-                
-                <p className={`text-lg mb-6 leading-relaxed ${
-                  isDark ? 'text-white/80' : 'text-gray-700'
-                }`}>
-                  Browse LinkedIn job postings directly in our platform. For each job, our AI automatically 
-                  analyzes the requirements and tailors your CV to maximize your chances.
-                </p>
-
-                <div className="space-y-4">
-                  {[
-                    { icon: Sparkles, text: 'AI analyzes job requirements automatically' },
-                    { icon: Target, text: 'CV optimized with relevant keywords & skills' },
-                    { icon: Target, text: 'See suggested CV edits before applying them' },
-                    { icon: Rocket, text: 'Apply with confidence in minutes' },
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                        isDark 
-                          ? 'bg-blue-500/20 text-blue-400' 
-                          : 'bg-blue-100 text-blue-600'
-                      }`}>
-                        <item.icon className="w-5 h-5" />
-                      </div>
-                      <span className={`font-medium ${
-                        isDark ? 'text-white' : 'text-gray-900'
-                      }`}>
-                        {item.text}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className={`rounded-2xl p-8 backdrop-blur-md border ${
-                isDark 
-                  ? 'bg-white/5 border-white/10' 
-                  : 'bg-white/80 border-gray-200 shadow-xl backdrop-blur-md'
-              }`}>
-                <div className="space-y-4">
-                  {/* Mock Job Card */}
-                  <div className={`p-4 rounded-xl border backdrop-blur-md ${
-                    isDark 
-                      ? 'bg-white/5 border-white/10' 
-                      : 'bg-white/70 border-gray-200'
-                  }`}>
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#0A66C2] to-[#004182] flex items-center justify-center text-white font-bold">
-                        <Linkedin className="w-7 h-7" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className={`font-semibold ${
-                          isDark ? 'text-white' : 'text-gray-900'
-                        }`}>Senior Software Engineer</h4>
-                        <p className={`text-sm ${
-                          isDark ? 'text-white/60' : 'text-gray-600'
-                        }`}>Google • San Francisco, CA</p>
-                      </div>
-                      <Linkedin className={`w-5 h-5 ${
-                        isDark ? 'text-blue-400' : 'text-blue-600'
-                      }`} />
-                    </div>
-                    <div className="flex gap-2 mb-3">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        isDark 
-                          ? 'bg-blue-500/20 text-blue-300' 
-                          : 'bg-blue-100 text-blue-700'
-                      }`}>React</span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        isDark 
-                          ? 'bg-purple-500/20 text-purple-300' 
-                          : 'bg-purple-100 text-purple-700'
-                      }`}>TypeScript</span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        isDark 
-                          ? 'bg-green-500/20 text-green-300' 
-                          : 'bg-green-100 text-green-700'
-                      }`}>Node.js</span>
-                    </div>
-                  </div>
-
-                  {/* AI Processing Animation */}
-                  <div className="flex items-center gap-3 py-3">
-                    <div className="flex-1">
-                      <div className={`h-2 rounded-full overflow-hidden ${
-                        isDark ? 'bg-white/10' : 'bg-gray-200'
-                      }`}>
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse" style={{ width: '70%' }}></div>
-                      </div>
-                    </div>
-                    <Sparkles className={`w-5 h-5 animate-spin ${
-                      isDark ? 'text-blue-400' : 'text-blue-600'
-                    }`} />
-                  </div>
-
-                  {/* Optimized CV Result */}
-                  <div className={`p-4 rounded-xl border backdrop-blur-md ${
-                    isDark 
-                      ? 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/30' 
-                      : 'bg-gradient-to-br from-green-50/80 to-emerald-50/80 border-green-300'
-                  }`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <CheckCircle className={`w-5 h-5 ${
-                        isDark ? 'text-green-400' : 'text-green-600'
-                      }`} />
-                      <span className={`font-semibold ${
-                        isDark ? 'text-green-300' : 'text-green-700'
-                      }`}>CV Optimized!</span>
-                    </div>
-                    <p className={`text-sm ${
-                      isDark ? 'text-white/70' : 'text-gray-600'
-                    }`}>
-                      Added 12 relevant keywords, enhanced 3 experience descriptions, tailored skills section
-                    </p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Stats Section */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: Users, value: '52,000+', label: 'Active Users' },
-              { icon: Sparkles, value: '485,000+', label: 'CVs AI-Optimized' },
-              { icon: TrendingUp, value: '91%', label: 'Job Match Rate' },
-              { icon: Clock, value: '<5min', label: 'Avg. Creation Time' },
-            ].map((stat, index) => (
-              <div
-                key={index}
-                className={`text-center p-6 rounded-2xl backdrop-blur-md border transition-all hover:scale-105 ${
-                  isDark 
-                    ? 'bg-white/5 border-white/10 hover:bg-white/10' 
-                    : 'bg-white/80 border-gray-200 hover:shadow-xl'
-                }`}
-                style={{
-                  animationName: 'fadeInUp',
-                  animationDuration: '0.8s',
-                  animationTimingFunction: 'ease-out',
-                  animationFillMode: 'forwards',
-                  animationDelay: `${index * 100}ms`,
-                }}
-              >
-                <stat.icon className={`w-8 h-8 mx-auto mb-3 ${
-                  isDark ? 'text-blue-400' : 'text-blue-600'
-                }`} />
-                <div className={`text-3xl font-bold mb-1 ${
-                  isDark ? 'text-white' : 'text-gray-900'
-                }`}>
-                  {stat.value}
+        <section className="bg-white border-b-4 border-black py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[
+                { value: '50,000+', label: 'PROFESSIONALS' },
+                { value: '485,000+', label: 'CVS CREATED' },
+                { value: '91%', label: 'MATCH RATE' },
+                { value: '<5MIN', label: 'AVG TIME' },
+              ].map((stat, index) => (
+                <div
+                  key={index}
+                  className="p-8 border-4 border-black bg-white hover:bg-black hover:text-white transition-all"
+                >
+                  <div className="text-4xl font-black text-black hover:text-white">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs font-black uppercase tracking-widest text-black hover:text-white mt-2">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className={`text-sm ${
-                  isDark ? 'text-white/60' : 'text-gray-600'
-                }`}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
