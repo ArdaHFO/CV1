@@ -294,23 +294,23 @@ export default function Home() {
                       <Image
                         src="/linkedin.png"
                         alt="LinkedIn"
-                        width={48}
-                        height={48}
-                        className="h-5 w-5 shrink-0 object-contain"
+                        width={20}
+                        height={20}
+                        className="shrink-0 object-contain"
                       />
                       <Image
                         src="/workday-hcm.png"
                         alt="Workday"
-                        width={423}
-                        height={200}
-                        className="h-5 w-auto shrink-0 object-contain"
+                        width={42}
+                        height={20}
+                        className="shrink-0 object-contain"
                       />
                       <Image
                         src="/careerone.png"
                         alt="CareerOne"
-                        width={247}
-                        height={53}
-                        className="h-5 w-auto shrink-0 object-contain"
+                        width={93}
+                        height={20}
+                        className="shrink-0 object-contain"
                       />
                     </div>
                   </Marquee>
