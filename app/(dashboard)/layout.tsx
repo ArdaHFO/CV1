@@ -599,7 +599,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
 
       <Dialog open={upgradeOpen} onOpenChange={setUpgradeOpen}>
-        <DialogContent className="sm:max-w-5xl p-4">
+        <DialogContent className="sm:max-w-2xl p-4">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Crown className="h-5 w-5 text-[#FF3000]" />
@@ -610,9 +610,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="space-y-4">
-              <div className="space-y-1.5">
+          <div className="space-y-3">
+            <div className="space-y-1.5">
                 <p className="text-xs font-black uppercase tracking-widest">Subscriptions</p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {plans.map((plan) => {
@@ -625,7 +624,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           setSelectedPurchaseType('plan');
                           setSelectedPlanId(plan.id);
                         }}
-                        className={`group relative border-2 border-black p-3 text-left transition-colors overflow-hidden ${
+                        className={`group relative border-2 border-black p-2 text-left transition-colors overflow-hidden ${
                           isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'
                         }`}
                       >
@@ -634,7 +633,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <p className="text-[11px] font-black uppercase tracking-widest">{plan.name}</p>
                             {'badge' in plan && plan.badge ? <Badge>{plan.badge}</Badge> : null}
                           </div>
-                          <p className="mt-1.5 text-lg font-black uppercase">
+                          <p className="mt-1 text-base font-black uppercase">
                             {plan.price}
                             <span className="ml-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
                           </p>
@@ -670,7 +669,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           setSelectedPurchaseType('ai-optimize-pack');
                           setSelectedAiOptimizePackId(pack.id);
                         }}
-                        className={`border-2 border-black p-3 text-left transition-colors ${
+                        className={`border-2 border-black p-2 text-left transition-colors ${
                           isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
                         }`}
                       >
@@ -678,16 +677,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <p className="text-[11px] font-black uppercase tracking-widest">{pack.name}</p>
                           {'badge' in pack && pack.badge ? <Badge>{pack.badge}</Badge> : null}
                         </div>
-                        <p className="mt-1.5 text-lg font-black uppercase">{pack.price}</p>
+                        <p className="mt-1 text-base font-black uppercase">{pack.price}</p>
                         <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
                       </button>
                     );
                   })}
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-4">
               <div className="space-y-1.5">
                 <p className="text-xs font-black uppercase tracking-widest">
                   Job Search Tokens <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">(Balance: {remainingTokenSearches})</span>
@@ -703,7 +700,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           setSelectedPurchaseType('token-pack');
                           setSelectedTokenPackId(pack.id);
                         }}
-                        className={`border-2 border-black p-3 text-left transition-colors ${
+                        className={`border-2 border-black p-2 text-left transition-colors ${
                           isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
                         }`}
                       >
@@ -711,7 +708,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <p className="text-[11px] font-black uppercase tracking-widest">{pack.name}</p>
                           {pack.badge ? <Badge>{pack.badge}</Badge> : null}
                         </div>
-                        <p className="mt-1.5 text-lg font-black uppercase">{pack.price}</p>
+                        <p className="mt-1 text-base font-black uppercase">{pack.price}</p>
                         <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
                       </button>
                     );
@@ -732,7 +729,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           setSelectedPurchaseType('cv-import-pack');
                           setSelectedCvImportPackId(pack.id);
                         }}
-                        className={`border-2 border-black p-3 text-left transition-colors ${
+                        className={`border-2 border-black p-2 text-left transition-colors ${
                           isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
                         }`}
                       >
@@ -740,14 +737,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <p className="text-[11px] font-black uppercase tracking-widest">{pack.name}</p>
                           {pack.badge ? <Badge>{pack.badge}</Badge> : null}
                         </div>
-                        <p className="mt-1.5 text-lg font-black uppercase">{pack.price}</p>
+                        <p className="mt-1 text-base font-black uppercase">{pack.price}</p>
                         <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
                       </button>
                     );
                   })}
                 </div>
               </div>
-            </div>
           </div>
 
           <form className="space-y-3" onSubmit={handlePayment}>
@@ -819,7 +815,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
               <Button
                 type="submit"
-                className="h-9 gap-2 border-2 border-black bg-green-600 text-white hover:bg-green-700"
+                className="h-9 gap-2 border-2 border-transparent text-white font-black"
+                style={{ backgroundColor: '#16a34a' }}
                 disabled={processingPayment}
               >
                 {processingPayment ? 'Redirecting to Stripe...' : `Continue to Stripe (${selectedPrice})`}
