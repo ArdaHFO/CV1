@@ -349,6 +349,11 @@ export default function JobsPage() {
                   {platform === 'linkedin' ? 'Powered by LinkedIn' : platform === 'workday' ? 'Powered by Workday' : 'Powered by CareerOne'}
                 </span>
               </div>
+              {platform === 'careerone' && (
+                <div className="px-3 py-1.5 border-2 border-[#FF3000] bg-[#FF3000]/5">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#FF3000]">🇦🇺 Australia &amp; NZ Only</span>
+                </div>
+              )}
             </div>
             <p className="text-xs font-bold uppercase tracking-widest text-black/60">
               Search and optimize your CV to match job requirements
@@ -384,7 +389,7 @@ export default function JobsPage() {
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40 w-4 h-4" />
                   <Input
-                    placeholder="Location (optional)"
+                    placeholder={platform === 'careerone' ? 'e.g. Sydney, Melbourne, Brisbane' : 'Location (optional)'}
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -507,7 +512,7 @@ export default function JobsPage() {
           <div className="border-4 border-black bg-white py-16">
             <div className="flex flex-col items-center gap-4">
               <div className="w-10 h-10 border-4 border-black border-t-[#FF3000] animate-spin" />
-              <p className="text-xs font-black uppercase tracking-widest">Searching LinkedIn jobs...</p>
+              <p className="text-xs font-black uppercase tracking-widest">Searching {platform === 'linkedin' ? 'LinkedIn' : platform === 'workday' ? 'Workday' : 'CareerOne'} jobs...</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 max-w-xs text-center">
                 Fetching real-time data — typically 1–2 minutes
               </p>

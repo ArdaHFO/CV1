@@ -346,9 +346,10 @@ async function searchCareerOneJobs(
       : undefined;
     const contractTypes = employmentType === 'contract' ? ['Contract'] : undefined;
 
-    // Map datePosted → dayRange
+    // Map datePosted → dayRange (only send when > 0, actor treats 0 as "0 days" = no results)
     const dayRangeMap: Record<string, number> = { '24h': 1, 'week': 7, 'month': 30 };
-    const dayRange = datePosted && dayRangeMap[datePosted] ? dayRangeMap[datePosted] : undefined;
+    const dayRangeVal = datePosted ? dayRangeMap[datePosted] : undefined;
+    const dayRange = dayRangeVal && dayRangeVal > 0 ? dayRangeVal : undefined;
 
     const body: Record<string, unknown> = {
       searchTerm: keywords || 'developer',
