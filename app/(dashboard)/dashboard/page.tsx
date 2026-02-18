@@ -306,25 +306,25 @@ export default function DashboardPage() {
       {/* Header with Animation */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
-            My CVs
+          <h1 className="text-7xl font-black text-black leading-none">
+            my cvs
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
+          <p className="text-base font-bold text-black mt-4">
             Manage and edit all your CV versions
           </p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="text-xs font-bold uppercase tracking-widest text-black mt-2">
             {planTier === 'pro'
               ? 'Pro plan: Unlimited CV creation'
               : `Freemium plan: ${remainingCvCreations}/1 CV creation remaining`}
           </p>
-          {cvLimitMessage && <p className="text-xs text-amber-700 dark:text-amber-400">{cvLimitMessage}</p>}
+          {cvLimitMessage && <p className="text-xs font-bold text-[#FF3000] mt-2">{cvLimitMessage}</p>}
         </div>
 
         <div className="flex gap-3">
           <Button 
             onClick={() => setUploadDialogOpen(true)}
             variant="outline"
-            className="gap-2 group relative overflow-hidden border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950 dark:border-blue-400 dark:text-blue-400 shadow-md hover:shadow-lg transition-all duration-300"
+            className="gap-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
           >
             <Upload className="w-4 h-4" />
             Import CV
@@ -332,22 +332,21 @@ export default function DashboardPage() {
 
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+              <Button className="gap-2 border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider">
+                <Plus className="w-4 h-4" />
                 Create New CV
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md border-2 border-black">
               <DialogHeader className="space-y-3">
-                <DialogTitle className="text-2xl">Create New CV</DialogTitle>
-                <DialogDescription className="text-base">
+                <DialogTitle className="text-2xl font-black text-black">Create New CV</DialogTitle>
+                <DialogDescription className="text-base font-bold text-black">
                   Enter a title for your CV. For example: "Frontend Developer", "Project Manager"
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-sm font-medium">CV Title</Label>
+                <Label htmlFor="title" className="text-sm font-black uppercase tracking-widest">CV Title</Label>
                 <Input
                   id="title"
                   placeholder="e.g., Frontend Developer"
@@ -358,7 +357,7 @@ export default function DashboardPage() {
                       handleCreateResume();
                     }
                   }}
-                  className="h-11 border-zinc-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-500 transition-colors duration-300"
+                  className="h-11 border-2 border-black bg-white text-black font-bold"
                   autoFocus
                 />
               </div>
@@ -368,14 +367,14 @@ export default function DashboardPage() {
                 variant="outline"
                 onClick={() => setCreateDialogOpen(false)}
                 disabled={creating}
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-300"
+                className="border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
               >
                 Cancel
               </Button>
               <Button 
                 onClick={handleCreateResume} 
                 disabled={creating || !newResumeTitle.trim() || (planTier === 'freemium' && remainingCvCreations <= 0)}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                className="border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider"
               >
                 {creating ? (
                   <>
@@ -396,16 +395,16 @@ export default function DashboardPage() {
 
       {/* Rename Dialog */}
         <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-md border-2 border-black">
             <DialogHeader className="space-y-3">
-              <DialogTitle className="text-2xl">Rename CV</DialogTitle>
-              <DialogDescription className="text-base">
+              <DialogTitle className="text-2xl font-black text-black">Rename CV</DialogTitle>
+              <DialogDescription className="text-base font-bold text-black">
                 Enter a new title for your CV
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="rename-title" className="text-sm font-medium">CV Title</Label>
+                <Label htmlFor="rename-title" className="text-sm font-black uppercase tracking-widest">CV Title</Label>
                 <Input
                   id="rename-title"
                   placeholder="e.g., Frontend Developer"
@@ -416,7 +415,7 @@ export default function DashboardPage() {
                       handleRenameSubmit();
                     }
                   }}
-                  className="h-11 border-zinc-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-500 transition-colors duration-300"
+                  className="h-11 border-2 border-black bg-white text-black font-bold"
                   autoFocus
                 />
               </div>
@@ -429,14 +428,14 @@ export default function DashboardPage() {
                   setRenamingResume(null);
                   setRenameTitle('');
                 }}
-                className="hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors duration-300"
+                className="border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
               >
                 Cancel
               </Button>
               <Button 
                 onClick={handleRenameSubmit}
                 disabled={!renameTitle.trim()}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+                className="border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider disabled:opacity-50"
               >
                 Rename
               </Button>
@@ -448,37 +447,37 @@ export default function DashboardPage() {
       {/* Stats Cards - Only show if there are resumes */}
       {resumes.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 border-blue-200 dark:border-blue-800 backdrop-blur-sm hover:scale-105 transition-transform duration-300">
+          <Card className="bg-white text-black border-3 border-black hover:bg-black hover:text-white transition-all">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Total CVs</p>
-                  <p className="text-3xl font-bold text-blue-900 dark:text-blue-100 mt-2">{resumes.length}</p>
+                  <p className="text-sm font-black uppercase tracking-widest">Total CVs</p>
+                  <p className="text-5xl font-black mt-4">{resumes.length}</p>
                 </div>
-                <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                <div className="w-16 h-16 border-3 border-black flex items-center justify-center">
+                  <FileText className="w-8 h-8" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card 
-            className={`bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/30 dark:to-pink-950/30 border-purple-200 dark:border-purple-800 backdrop-blur-sm hover:scale-105 transition-all duration-300 ${defaultResume ? 'cursor-pointer hover:shadow-2xl hover:border-purple-400 dark:hover:border-purple-600' : 'opacity-60'}`}
+            className={`bg-white border-3 border-black transition-all ${defaultResume ? 'cursor-pointer hover:bg-black hover:text-white' : 'opacity-60'}`}
             onClick={() => defaultResume && router.push(`/editor/${defaultResume.id}`)}
           >
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0 pr-2">
-                  <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Default CV</p>
-                  <p className="text-lg font-semibold text-purple-900 dark:text-purple-100 mt-2 truncate">
+                  <p className="text-sm font-black uppercase tracking-widest">Default CV</p>
+                  <p className="text-2xl font-black mt-4 truncate">
                     {defaultResume?.title || 'None'}
                   </p>
                   {defaultResume && (
-                    <p className="text-xs text-purple-500 dark:text-purple-400 mt-1">Click to edit</p>
+                    <p className="text-xs font-bold uppercase tracking-widest mt-3">Click to edit</p>
                   )}
                 </div>
-                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Star className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="currentColor" />
+                <div className="w-16 h-16 border-3 border-black flex items-center justify-center flex-shrink-0">
+                  <Star className="w-8 h-8" fill="currentColor" />
                 </div>
               </div>
             </CardContent>
@@ -488,23 +487,23 @@ export default function DashboardPage() {
 
       {/* Resumes Grid */}
       {resumes.length === 0 ? (
-        <Card className="border-dashed border-2 hover:border-blue-300 dark:hover:border-blue-700 transition-colors duration-300 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+        <Card className="border-3 border-black bg-[#F2F2F2] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
           <CardContent className="flex flex-col items-center justify-center py-20">
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-full flex items-center justify-center mb-6 animate-pulse">
-              <FileText className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+            <div className="w-24 h-24 border-3 border-black flex items-center justify-center mb-6">
+              <FileText className="w-12 h-12" />
             </div>
-            <h3 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-              No CVs created yet
+            <h3 className="text-4xl font-black text-black mb-4">
+              No CVs yet
             </h3>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-8 text-center max-w-md">
+            <p className="text-black font-bold mb-8 text-center max-w-md">
               Start by creating your first CV. With our AI-powered editor and templates, prepare
               your professional CV in minutes.
             </p>
             <Button 
               onClick={() => setCreateDialogOpen(true)} 
-              className="gap-2 group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="gap-2 border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] font-black uppercase tracking-wider"
             >
-              <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+              <Plus className="w-4 h-4" />
               Create My First CV
             </Button>
           </CardContent>
@@ -514,7 +513,7 @@ export default function DashboardPage() {
           {resumes.map((resume, index) => (
             <Card 
               key={resume.id} 
-              className="group hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-1 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border-zinc-200 dark:border-zinc-800 hover:border-blue-300 dark:hover:border-blue-700"
+              className="border-3 border-black bg-white hover:bg-black hover:text-white transition-all"
               style={{
                 animationName: 'fadeInUp',
                 animationDuration: '0.6s',
@@ -523,12 +522,12 @@ export default function DashboardPage() {
                 animationDelay: `${index * 100}ms`,
               }}
             >
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2 border-b-2 border-black">
                 <div className="flex-1 space-y-1">
-                  <CardTitle className="text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+                  <CardTitle className="text-xl font-black">
                     {resume.title}
                   </CardTitle>
-                  <CardDescription className="text-xs">
+                  <CardDescription className="text-xs font-bold uppercase tracking-widest">
                     Updated: {new Date(resume.updated_at).toLocaleDateString('en-US', { 
                       month: 'short', 
                       day: 'numeric',
@@ -541,12 +540,12 @@ export default function DashboardPage() {
                     <Button 
                       variant="ghost" 
                       size="icon" 
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-blue-100 dark:hover:bg-blue-900"
+                      className="h-8 w-8 border-2 border-black hover:bg-black hover:text-white"
                     >
                       <MoreVertical className="w-4 h-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuContent align="end" className="w-48 border-2 border-black">
                     <DropdownMenuItem onClick={() => router.push(`/editor/${resume.id}`)}>
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
@@ -577,7 +576,7 @@ export default function DashboardPage() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => handleDeleteResume(resume.id)}
-                      className="text-red-600"
+                      className="text-[#FF3000]"
                     >
                       <Trash className="mr-2 h-4 w-4" />
                       Delete
@@ -585,30 +584,28 @@ export default function DashboardPage() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-4">
                 <div className="flex items-center gap-4 text-sm h-6">
-                  <Badge
-                    className={`bg-gradient-to-r from-blue-500 to-indigo-500 text-white border-none shadow-sm ${
-                      resume.is_default ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                    }`}
-                  >
-                    Default
-                  </Badge>
+                  {resume.is_default && (
+                    <div className="border-2 border-black px-3 py-1 bg-black text-white font-black uppercase tracking-wider text-xs">
+                      Default
+                    </div>
+                  )}
                 </div>
                 
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
-                    className="flex-1 group/btn border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950 hover:border-blue-400 dark:hover:border-blue-600 transition-all duration-300"
+                    className="flex-1 border-2 border-black bg-white text-black hover:bg-black hover:text-white font-black uppercase tracking-wider"
                     onClick={() => router.push(`/editor/${resume.id}`)}
                   >
-                    <Edit className="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform duration-300" />
+                    <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </Button>
                   <Button
                     variant="outline"
                     size="icon"
-                    className="border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all duration-300 hover:scale-110"
+                    className="border-2 border-black bg-white text-black hover:bg-black hover:text-white"
                     onClick={() => window.open(`/preview/username/${resume.slug}`, '_blank')}
                   >
                     <ExternalLink className="w-4 h-4" />
