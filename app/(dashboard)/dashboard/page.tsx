@@ -77,7 +77,14 @@ export default function DashboardPage() {
     const response = await fetch('/api/billing/status');
     const payload = (await response.json()) as {
       success?: boolean;
-      status?: { planTier: PlanTier; remaining: { cvCreations: number | 'unlimited' } };
+      status?: {
+        planTier: PlanTier;
+        remaining: {
+          cvCreations: number | 'unlimited';
+          cvImports: number | 'unlimited';
+          jobSearches: number;
+        };
+      };
     };
 
     console.log(`[LOAD_BILLING] response.ok=${response.ok}, payload.success=${payload.success}, payload.status=${JSON.stringify(payload.status)}`);
@@ -226,7 +233,16 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSetDefaultResume = (resumeId: string) => {
+  const handleSetDefaultResume = async (resumeId: string) => {
+    // Clear default on all resumes in DB first
+    for (const r of resumes) {
+      if (r.is_default && r.id !== resumeId) {
+        await updateResume(r.id, { is_default: false });
+      }
+    }
+    // Set the new default in DB
+    await updateResume(resumeId, { is_default: true });
+    // Update store
     setDefaultResume(resumeId);
   };
 

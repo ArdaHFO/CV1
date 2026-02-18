@@ -56,6 +56,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isPro, setIsPro] = useState(false);
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [remainingTokenSearches, setRemainingTokenSearches] = useState(0);
+  const [quotas, setQuotas] = useState<{
+    cvCreations: number | 'unlimited';
+    cvImports: number | 'unlimited';
+    jobSearches: number;
+  } | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const { isDark } = useAppDarkModeState();
 
@@ -93,6 +98,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         };
         remaining: {
           tokenJobSearches: number;
+          cvCreations: number | 'unlimited';
+          cvImports: number | 'unlimited';
+          jobSearches: number;
         };
       };
     };
@@ -105,6 +113,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
 
     setRemainingTokenSearches(payload.status.remaining.tokenJobSearches ?? 0);
+
+    setQuotas({
+      cvCreations: payload.status.remaining.cvCreations,
+      cvImports: payload.status.remaining.cvImports,
+      jobSearches: payload.status.remaining.jobSearches,
+    });
 
     const mappedSubscription: SubscriptionData = {
       status: payload.status.subscription.status,
@@ -400,6 +414,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
 
           <div className="px-4 pb-4">
+            {/* Quota display – only show for freemium users */}
+            {!isPro && quotas && (
+              <div className="mb-3 border-2 border-black bg-[#F2F2F2] p-3 space-y-2">
+                <p className="text-[9px] font-black uppercase tracking-widest text-black/60 mb-2">Free Plan Limits</p>
+                {([
+                  { label: 'CV Creation', value: quotas.cvCreations, max: 1 },
+                  { label: 'CV Import', value: quotas.cvImports, max: 1 },
+                  { label: 'Job Search', value: quotas.jobSearches, max: 1 },
+                ] as { label: string; value: number | 'unlimited'; max: number }[]).map(({ label, value, max }) => (
+                  <div key={label}>
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest">
+                        {value === 'unlimited' ? '∞' : `${value}/${max}`}
+                      </span>
+                    </div>
+                    <div className="h-1.5 border border-black bg-white">
+                      <div
+                        className="h-full bg-black transition-all"
+                        style={{
+                          width: value === 'unlimited' ? '100%' : `${Math.min(100, ((value as number) / max) * 100)}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             <Button
               onClick={() => setUpgradeOpen(true)}
               variant="accent"
