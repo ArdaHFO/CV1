@@ -624,39 +624,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           setSelectedPurchaseType('plan');
                           setSelectedPlanId(plan.id);
                         }}
-                        className={`group relative border-2 border-black p-2 text-left transition-colors ${
+                        className={`group relative border-2 border-black p-2 text-left transition-colors overflow-hidden h-[144px] ${
                           isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'
                         }`}
                       >
-                        {/* Badge always visible */}
-                        {'badge' in plan && plan.badge ? (
-                          <span className="absolute top-1.5 right-1.5 z-20 bg-[#FF3000] text-white text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 leading-none">
-                            {plan.badge}
-                          </span>
-                        ) : null}
-
                         {/* Default view */}
-                        <p className="text-[11px] font-black uppercase tracking-widest pr-14 transition-opacity duration-150 group-hover:opacity-0">{plan.name}</p>
-                        <p className="mt-1 text-base font-black uppercase transition-opacity duration-150 group-hover:opacity-0">
-                          {plan.price}
-                          <span className="ml-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
-                        </p>
-                        <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70 transition-opacity duration-150 group-hover:opacity-0">{plan.description}</p>
-
-                        {/* Floating benefits panel — pops up above the card */}
-                        {'benefits' in plan && plan.benefits && plan.benefits.length > 0 ? (
-                          <div className="pointer-events-none absolute bottom-[calc(100%+4px)] left-0 right-0 z-50 border-2 border-black bg-black p-2 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-                            <p className="mb-1 text-[9px] font-black uppercase tracking-widest text-[#FF3000]">What you get</p>
-                            <ul className="space-y-0.5">
-                              {plan.benefits.map((b) => (
-                                <li key={b} className="flex items-start gap-1 text-[9px] font-bold uppercase tracking-widest leading-tight text-white">
-                                  <Check className="h-2.5 w-2.5 shrink-0 text-[#FF3000] mt-px" />
-                                  <span>{b}</span>
-                                </li>
-                              ))}
-                            </ul>
+                        <div className="transition-opacity duration-150 group-hover:opacity-0">
+                          <div className="flex items-center justify-between gap-1">
+                            <p className="text-[11px] font-black uppercase tracking-widest">{plan.name}</p>
+                            {'badge' in plan && plan.badge ? <Badge>{plan.badge}</Badge> : null}
                           </div>
-                        ) : null}
+                          <p className="mt-1 text-base font-black uppercase">
+                            {plan.price}
+                            <span className="ml-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{plan.period}</span>
+                          </p>
+                          <p className="mt-0.5 text-[9px] font-bold uppercase tracking-widest text-current/70">{plan.description}</p>
+                        </div>
+
+                        {/* Hover: benefits overlay inside the card */}
+                        <div className="absolute inset-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150 bg-black text-white flex flex-col">
+                          <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000] mb-1 shrink-0">What you get</p>
+                          <ul className="space-y-[3px]">
+                            {'benefits' in plan && plan.benefits?.map((b) => (
+                              <li key={b} className="flex items-start gap-1 text-[9px] font-bold uppercase tracking-widest leading-tight">
+                                <Check className="h-2.5 w-2.5 shrink-0 text-[#FF3000] mt-px" />
+                                <span>{b}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </button>
                     );
                   })}
