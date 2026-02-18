@@ -63,7 +63,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     cvCreations: number | 'unlimited';
     cvImports: number | 'unlimited';
     cvOptimizations: number | 'unlimited';
-    jobSearches: number;
+    jobSearches: number | 'unlimited';
   } | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const { isDark } = useAppDarkModeState();

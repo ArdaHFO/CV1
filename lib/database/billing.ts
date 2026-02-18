@@ -51,8 +51,8 @@ export type BillingStatus = {
     purchasedCvImportTokens: number;
   };
   remaining: {
-    jobSearches: number;
-    includedJobSearches: number;
+    jobSearches: number | 'unlimited';
+    includedJobSearches: number | 'unlimited';
     tokenJobSearches: number;
     cvCreations: number | 'unlimited';
     cvOptimizations: number | 'unlimited';
@@ -143,9 +143,9 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
 
   const planTier = mapPlanTier(subscription);
   const consumedSearches = planTier === 'pro' ? usage.pro_job_searches : usage.freemium_job_searches;
-  const remainingIncludedSearches = Math.max(0, getJobSearchQuota(planTier) - consumedSearches);
+  const remainingIncludedSearches: number | 'unlimited' = planTier === 'pro' ? 'unlimited' : Math.max(0, getJobSearchQuota(planTier) - consumedSearches);
   const remainingTokenSearches = Math.max(0, usage.purchased_job_search_tokens ?? 0);
-  const remainingJobSearches = remainingIncludedSearches + remainingTokenSearches;
+  const remainingJobSearches: number | 'unlimited' = planTier === 'pro' ? 'unlimited' : (remainingIncludedSearches as number) + remainingTokenSearches;
 
   const cvRemaining = planTier === 'pro'
     ? 'unlimited'
@@ -280,7 +280,7 @@ export async function consumeUsage(
   const status = await getBillingStatus(userId);
 
   if (action === 'job-search') {
-    if (status.remaining.includedJobSearches > 0) {
+    if (status.remaining.includedJobSearches === 'unlimited' || status.remaining.includedJobSearches > 0) {
       const updates = status.planTier === 'pro'
         ? { pro_job_searches: status.usage.proJobSearches + 1 }
         : { freemium_job_searches: status.usage.freemiumJobSearches + 1 };
@@ -316,7 +316,7 @@ export async function consumeUsage(
       };
     }
 
-    if (status.remaining.jobSearches <= 0) {
+    if (status.remaining.jobSearches !== 'unlimited' && status.remaining.jobSearches <= 0) {
       return {
         allowed: false,
         message:
