@@ -463,33 +463,48 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </nav>
 
           <div className="px-4 pb-4">
-            {/* Quota display – only show for freemium users */}
-            {!isPro && quotas && (
+            {/* Quota display */}
+            {quotas && (
               <div className="mb-3 border-2 border-black bg-[#F2F2F2] p-3 space-y-2">
-                <p className="text-[9px] font-black uppercase tracking-widest text-black/60 mb-2">Free Plan Limits</p>
-                {([
-                  { label: 'CV Creation', value: quotas.cvCreations, max: 1 },
-                  { label: 'CV Import', value: quotas.cvImports, max: 1 },
-                  { label: 'AI Optimize', value: quotas.cvOptimizations, max: 2 },
-                  { label: 'Job Search', value: quotas.jobSearches, max: 1 },
-                ] as { label: string; value: number | 'unlimited'; max: number }[]).map(({ label, value, max }) => (
-                  <div key={label}>
-                    <div className="flex items-center justify-between mb-0.5">
-                      <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
-                      <span className="text-[9px] font-black uppercase tracking-widest">
-                        {value === 'unlimited' ? '∞' : `${value}/${max}`}
-                      </span>
-                    </div>
-                    <div className="h-1.5 border border-black bg-white">
-                      <div
-                        className="h-full bg-black transition-all"
-                        style={{
-                          width: value === 'unlimited' ? '100%' : `${Math.min(100, ((value as number) / max) * 100)}%`,
-                        }}
-                      />
-                    </div>
+                <p className="text-[9px] font-black uppercase tracking-widest text-black/60 mb-2">
+                  {isPro ? 'Pro Plan — Active' : 'Free Plan Limits'}
+                </p>
+                {isPro ? (
+                  // Pro: show unlimited badges
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {(['CV Creation', 'CV Import', 'AI Optimize', 'Job Search'] as string[]).map((label) => (
+                      <div key={label} className="flex items-center justify-between border border-black bg-white px-1.5 py-0.5 gap-1">
+                        <span className="text-[8px] font-black uppercase tracking-widest truncate">{label}</span>
+                        <span className="text-[9px] font-black text-black shrink-0">∞</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  // Freemium: progress bars
+                  ([
+                    { label: 'CV Creation', value: quotas.cvCreations, max: 1 },
+                    { label: 'CV Import', value: quotas.cvImports, max: 1 },
+                    { label: 'AI Optimize', value: quotas.cvOptimizations, max: 2 },
+                    { label: 'Job Search', value: quotas.jobSearches, max: 1 },
+                  ] as { label: string; value: number | 'unlimited'; max: number }[]).map(({ label, value, max }) => (
+                    <div key={label}>
+                      <div className="flex items-center justify-between mb-0.5">
+                        <span className="text-[9px] font-black uppercase tracking-widest">{label}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest">
+                          {value === 'unlimited' ? '∞' : `${value}/${max}`}
+                        </span>
+                      </div>
+                      <div className="h-1.5 border border-black bg-white">
+                        <div
+                          className="h-full bg-black transition-all"
+                          style={{
+                            width: value === 'unlimited' ? '100%' : `${Math.min(100, ((value as number) / max) * 100)}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             )}
             <Button
