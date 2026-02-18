@@ -270,6 +270,11 @@ export default function Home() {
                 Search{' '}
                 <MorphingText
                   texts={['LinkedIn', 'Workday', 'CareerOne']}
+                  colors={{
+                    LinkedIn: '#0A66C2',
+                    Workday: '#005CB9',
+                    CareerOne: '#00A651',
+                  }}
                   className="mx-0 inline-block h-[0.9em] w-[9ch] max-w-none align-baseline text-left text-[1em] font-black uppercase leading-[0.9] tracking-tight md:h-[0.9em] md:text-[1em] lg:text-[1em]"
                 />{' '}
                 Jobs.

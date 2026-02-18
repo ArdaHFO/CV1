@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const morphTime = 1.5;
 const cooldownTime = 0.5;
 
-const useMorphingText = (texts: string[]) => {
+const useMorphingText = (texts: string[], colors?: Record<string, string>) => {
   const textIndexRef = useRef(0);
   const morphRef = useRef(0);
   const cooldownRef = useRef(0);
@@ -21,6 +21,18 @@ const useMorphingText = (texts: string[]) => {
       const [current1, current2] = [text1Ref.current, text2Ref.current];
       if (!current1 || !current2) return;
 
+      const currentText = texts[textIndexRef.current % texts.length];
+      const nextText = texts[(textIndexRef.current + 1) % texts.length];
+
+      const currentColor = colors?.[currentText];
+      const nextColor = colors?.[nextText];
+
+      if (currentColor) current1.style.color = currentColor;
+      else current1.style.removeProperty("color");
+
+      if (nextColor) current2.style.color = nextColor;
+      else current2.style.removeProperty("color");
+
       current2.style.filter = `blur(${Math.min(8 / fraction - 8, 100)}px)`;
       current2.style.opacity = `${Math.pow(fraction, 0.4) * 100}%`;
 
@@ -28,10 +40,10 @@ const useMorphingText = (texts: string[]) => {
       current1.style.filter = `blur(${Math.min(8 / invertedFraction - 8, 100)}px)`;
       current1.style.opacity = `${Math.pow(invertedFraction, 0.4) * 100}%`;
 
-      current1.textContent = texts[textIndexRef.current % texts.length];
-      current2.textContent = texts[(textIndexRef.current + 1) % texts.length];
+      current1.textContent = currentText;
+      current2.textContent = nextText;
     },
-    [texts],
+    [texts, colors],
   );
 
   const doMorph = useCallback(() => {
@@ -91,10 +103,14 @@ const useMorphingText = (texts: string[]) => {
 interface MorphingTextProps {
   className?: string;
   texts: string[];
+  colors?: Record<string, string>;
 }
 
-const Texts: React.FC<Pick<MorphingTextProps, "texts">> = ({ texts }) => {
-  const { text1Ref, text2Ref } = useMorphingText(texts);
+const Texts: React.FC<Pick<MorphingTextProps, "texts" | "colors">> = ({
+  texts,
+  colors,
+}) => {
+  const { text1Ref, text2Ref } = useMorphingText(texts, colors);
   return (
     <>
       <span
@@ -126,14 +142,14 @@ const SvgFilters: React.FC = () => (
   </svg>
 );
 
-const MorphingText: React.FC<MorphingTextProps> = ({ texts, className }) => (
+const MorphingText: React.FC<MorphingTextProps> = ({ texts, colors, className }) => (
   <div
     className={cn(
       "relative mx-auto h-16 w-full max-w-screen-md text-center font-sans text-[40pt] font-bold leading-none [filter:url(#threshold)_blur(0.6px)] md:h-24 lg:text-[6rem]",
       className,
     )}
   >
-    <Texts texts={texts} />
+    <Texts texts={texts} colors={colors} />
     <SvgFilters />
   </div>
 );
