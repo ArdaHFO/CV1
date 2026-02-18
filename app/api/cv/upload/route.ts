@@ -3,8 +3,8 @@ import { getServerUserId } from '@/lib/auth/server-user';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/client';
 import type { ResumeContent } from '@/types';
-import pdfParse from 'pdf-parse';
-import mammoth from 'mammoth';
+// import pdf from 'pdf-parse';
+// import * as mammoth from 'mammoth';
 
 // Helper function to create empty resume template
 function createEmptyResumeContent(fileName: string): ResumeContent {
@@ -32,15 +32,16 @@ function createEmptyResumeContent(fileName: string): ResumeContent {
 }
 
 async function extractTextFromFile(fileBuffer: Buffer, fileExtension: string): Promise<string> {
-  if (fileExtension === 'pdf') {
-    const parsed = await pdfParse(fileBuffer);
-    return parsed.text || '';
-  }
+  // TODO: Re-enable pdf parsing after fixing pdf-parse import
+  // if (fileExtension === 'pdf') {
+  //   const parsed = await pdfParse(fileBuffer);
+  //   return parsed.text || '';
+  // }
 
-  if (fileExtension === 'docx' || fileExtension === 'doc') {
-    const parsed = await mammoth.extractRawText({ buffer: fileBuffer });
-    return parsed.value || '';
-  }
+  // if (fileExtension === 'docx' || fileExtension === 'doc') {
+  //   const parsed = await mammoth.extractRawText({ buffer: fileBuffer });
+  //   return parsed.value || '';
+  // }
 
   return '';
 }
