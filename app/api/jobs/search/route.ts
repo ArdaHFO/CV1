@@ -410,14 +410,22 @@ async function searchCareerOneJobs(
     const jobs: Job[] = items.map((item: any, index: number) => {
       const jobId = item.id || item.jobId || item.jobAdId || `careerone-${Date.now()}-${index}`;
 
-      // CareerOne (Seek-based) uses 'heading' for title
-      const title = item.heading || item.title || item.jobTitle || item.position || 'No Title';
+      // CareerOne actor schema may vary:
+      // - Seek-style: heading, advertiser, content
+      // - CareerOne-style: job_title, company_name, job_description, URL
+      const title =
+        item.job_title ||
+        item.heading ||
+        item.title ||
+        item.jobTitle ||
+        item.position ||
+        'No Title';
 
       // CareerOne uses advertiser.description (object) or advertiser as string
       const advertiser = item.advertiser;
       const company = (typeof advertiser === 'object' && advertiser !== null)
         ? (advertiser.description || advertiser.name || advertiser.label || JSON.stringify(advertiser))
-        : (advertiser || item.company || item.companyName || item.employer || 'Unknown Company');
+        : (advertiser || item.company_name || item.company || item.companyName || item.employer || item.company_name || 'Unknown Company');
 
       // Location: may be string or object with 'label'/'area'
       const locRaw = item.location || item.locationName || item.locationLabel || item.suburb || item.city;
@@ -425,22 +433,45 @@ async function searchCareerOneJobs(
         ? (locRaw.label || locRaw.area || locRaw.description || JSON.stringify(locRaw))
         : (locRaw || 'Location not specified');
 
-      // Description: CareerOne uses 'content' or 'teaser'
-      const rawDesc = item.content || item.description || item.jobDescription || item.summary || item.teaser || '';
+      // Description: CareerOne uses 'content'/'teaser' (Seek-style) or 'job_description' (CareerOne-style)
+      const rawDesc = item.job_description || item.job_description_html || item.content || item.description || item.jobDescription || item.summary || item.teaser || '';
       const description = typeof rawDesc === 'string'
         ? rawDesc.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'No description available'
         : 'No description available';
 
-      const url = item.url || item.jobUrl || item.applyUrl || item.link || '#';
+      const url = item.URL || item.url || item.jobUrl || item.applyUrl || item.apply_url || item.link || '#';
 
-      // Salary: may be object with label
-      const salaryRaw = item.salary || item.salaryRange || item.wage || item.salaryLabel;
+      // Salary: may be object with label, or CareerOne-style pay_description
+      const salaryRaw = item.pay_description || item.salary || item.salaryRange || item.wage || item.salaryLabel;
       const salary = (typeof salaryRaw === 'object' && salaryRaw !== null)
         ? (salaryRaw.label || salaryRaw.description || salaryRaw.currencyLabel || 'Not specified')
         : (salaryRaw || 'Not specified');
 
       const skills: string[] = [];
-      if (Array.isArray(item.skills)) skills.push(...item.skills.map((s: any) => typeof s === 'string' ? s : s?.name || '').filter(Boolean));
+      if (Array.isArray(item.skills)) {
+        skills.push(
+          ...item.skills
+            .map((s: any) => (typeof s === 'string' ? s : s?.name || s?.label || ''))
+            .filter(Boolean)
+        );
+      }
+      // CareerOne-style fields
+      if (Array.isArray(item.perks)) {
+        skills.push(
+          ...item.perks
+            .map((p: any) => (typeof p === 'string' ? p : p?.name || p?.label || ''))
+            .filter(Boolean)
+        );
+      }
+      if (Array.isArray(item.skills_details)) {
+        skills.push(
+          ...item.skills_details
+            .map((sd: any) => (typeof sd === 'string' ? sd : sd?.name || sd?.label || ''))
+            .filter(Boolean)
+        );
+      }
+      if (item.category) skills.push(String(item.category));
+      if (item.industry) skills.push(String(item.industry));
       // classification may be object {description:'...'} or string
       const classif = item.classification;
       if (classif) skills.push(typeof classif === 'object' ? (classif.description || classif.label || '') : classif);
@@ -468,7 +499,14 @@ async function searchCareerOneJobs(
       else if (rawType.includes('intern')) rawType = 'internship';
       const employmentType: EmpType = (validTypes.includes(rawType as EmpType) ? rawType : 'full-time') as EmpType;
 
-      const postedDate = item.listingDate || item.postedDate || item.datePosted || item.publishedAt || item.expiresAt || new Date().toISOString().split('T')[0];
+      const postedDate =
+        item.created_at ||
+        item.listingDate ||
+        item.postedDate ||
+        item.datePosted ||
+        item.publishedAt ||
+        item.expiresAt ||
+        new Date().toISOString().split('T')[0];
       // Normalize to YYYY-MM-DD if ISO string
       const postedDateStr = typeof postedDate === 'string' ? postedDate.split('T')[0] : new Date().toISOString().split('T')[0];
 
