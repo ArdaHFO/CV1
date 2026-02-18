@@ -288,29 +288,29 @@ export default function Home() {
               </div>
 
               <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                <div className="w-full shrink-0 overflow-hidden border-2 border-black bg-white px-3 py-1 sm:w-[340px]">
+                <div className="w-full shrink-0 overflow-hidden border-2 border-black bg-white px-3 py-1 sm:w-[380px]">
                   <Marquee pauseOnHover speed={18} className="mt-0">
-                    <div className="mx-4 flex items-center gap-4">
+                    <div className="mx-5 flex items-center gap-6">
                       <Image
                         src="/linkedin.png"
                         alt="LinkedIn"
                         width={48}
                         height={48}
-                        className="h-5 w-5 object-contain"
+                        className="h-5 w-5 shrink-0 object-contain"
                       />
                       <Image
                         src="/workday-hcm.png"
                         alt="Workday"
                         width={423}
                         height={200}
-                        className="h-5 w-auto object-contain"
+                        className="h-5 w-auto shrink-0 object-contain"
                       />
                       <Image
                         src="/careerone.png"
                         alt="CareerOne"
                         width={247}
                         height={53}
-                        className="h-5 w-auto object-contain"
+                        className="h-5 w-auto shrink-0 object-contain"
                       />
                     </div>
                   </Marquee>
