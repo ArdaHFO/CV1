@@ -583,8 +583,21 @@ async function searchWorkdayJobs(
 
     const jobs: Job[] = items.map((item: any, index: number) => {
       const jobId = item.id || item.jobId || item.requisitionId || `workday-${Date.now()}-${index}`;
-      const title = item.title || item.jobTitle || item.positionTitle || 'No Title';
-      const company = item.company || item.companyName || item.organization || item.employer || 'Unknown Company';
+      const toText = (value: unknown, fallback = ''): string => {
+        if (typeof value === 'string') return value;
+        if (value == null) return fallback;
+        if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+        if (typeof value === 'object') {
+          const obj = value as Record<string, unknown>;
+          const picked = obj.label ?? obj.name ?? obj.title ?? obj.description;
+          if (typeof picked === 'string') return picked;
+          return fallback;
+        }
+        return fallback;
+      };
+
+      const title = toText(item.title || item.jobTitle || item.positionTitle, 'No Title');
+      const company = toText(item.company || item.companyName || item.organization || item.employer, 'Unknown Company');
       const loc = item.location || item.locationName || item.jobLocation || item.primaryLocation || 'Location not specified';
 
       const rawDesc = item.description || item.jobDescription || item.summary || '';
@@ -594,7 +607,7 @@ async function searchWorkdayJobs(
 
       const url = item.url || item.applyUrl || item.externalJobUrl || item.jobUrl || item.link || '#';
 
-      const salary = item.salaryRange || item.compensation || item.salary || 'Not specified';
+      const salary = toText(item.salaryRange || item.compensation || item.salary, 'Not specified');
 
       const skills: string[] = [];
       const _toStr = (s: unknown) => typeof s === 'string' ? s.trim() : (s && typeof s === 'object' ? String((s as Record<string,unknown>).name || (s as Record<string,unknown>).label || '') : '');
@@ -620,19 +633,22 @@ async function searchWorkdayJobs(
         employmentType = (validTypes.includes(raw as EmpType) ? raw : 'full-time') as EmpType;
       }
 
-      const postedDate = item.postedDate || item.datePosted || item.startDate || new Date().toISOString().split('T')[0];
+      const postedDateRaw = item.postedDate || item.datePosted || item.startDate || new Date().toISOString().split('T')[0];
+      const postedDateStr = typeof postedDateRaw === 'string'
+        ? postedDateRaw.split('T')[0]
+        : new Date().toISOString().split('T')[0];
 
       return {
         id: String(jobId),
         title,
         company,
-        location: typeof loc === 'string' ? loc : JSON.stringify(loc),
+        location: typeof loc === 'string' ? loc : toText(loc, 'Location not specified'),
         description,
         requirements,
         skills: [...new Set(skills)].filter(Boolean),
         salary_range: salary,
         employment_type: employmentType,
-        posted_date: postedDate,
+        posted_date: postedDateStr,
         apply_url: url,
         source: 'workday',
       } satisfies Job;
