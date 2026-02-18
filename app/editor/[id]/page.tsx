@@ -734,7 +734,7 @@ export default function EditorPage() {
 
             <div className="flex items-center gap-2 shrink-0">
               <Button size="sm" variant="secondary" className="gap-2" onClick={() => setOptimizeDialogOpen(true)}>
-                <Sparkles className="w-4 h-4" />
+                <img src="/meta-llama.png" alt="AI" className="w-4 h-4 object-contain" />
                 <span className="hidden md:inline">Optimize</span>
               </Button>
               <Button size="sm" variant="secondary" className="gap-2" onClick={handleDownloadPDF}>

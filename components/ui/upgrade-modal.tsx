@@ -50,7 +50,8 @@ export function UpgradeModal({
   const config = featureConfig[feature];
 
   const handleUpgrade = () => {
-    router.push('/pricing');
+    onOpenChange(false);
+    router.push('/dashboard?openUpgrade=true');
   };
 
   return (

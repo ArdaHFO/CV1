@@ -59,6 +59,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [quotas, setQuotas] = useState<{
     cvCreations: number | 'unlimited';
     cvImports: number | 'unlimited';
+    cvOptimizations: number | 'unlimited';
     jobSearches: number;
   } | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -100,6 +101,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           tokenJobSearches: number;
           cvCreations: number | 'unlimited';
           cvImports: number | 'unlimited';
+          cvOptimizations: number | 'unlimited';
           jobSearches: number;
         };
       };
@@ -117,6 +119,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setQuotas({
       cvCreations: payload.status.remaining.cvCreations,
       cvImports: payload.status.remaining.cvImports,
+      cvOptimizations: payload.status.remaining.cvOptimizations,
       jobSearches: payload.status.remaining.jobSearches,
     });
 
@@ -202,11 +205,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       await loadBillingStatus();
 
-      // Open upgrade dialog pre-selected to cv-import packs
+      // Open upgrade dialog pre-selected based on query param
       const openUpgrade = searchParams.get('openUpgrade');
       if (openUpgrade === 'cv-import') {
         setSelectedPurchaseType('cv-import-pack');
         setSelectedCvImportPackId('cv-import-1');
+        setUpgradeOpen(true);
+        window.history.replaceState({}, '', window.location.pathname);
+      } else if (openUpgrade === 'true' || openUpgrade === '1') {
+        setSelectedPurchaseType('plan');
         setUpgradeOpen(true);
         window.history.replaceState({}, '', window.location.pathname);
       }
@@ -421,6 +428,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {([
                   { label: 'CV Creation', value: quotas.cvCreations, max: 1 },
                   { label: 'CV Import', value: quotas.cvImports, max: 1 },
+                  { label: 'AI Optimize', value: quotas.cvOptimizations, max: 1 },
                   { label: 'Job Search', value: quotas.jobSearches, max: 1 },
                 ] as { label: string; value: number | 'unlimited'; max: number }[]).map(({ label, value, max }) => (
                   <div key={label}>
