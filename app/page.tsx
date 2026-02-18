@@ -13,6 +13,7 @@ import ShaderBackground from '@/components/ui/shader-background';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { PricingWithChart } from '@/components/ui/pricing-with-chart';
 import { GlareCard } from '@/components/ui/glare-card';
+import AnimatedTextCycle from '@/components/ui/animated-text-cycle';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import type { User } from '@/types';
@@ -182,12 +183,21 @@ export default function Home() {
             }`}>
               Search LinkedIn jobs and tailor your CV
               <br />
-              <span className={`${
+              <span className={`inline-flex flex-wrap items-baseline justify-center gap-2 ${
                 isDark
                   ? 'text-violet-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]'
                   : 'bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent'
               }`}>
-                in one focused workflow
+                with
+                <AnimatedTextCycle
+                  words={['Precision', 'Speed', 'Clarity', 'Confidence']}
+                  interval={2600}
+                  className={`${
+                    isDark
+                      ? 'text-fuchsia-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]'
+                      : 'bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent'
+                  }`}
+                />
               </span>
             </h1>
 

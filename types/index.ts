@@ -253,6 +253,46 @@ export interface CVOptimizationResult {
   recommended_changes: string[];
 }
 
+// Application Tracker Types
+export type ApplicationStatus = 'Applied' | 'Screening' | 'Interview' | 'Offer' | 'Rejected';
+
+export interface ApplicationNote {
+  id: string;
+  application_id: string;
+  user_id: string;
+  note: string;
+  created_at: string;
+}
+
+export interface ApplicationInterview {
+  id: string;
+  application_id: string;
+  user_id: string;
+  stage: string;
+  scheduled_at?: string | null;
+  notes?: string | null;
+  created_at: string;
+}
+
+export interface Application {
+  id: string;
+  user_id: string;
+  job_id?: string | null;
+  job_title: string;
+  company: string;
+  location?: string | null;
+  job_url?: string | null;
+  status: ApplicationStatus;
+  applied_at?: string | null;
+  reminder_at?: string | null;
+  resume_id?: string | null;
+  resume_version_id?: string | null;
+  created_at: string;
+  updated_at: string;
+  notes?: ApplicationNote[];
+  interviews?: ApplicationInterview[];
+}
+
 // Azurill Template System Types
 export interface TemplateProps {
   pageIndex: number;

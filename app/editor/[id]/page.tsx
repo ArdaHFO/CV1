@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
-import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock } from 'lucide-react';
+import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -13,6 +13,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { getCurrentUser } from '@/lib/auth/auth';
 import {
   getActiveResumeVersion,
@@ -30,7 +41,7 @@ import { AzurillTemplate } from '@/features/editor/templates/AzurillTemplate';
 import { AcademicTemplate, generateLatexFromContent as generateLatexFromContentHelper } from '@/features/editor/templates/AcademicTemplate';
 import { parseLatexToContent } from '@/features/editor/templates/latexParser';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
-import type { ResumeContent, TemplateType } from '@/types';
+import type { ResumeContent, TemplateType, Job, CVOptimizationResult } from '@/types';
 
 export default function EditorPage() {
   const router = useRouter();
@@ -58,6 +69,15 @@ export default function EditorPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState<{ type: string; content: string } | null>(null);
   const [jobDescriptionForOptimization, setJobDescriptionForOptimization] = useState('');
+  const [optimizeDialogOpen, setOptimizeDialogOpen] = useState(false);
+  const [optimizeQuery, setOptimizeQuery] = useState('');
+  const [optimizeLocation, setOptimizeLocation] = useState('');
+  const [optimizeJobs, setOptimizeJobs] = useState<Job[]>([]);
+  const [optimizeSearching, setOptimizeSearching] = useState(false);
+  const [selectedOptimizeJob, setSelectedOptimizeJob] = useState<Job | null>(null);
+  const [optimizationResult, setOptimizationResult] = useState<CVOptimizationResult | null>(null);
+  const [selectedSuggestionIndexes, setSelectedSuggestionIndexes] = useState<number[]>([]);
+  const [applyingOptimization, setApplyingOptimization] = useState(false);
   const { isDark } = useAppDarkModeState();
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern');
   const [zoomLevel, setZoomLevel] = useState(100);
@@ -411,40 +431,158 @@ export default function EditorPage() {
     document.body.removeChild(link);
   };
 
-  const handleAIOptimize = async () => {
-    if (!content || !jobDescriptionForOptimization.trim()) {
-      alert('Please enter a job description');
-      return;
+  const handleOptimizeSearch = async () => {
+    if (!optimizeQuery.trim()) return;
+
+    setOptimizeSearching(true);
+    setOptimizeJobs([]);
+    try {
+      const params = new URLSearchParams({
+        keywords: optimizeQuery,
+        location: optimizeLocation,
+        employmentType: 'all',
+        experienceLevel: 'all',
+        datePosted: 'all',
+        remoteOnly: 'false',
+        limit: '10',
+      });
+
+      const response = await fetch(`/api/jobs/search?${params.toString()}`);
+      const payload = await response.json();
+
+      if (!response.ok || !payload.success) {
+        alert(payload?.error || 'Job search failed. Please try again.');
+        return;
+      }
+
+      setOptimizeJobs(Array.isArray(payload.jobs) ? payload.jobs : []);
+    } catch (error) {
+      console.error('Job search error:', error);
+      alert('Job search failed. Please try again.');
+    } finally {
+      setOptimizeSearching(false);
     }
+  };
+
+  const handleOptimizeForJob = async (job: Job) => {
+    if (!content) return;
 
     setAiLoading(true);
+    setOptimizationResult(null);
+    setSelectedSuggestionIndexes([]);
+    setSelectedOptimizeJob(job);
+    setJobDescriptionForOptimization(job.description || '');
+
     try {
-      const response = await fetch('/api/ai', {
+      const response = await fetch('/api/jobs/optimize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'optimize',
-          resumeContent: content,
-          jobDescription: jobDescriptionForOptimization,
+          jobDescription: job.description,
+          jobRequirements: job.requirements,
+          jobSkills: job.skills,
+          cvContent: content,
         }),
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        setAiResult({
-          type: 'optimize',
-          content: data.result,
-        });
-      } else {
-        alert('Error: ' + (data.error || 'Unknown error'));
+      if (!response.ok || !data.success) {
+        alert(data?.error || 'Optimization failed. Please try again.');
+        return;
       }
+
+      setOptimizationResult(data.result as CVOptimizationResult);
+      setSelectedSuggestionIndexes(
+        (data.result?.suggestions || []).map((_: unknown, index: number) => index)
+      );
     } catch (error) {
-      console.error('AI Optimization error:', error);
+      console.error('Optimization error:', error);
       alert('Failed to optimize resume');
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const toggleSuggestion = (index: number) => {
+    setSelectedSuggestionIndexes((current) =>
+      current.includes(index)
+        ? current.filter((item) => item !== index)
+        : [...current, index]
+    );
+  };
+
+  const applySelectedOptimizations = () => {
+    if (!content || !optimizationResult) return;
+
+    if (selectedSuggestionIndexes.length === 0) {
+      alert('Please select at least one suggestion to apply.');
+      return;
+    }
+
+    setApplyingOptimization(true);
+
+    try {
+      const updatedContent: ResumeContent = {
+        ...content,
+        experience: [...content.experience],
+        skills: [...content.skills],
+      };
+
+      optimizationResult.suggestions.forEach((suggestion, index) => {
+        if (!selectedSuggestionIndexes.includes(index)) return;
+
+        if (suggestion.section === 'summary' && suggestion.suggested) {
+          updatedContent.summary = suggestion.suggested;
+        }
+
+        if (suggestion.section === 'experience' && updatedContent.experience[0]) {
+          const currentDescription = updatedContent.experience[0].description || '';
+          updatedContent.experience[0] = {
+            ...updatedContent.experience[0],
+            description: `${currentDescription}\n- ${suggestion.suggested}`.trim(),
+          };
+        }
+
+        if (suggestion.section === 'skills' && suggestion.suggested) {
+          updatedContent.skills = [
+            ...updatedContent.skills,
+            {
+              id: crypto.randomUUID?.() || `skill-${Date.now()}-${index}`,
+              name: suggestion.suggested,
+              category: 'Suggested',
+              level: 'intermediate' as const,
+            },
+          ];
+        }
+      });
+
+      if (optimizationResult.missing_skills.length > 0) {
+        const missingSkills = optimizationResult.missing_skills.map((skill, index) => ({
+          id: crypto.randomUUID?.() || `missing-skill-${Date.now()}-${index}`,
+          name: skill,
+          category: 'Suggested',
+          level: 'beginner' as const,
+        }));
+
+        updatedContent.skills = [...updatedContent.skills, ...missingSkills];
+      }
+
+      setContent(updatedContent);
+      setIsDirty(true);
+      alert('Selected optimizations applied. Review and save your CV.');
+    } finally {
+      setApplyingOptimization(false);
+    }
+  };
+
+  const handleAIOptimize = async () => {
+    if (!selectedOptimizeJob) {
+      setOptimizeDialogOpen(true);
+      return;
+    }
+
+    await handleOptimizeForJob(selectedOptimizeJob);
   };
 
   const handleAIExtractKeywords = async () => {
@@ -552,7 +690,7 @@ export default function EditorPage() {
               <Button 
                 size="sm" 
                 className="gap-2 bg-zinc-700 hover:bg-zinc-800 text-white" 
-                onClick={() => setAiResult({ type: 'optimize', content: '' })}
+                onClick={() => setOptimizeDialogOpen(true)}
               >
                 <Sparkles className="w-4 h-4" />
                 Optimize for Job
@@ -582,7 +720,7 @@ export default function EditorPage() {
       {/* Editor Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* AI Features Modal */}
-        {aiResult && (
+        {aiResult?.type === 'keywords' && (
           <Card className="mb-8 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
               <CardTitle className="flex items-center gap-2">
@@ -599,112 +737,253 @@ export default function EditorPage() {
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
-              {aiResult.type === 'optimize' ? (
-                <div>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 mb-4">
-                    Optimize your CV for a job description:
-                  </p>
-                  <textarea
-                    value={jobDescriptionForOptimization}
-                    onChange={(e) => setJobDescriptionForOptimization(e.target.value)}
-                    placeholder="Paste the job description here..."
-                    className="w-full px-3 py-2 rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 min-h-24 mb-4"
-                  />
-                  <Button 
-                    onClick={handleAIOptimize} 
-                    disabled={aiLoading}
-                    className="w-full gap-2"
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    {aiLoading ? 'Optimizing...' : 'Optimize Resume'}
-                  </Button>
-                </div>
-              ) : aiResult.type === 'keywords' ? (
-                <div className="space-y-4">
-                  {(() => {
-                    try {
-                      const parsed = typeof aiResult.content === 'string' 
-                        ? JSON.parse(aiResult.content) 
-                        : aiResult.content;
-                      
-                      const allKeywords = [
-                        ...(parsed.technicalSkills || []),
-                        ...(parsed.softSkills || []),
-                        ...(parsed.tools || []),
-                        ...(parsed.keywords || []),
-                      ];
+              <div className="space-y-4">
+                {(() => {
+                  try {
+                    const parsed = typeof aiResult.content === 'string'
+                      ? JSON.parse(aiResult.content)
+                      : aiResult.content;
 
-                      return (
-                        <>
-                          <div>
-                            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Extracted Keywords:</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {allKeywords.map((keyword, idx) => (
-                                <span
-                                  key={idx}
-                                  className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 rounded-full text-sm font-medium"
-                                >
-                                  {keyword}
-                                </span>
-                              ))}
-                            </div>
+                    const allKeywords = [
+                      ...(parsed.technicalSkills || []),
+                      ...(parsed.softSkills || []),
+                      ...(parsed.tools || []),
+                      ...(parsed.keywords || []),
+                    ];
+
+                    return (
+                      <>
+                        <div>
+                          <h4 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-3">Extracted Keywords:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {allKeywords.map((keyword, idx) => (
+                              <span
+                                key={idx}
+                                className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-900 dark:text-blue-100 rounded-full text-sm font-medium"
+                              >
+                                {keyword}
+                              </span>
+                            ))}
                           </div>
-                          {parsed.summary && (
-                            <div className="bg-zinc-100 dark:bg-zinc-700 p-3 rounded-lg">
-                              <p className="text-sm text-zinc-700 dark:text-zinc-300">
-                                <span className="font-semibold">Summary: </span>
-                                {parsed.summary}
-                              </p>
-                            </div>
-                          )}
-                          <Button
-                            onClick={() => {
-                              const keywordText = allKeywords.join(', ');
-                              navigator.clipboard.writeText(keywordText);
-                              alert('Keywords copied to clipboard!');
-                            }}
-                            variant="outline"
-                            className="w-full gap-2"
-                          >
-                            <Copy className="w-4 h-4" />
-                            Copy Keywords
-                          </Button>
-                        </>
-                      );
-                    } catch (e) {
-                      return (
-                        <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                          <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
-                            {aiResult.content}
-                          </p>
                         </div>
-                      );
-                    }
-                  })()}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700">
-                    <p className="text-sm text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
-                      {aiResult.content}
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => {
-                      navigator.clipboard.writeText(aiResult.content);
-                      alert('Copied to clipboard!');
-                    }}
-                    variant="outline"
-                    className="w-full gap-2"
-                  >
-                    <Copy className="w-4 h-4" />
-                    Copy Result
-                  </Button>
-                </div>
-              )}
+                        {parsed.summary && (
+                          <div className="bg-zinc-100 dark:bg-zinc-700 p-3 rounded-lg">
+                            <p className="text-sm text-zinc-700 dark:text-zinc-300">
+                              <span className="font-semibold">Summary: </span>
+                              {parsed.summary}
+                            </p>
+                          </div>
+                        )}
+                        <Button
+                          onClick={() => {
+                            const keywordText = allKeywords.join(', ');
+                            navigator.clipboard.writeText(keywordText);
+                            alert('Keywords copied to clipboard!');
+                          }}
+                          variant="outline"
+                          className="w-full gap-2"
+                        >
+                          <Copy className="w-4 h-4" />
+                          Copy Keywords
+                        </Button>
+                      </>
+                    );
+                  } catch (error) {
+                    console.error('Failed to parse keywords:', error);
+                    return (
+                      <div className="text-sm text-zinc-700 dark:text-zinc-300">
+                        Failed to parse keywords. Raw response:
+                        <pre className="mt-2 p-2 bg-white/50 dark:bg-black/20 rounded text-xs overflow-auto">
+                          {aiResult.content}
+                        </pre>
+                      </div>
+                    );
+                  }
+                })()}
+              </div>
             </CardContent>
           </Card>
         )}
+
+        {optimizationResult && (
+                <Card className="mb-8 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950">
+                  <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-blue-600" />
+                        Job Optimization Results
+                      </CardTitle>
+                      {selectedOptimizeJob && (
+                        <CardDescription>
+                          {selectedOptimizeJob.title} at {selectedOptimizeJob.company}
+                        </CardDescription>
+                      )}
+                    </div>
+                    <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      Match {optimizationResult.job_match_score}%
+                    </Badge>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {optimizationResult.missing_skills.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Missing Skills</p>
+                        <div className="flex flex-wrap gap-2">
+                          {optimizationResult.missing_skills.map((skill) => (
+                            <Badge key={skill} className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Suggestions</p>
+                      {optimizationResult.suggestions.map((suggestion, index) => (
+                        <div
+                          key={`${suggestion.section}-${index}`}
+                          className="p-3 border rounded-lg border-blue-100 dark:border-blue-900"
+                        >
+                          <div className="flex items-start gap-2 mb-2">
+                            <input
+                              type="checkbox"
+                              checked={selectedSuggestionIndexes.includes(index)}
+                              onChange={() => toggleSuggestion(index)}
+                              className="mt-0.5 h-4 w-4"
+                            />
+                            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium capitalize mb-1">
+                                {suggestion.section} Section
+                              </p>
+                              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                                {suggestion.reason}
+                              </p>
+                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              {suggestion.priority}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-zinc-700 dark:text-zinc-300 pl-6">
+                            {suggestion.suggested}
+                          </p>
+                        </div>
+                      ))}
+
+                      <Button
+                        className="w-full gap-2"
+                        onClick={applySelectedOptimizations}
+                        disabled={applyingOptimization || selectedSuggestionIndexes.length === 0}
+                      >
+                        {applyingOptimization ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Applying selected changes...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            Apply Selected Changes ({selectedSuggestionIndexes.length})
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+        <Dialog open={optimizeDialogOpen} onOpenChange={setOptimizeDialogOpen}>
+          <DialogContent className="sm:max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Optimize CV for a Job</DialogTitle>
+              <DialogDescription>
+                Search LinkedIn jobs and pick one to tailor this CV.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <div className="grid gap-3 md:grid-cols-[1.5fr_1fr_auto]">
+                <div className="space-y-2">
+                  <Label htmlFor="optimize-query">Job title or keywords</Label>
+                  <Input
+                    id="optimize-query"
+                    value={optimizeQuery}
+                    onChange={(e) => setOptimizeQuery(e.target.value)}
+                    placeholder="e.g., Frontend Developer"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="optimize-location">Location (optional)</Label>
+                  <Input
+                    id="optimize-location"
+                    value={optimizeLocation}
+                    onChange={(e) => setOptimizeLocation(e.target.value)}
+                    placeholder="e.g., Remote, London"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button onClick={handleOptimizeSearch} disabled={optimizeSearching} className="gap-2">
+                    {optimizeSearching ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Searching...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4" />
+                        Search
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+                {optimizeJobs.length === 0 && (
+                  <p className="text-sm text-zinc-500">Search for a job to see results.</p>
+                )}
+                {optimizeJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className={`rounded-lg border p-4 cursor-pointer transition-all ${
+                      selectedOptimizeJob?.id === job.id
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950'
+                        : 'border-zinc-200 dark:border-zinc-700'
+                    }`}
+                    onClick={() => setSelectedOptimizeJob(job)}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-zinc-900 dark:text-zinc-100">{job.title}</p>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                          {job.company} • {job.location}
+                        </p>
+                      </div>
+                      <Badge variant="outline">{job.source}</Badge>
+                    </div>
+                    <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                      {job.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOptimizeDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (!selectedOptimizeJob) return;
+                  setOptimizeDialogOpen(false);
+                  await handleOptimizeForJob(selectedOptimizeJob);
+                }}
+                disabled={!selectedOptimizeJob || aiLoading}
+              >
+                {aiLoading ? 'Optimizing...' : 'Optimize Selected Job'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* QR Code Dialog */}
         {showQR && qrUrl && (

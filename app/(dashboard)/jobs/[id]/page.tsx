@@ -22,6 +22,9 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UpgradeModal } from '@/components/ui/upgrade-modal';
 import { useDashboardStore } from '@/lib/store/dashboard-store';
+import { getCurrentUser } from '@/lib/auth/auth';
+import { createApplication } from '@/lib/database/applications';
+import { getActiveResumeVersion } from '@/lib/database/resumes';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import type { Job, CVOptimizationResult, Resume, ResumeContent } from '@/types';
 
@@ -338,6 +341,7 @@ export default function JobDetailPage() {
   );
 
   const [job, setJob] = useState<Job | null>(null);
+  const [currentUserId, setCurrentUserId] = useState('');
   const [selectedResumeId, setSelectedResumeId] = useState<string>('');
   const [optimization, setOptimization] = useState<CVOptimizationResult | null>(null);
   const [optimizing, setOptimizing] = useState(false);
@@ -375,6 +379,16 @@ export default function JobDetailPage() {
       setSelectedResumeId(availableResumes[0].id);
     }
   }, [jobId, availableResumes]);
+
+  useEffect(() => {
+    const bootstrapUser = async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
+    bootstrapUser();
+  }, []);
 
   const handleOptimize = async () => {
     if (!job || !selectedResumeId) return;
@@ -437,6 +451,33 @@ export default function JobDetailPage() {
       console.error('Optimization error:', error);
     } finally {
       setOptimizing(false);
+    }
+  };
+
+  const handleTrackApplication = async () => {
+    if (!job || !currentUserId || !selectedResumeId) return;
+
+    const activeVersion = await getActiveResumeVersion(selectedResumeId);
+
+    const created = await createApplication({
+      user_id: currentUserId,
+      job_id: job.id,
+      job_title: job.title,
+      company: job.company,
+      location: job.location,
+      job_url: job.apply_url || null,
+      status: 'Applied',
+      applied_at: new Date().toISOString().slice(0, 10),
+      reminder_at: null,
+      resume_id: selectedResumeId,
+      resume_version_id: activeVersion?.id ?? null,
+    });
+
+    if (created) {
+      alert('Application tracked! Opening your Application Tracker.');
+      router.push('/applications');
+    } else {
+      alert('Could not track application. Please try again.');
     }
   };
 
@@ -531,14 +572,19 @@ export default function JobDetailPage() {
                       </span>
                     </CardDescription>
                   </div>
-                  {job.apply_url && (
-                    <Button asChild>
-                      <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        Apply
-                      </a>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button variant="outline" onClick={handleTrackApplication}>
+                      Track Application
                     </Button>
-                  )}
+                    {job.apply_url && (
+                      <Button asChild>
+                        <a href={job.apply_url} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          Apply
+                        </a>
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-4 text-sm text-zinc-600 dark:text-zinc-400">
