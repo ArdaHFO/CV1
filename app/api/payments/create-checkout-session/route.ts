@@ -29,10 +29,10 @@ const TOKEN_PACK_CONFIG = {
 } as const;
 
 const CV_IMPORT_PACK_CONFIG = {
-  'cv-import-1': {
-    name: 'CSpark CV Import (1)',
+  'cv-import-5': {
+    name: 'CSpark CV Import Pack (5)',
     amount: 999,
-    importCount: 1,
+    importCount: 5,
   },
   'cv-import-10': {
     name: 'CSpark CV Import Pack (10)',
@@ -41,10 +41,24 @@ const CV_IMPORT_PACK_CONFIG = {
   },
 } as const;
 
+const AI_OPTIMIZE_PACK_CONFIG = {
+  'ai-optimize-5': {
+    name: 'CSpark AI Optimize Credits (5)',
+    amount: 999,
+    optimizeCount: 5,
+  },
+  'ai-optimize-10': {
+    name: 'CSpark AI Optimize Credits (10)',
+    amount: 1499,
+    optimizeCount: 10,
+  },
+} as const;
+
 type PlanId = keyof typeof PLAN_CONFIG;
 type TokenPackId = keyof typeof TOKEN_PACK_CONFIG;
 type CvImportPackId = keyof typeof CV_IMPORT_PACK_CONFIG;
-type PurchaseType = 'plan' | 'token-pack' | 'cv-import-pack';
+type AiOptimizePackId = keyof typeof AI_OPTIMIZE_PACK_CONFIG;
+type PurchaseType = 'plan' | 'token-pack' | 'cv-import-pack' | 'ai-optimize-pack';
 
 export async function POST(request: Request) {
   try {
@@ -73,6 +87,7 @@ export async function POST(request: Request) {
       planId?: PlanId;
       tokenPackId?: TokenPackId;
       cvImportPackId?: CvImportPackId;
+      aiOptimizePackId?: AiOptimizePackId;
     };
 
     const purchaseType: PurchaseType =
@@ -80,11 +95,14 @@ export async function POST(request: Request) {
         ? 'token-pack'
         : body.purchaseType === 'cv-import-pack'
         ? 'cv-import-pack'
+        : body.purchaseType === 'ai-optimize-pack'
+        ? 'ai-optimize-pack'
         : 'plan';
 
     const planId = body.planId;
     const tokenPackId = body.tokenPackId;
     const cvImportPackId = body.cvImportPackId;
+    const aiOptimizePackId = body.aiOptimizePackId;
 
     if (purchaseType === 'plan' && (!planId || !(planId in PLAN_CONFIG))) {
       return NextResponse.json({ error: 'Invalid plan selected.' }, { status: 400 });
@@ -98,9 +116,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid CV import pack selected.' }, { status: 400 });
     }
 
+    if (purchaseType === 'ai-optimize-pack' && (!aiOptimizePackId || !(aiOptimizePackId in AI_OPTIMIZE_PACK_CONFIG))) {
+      return NextResponse.json({ error: 'Invalid AI optimize pack selected.' }, { status: 400 });
+    }
+
     const selectedPlan = purchaseType === 'plan' ? PLAN_CONFIG[planId as PlanId] : null;
     const selectedTokenPack = purchaseType === 'token-pack' ? TOKEN_PACK_CONFIG[tokenPackId as TokenPackId] : null;
     const selectedCvImportPack = purchaseType === 'cv-import-pack' ? CV_IMPORT_PACK_CONFIG[cvImportPackId as CvImportPackId] : null;
+    const selectedAiOptimizePack = purchaseType === 'ai-optimize-pack' ? AI_OPTIMIZE_PACK_CONFIG[aiOptimizePackId as AiOptimizePackId] : null;
 
     const origin = request.headers.get('origin') ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
     const successUrl =
@@ -108,22 +131,27 @@ export async function POST(request: Request) {
         ? `${origin}/dashboard?checkout=success&checkoutType=plan&plan=${planId}`
         : purchaseType === 'cv-import-pack'
         ? `${origin}/dashboard?checkout=success&checkoutType=cv-import-pack&cvImportPack=${cvImportPackId}`
+        : purchaseType === 'ai-optimize-pack'
+        ? `${origin}/dashboard?checkout=success&checkoutType=ai-optimize-pack&aiOptimizePack=${aiOptimizePackId}`
         : `${origin}/dashboard?checkout=success&checkoutType=token-pack&tokenPack=${tokenPackId}`;
     const cancelUrl = `${origin}/dashboard?checkout=cancelled`;
 
     const getProductName = () => {
       if (purchaseType === 'plan') return selectedPlan!.name;
       if (purchaseType === 'cv-import-pack') return selectedCvImportPack!.name;
+      if (purchaseType === 'ai-optimize-pack') return selectedAiOptimizePack!.name;
       return selectedTokenPack!.name;
     };
     const getAmount = () => {
       if (purchaseType === 'plan') return selectedPlan!.amount;
       if (purchaseType === 'cv-import-pack') return selectedCvImportPack!.amount;
+      if (purchaseType === 'ai-optimize-pack') return selectedAiOptimizePack!.amount;
       return selectedTokenPack!.amount;
     };
     const getDescription = () => {
       if (purchaseType === 'plan') return `CSpark premium access billed per ${selectedPlan!.intervalLabel}.`;
       if (purchaseType === 'cv-import-pack') return `${selectedCvImportPack!.importCount} CV import credit(s) for CSpark.`;
+      if (purchaseType === 'ai-optimize-pack') return `${selectedAiOptimizePack!.optimizeCount} AI optimize credit(s) for CSpark.`;
       return `${selectedTokenPack!.tokenCount} additional job-search tokens for CSpark.`;
     };
 
@@ -150,6 +178,7 @@ export async function POST(request: Request) {
         planId: purchaseType === 'plan' ? (planId ?? '') : '',
         tokenPackId: purchaseType === 'token-pack' ? (tokenPackId ?? '') : '',
         cvImportPackId: purchaseType === 'cv-import-pack' ? (cvImportPackId ?? '') : '',
+        aiOptimizePackId: purchaseType === 'ai-optimize-pack' ? (aiOptimizePackId ?? '') : '',
         userId,
       },
     };

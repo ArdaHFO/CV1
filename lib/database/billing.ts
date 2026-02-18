@@ -2,7 +2,8 @@ import { supabaseAdmin } from '@/lib/supabase/client';
 
 export type PlanTier = 'freemium' | 'pro';
 export type TokenPackId = 'job-search-5' | 'job-search-10';
-export type CvImportPackId = 'cv-import-1' | 'cv-import-10';
+export type CvImportPackId = 'cv-import-5' | 'cv-import-10';
+export type AiOptimizePackId = 'ai-optimize-5' | 'ai-optimize-10';
 
 type SubscriptionRow = {
   user_id: string;
@@ -230,12 +231,27 @@ export async function addCvImportTokens(userId: string, packId: CvImportPackId) 
   const admin = requireAdminClient();
   const usage = await ensureUsageRow(userId);
 
-  const packTokens = packId === 'cv-import-10' ? 10 : 1;
+  const packTokens = packId === 'cv-import-10' ? 10 : 5;
   const updatedTokens = (usage.purchased_cv_import_tokens ?? 0) + packTokens;
 
   const { error } = await (admin as any)
     .from('user_usage_limits')
     .update({ purchased_cv_import_tokens: updatedTokens })
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
+export async function addAiOptimizeTokens(userId: string, packId: AiOptimizePackId) {
+  const admin = requireAdminClient();
+  const usage = await ensureUsageRow(userId);
+
+  const packTokens = packId === 'ai-optimize-10' ? 10 : 5;
+  const updatedTokens = (usage.purchased_optimization_tokens ?? 0) + packTokens;
+
+  const { error } = await (admin as any)
+    .from('user_usage_limits')
+    .update({ purchased_optimization_tokens: updatedTokens })
     .eq('user_id', userId);
 
   if (error) throw error;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addJobSearchTokens, addCvImportTokens, markCheckoutSuccess } from '@/lib/database/billing';
+import { addJobSearchTokens, addCvImportTokens, addAiOptimizeTokens, markCheckoutSuccess } from '@/lib/database/billing';
 import { getServerUserId } from '@/lib/auth/server-user';
 
 export async function POST(request: NextRequest) {
@@ -11,10 +11,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as {
-      purchaseType?: 'plan' | 'token-pack' | 'cv-import-pack';
+      purchaseType?: 'plan' | 'token-pack' | 'cv-import-pack' | 'ai-optimize-pack';
       planId?: 'pro-monthly' | 'pro-yearly';
       tokenPackId?: 'job-search-5' | 'job-search-10';
-      cvImportPackId?: 'cv-import-1' | 'cv-import-10';
+      cvImportPackId?: 'cv-import-5' | 'cv-import-10';
+      aiOptimizePackId?: 'ai-optimize-5' | 'ai-optimize-10';
     };
 
     const purchaseType = body.purchaseType ?? 'plan';
@@ -39,6 +40,17 @@ export async function POST(request: NextRequest) {
         );
       }
       await addCvImportTokens(userId, body.cvImportPackId);
+      return NextResponse.json({ success: true });
+    }
+
+    if (purchaseType === 'ai-optimize-pack') {
+      if (!body.aiOptimizePackId) {
+        return NextResponse.json(
+          { success: false, error: 'aiOptimizePackId is required' },
+          { status: 400 }
+        );
+      }
+      await addAiOptimizeTokens(userId, body.aiOptimizePackId);
       return NextResponse.json({ success: true });
     }
 

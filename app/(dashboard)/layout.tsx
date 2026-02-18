@@ -174,7 +174,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           );
         } else if (checkoutType === 'cv-import-pack') {
           const cvImportPack = searchParams.get('cvImportPack');
-          if (cvImportPack === 'cv-import-1' || cvImportPack === 'cv-import-10') {
+          if (cvImportPack === 'cv-import-5' || cvImportPack === 'cv-import-10') {
             await fetch('/api/billing/checkout-success', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -183,7 +183,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             const cleanUrl = `${window.location.origin}/dashboard`;
             window.history.replaceState({}, '', cleanUrl);
             setPaymentMessage(
-              `Payment successful! ${cvImportPack === 'cv-import-10' ? 10 : 1} CV import credit(s) added.`
+              `Payment successful! ${cvImportPack === 'cv-import-10' ? 10 : 5} CV import credit(s) added.`
+            );
+          }
+        } else if (checkoutType === 'ai-optimize-pack') {
+          const aiOptimizePack = searchParams.get('aiOptimizePack');
+          if (aiOptimizePack === 'ai-optimize-5' || aiOptimizePack === 'ai-optimize-10') {
+            await fetch('/api/billing/checkout-success', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ purchaseType: 'ai-optimize-pack', aiOptimizePackId: aiOptimizePack }),
+            });
+            const cleanUrl = `${window.location.origin}/dashboard`;
+            window.history.replaceState({}, '', cleanUrl);
+            setPaymentMessage(
+              `Payment successful! ${aiOptimizePack === 'ai-optimize-10' ? 10 : 5} AI optimize credit(s) added.`
             );
           }
         } else if (paidPlan === 'pro-monthly' || paidPlan === 'pro-yearly') {
@@ -244,7 +258,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       period: '/month',
       description: 'Flexible monthly billing for active job seekers.',
       benefits: [
-        'Unlimited CV versions',
+        'Unlimited CV creation',
+        'Unlimited CV imports',
+        'Unlimited job searches',
         'Unlimited AI optimizations',
         'Advanced ATS scoring',
         'Priority support',
@@ -262,7 +278,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       benefits: [
         'Everything in Monthly',
         '~17% savings vs monthly',
-        'Unlimited CV versions',
+        'Unlimited CV creation',
+        'Unlimited CV imports',
+        'Unlimited job searches',
         'Unlimited AI optimizations',
         'Advanced ATS scoring',
         'Priority support',
