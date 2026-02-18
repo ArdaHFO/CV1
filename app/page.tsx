@@ -290,7 +290,7 @@ export default function Home() {
               <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <div className="w-full shrink-0 overflow-hidden border-2 border-black bg-white px-3 py-1 sm:w-[380px]">
                   <Marquee pauseOnHover speed={18} className="mt-0">
-                    <div className="mx-5 flex items-center gap-6">
+                    <div className="flex items-center gap-6 pr-6">
                       <Image
                         src="/linkedin.png"
                         alt="LinkedIn"
