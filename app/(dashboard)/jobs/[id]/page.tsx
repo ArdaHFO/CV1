@@ -377,6 +377,15 @@ export default function JobDetailPage() {
       try {
         const searchedJobs = JSON.parse(lastSearch) as Job[];
         foundJob = searchedJobs.find((j) => j.id === jobId) || null;
+        // Normalize skills: older cache entries may be {id,name} objects
+        if (foundJob) {
+          foundJob = {
+            ...foundJob,
+            skills: (foundJob.skills || []).map((s: unknown) =>
+              typeof s === 'string' ? s : ((s as { name?: string })?.name ?? String(s))
+            ),
+          };
+        }
         console.log('Found job from localStorage:', foundJob?.title);
       } catch (error) {
         console.error('Error parsing localStorage jobs:', error);
@@ -656,11 +665,14 @@ export default function JobDetailPage() {
               <div className="p-6">
                 <h2 className="text-[10px] font-black uppercase tracking-widest mb-3">Required Skills</h2>
                 <div className="flex flex-wrap gap-2">
-                  {job.skills.map((skill) => (
-                    <span key={skill} className="px-2 py-0.5 border-2 border-black text-[10px] font-black uppercase tracking-widest">
-                      {skill}
-                    </span>
-                  ))}
+                  {job.skills.map((skill, idx) => {
+                    const s = typeof skill === 'string' ? skill : ((skill as { name?: string })?.name ?? '');
+                    return (
+                      <span key={`${s}-${idx}`} className="px-2 py-0.5 border-2 border-black text-[10px] font-black uppercase tracking-widest">
+                        {s}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -736,11 +748,14 @@ export default function JobDetailPage() {
                             Matching ({optimization.matching_skills.length})
                           </p>
                           <div className="flex flex-wrap gap-1.5">
-                            {optimization.matching_skills.map((skill) => (
-                              <span key={skill} className="px-2 py-0.5 border-2 border-black bg-black text-white text-[10px] font-black uppercase tracking-widest">
-                                {skill}
-                              </span>
-                            ))}
+                            {optimization.matching_skills.map((skill, idx) => {
+                              const s = typeof skill === 'string' ? skill : ((skill as { name?: string })?.name ?? '');
+                              return (
+                                <span key={`${s}-${idx}`} className="px-2 py-0.5 border-2 border-black bg-black text-white text-[10px] font-black uppercase tracking-widest">
+                                  {s}
+                                </span>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
@@ -751,11 +766,14 @@ export default function JobDetailPage() {
                             Missing ({optimization.missing_skills.length})
                           </p>
                           <div className="flex flex-wrap gap-1.5">
-                            {optimization.missing_skills.map((skill) => (
-                              <span key={skill} className="px-2 py-0.5 border-2 border-[#FF3000] text-[#FF3000] text-[10px] font-black uppercase tracking-widest">
-                                {skill}
-                              </span>
-                            ))}
+                            {optimization.missing_skills.map((skill, idx) => {
+                              const s = typeof skill === 'string' ? skill : ((skill as { name?: string })?.name ?? '');
+                              return (
+                                <span key={`${s}-${idx}`} className="px-2 py-0.5 border-2 border-[#FF3000] text-[#FF3000] text-[10px] font-black uppercase tracking-widest">
+                                  {s}
+                                </span>
+                              );
+                            })}
                           </div>
                         </div>
                       )}
