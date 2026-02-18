@@ -3,7 +3,10 @@ import { getServerUserId } from '@/lib/auth/server-user';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/client';
 import type { ResumeContent } from '@/types';
-// import pdf from 'pdf-parse';
+
+// PDF parsing requires pdfParse - currently commented out due to Canvas dependency
+// To enable: npm install pdf-parse @napi-rs/canvas
+// const pdfParse = require('pdf-parse');
 // import * as mammoth from 'mammoth';
 
 // Helper function to create empty resume template
@@ -32,17 +35,9 @@ function createEmptyResumeContent(fileName: string): ResumeContent {
 }
 
 async function extractTextFromFile(fileBuffer: Buffer, fileExtension: string): Promise<string> {
-  // TODO: Re-enable pdf parsing after fixing pdf-parse import
-  // if (fileExtension === 'pdf') {
-  //   const parsed = await pdfParse(fileBuffer);
-  //   return parsed.text || '';
-  // }
-
-  // if (fileExtension === 'docx' || fileExtension === 'doc') {
-  //   const parsed = await mammoth.extractRawText({ buffer: fileBuffer });
-  //   return parsed.value || '';
-  // }
-
+  // TODO: PDF and DOCX parsing requires additional dependencies with Canvas support
+  // For now, returning empty text - can be implemented with external service or
+  // alternative PDF libraries (e.g., pdfjs-dist, pdf-parse via serverless)
   return '';
 }
 

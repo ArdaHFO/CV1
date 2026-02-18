@@ -186,16 +186,16 @@ export default function SettingsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 animate-in fade-in slide-in-from-top-3 duration-700">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent mb-2">Settings</h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Customize your CSpark experience with comprehensive settings and preferences
+          <h1 className="text-5xl font-black leading-none text-black dark:text-white mb-2 uppercase">SETTINGS</h1>
+          <p className="text-base text-black dark:text-white font-medium">
+            CUSTOMIZE YOUR CSPARK EXPERIENCE WITH COMPREHENSIVE SETTINGS AND PREFERENCES
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Tab Navigation */}
           <div className="lg:col-span-1">
-            <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl">
+            <Card className="bg-white dark:bg-black border-2 border-black dark:border-white">
               <CardContent className="p-4">
                 <nav className="space-y-2">
                   {[
@@ -209,10 +209,10 @@ export default function SettingsPage() {
                     <button
                       key={id}
                       onClick={() => setActiveTab(id as keyof Settings)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-black uppercase transition-all duration-300 border-2 ${
                         activeTab === id
-                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                          : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 hover:translate-x-1'
+                          ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black'
+                          : 'border-transparent text-black dark:text-white hover:border-black dark:hover:border-white hover:bg-white/50 dark:hover:bg-black/50'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -221,8 +221,8 @@ export default function SettingsPage() {
                   ))}
                 </nav>
 
-                <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-700 space-y-2">
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs" onClick={exportSettings}>
+                <div className="mt-6 pt-4 border-t-2 border-black dark:border-white space-y-2">
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs border-2 border-black bg-white text-black hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black font-black uppercase" onClick={exportSettings}>
                     <Download className="w-4 h-4" />
                     Export Settings
                   </Button>
@@ -230,7 +230,7 @@ export default function SettingsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full justify-start gap-2 text-xs"
+                      className="w-full justify-start gap-2 text-xs border-2 border-black bg-white text-black hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black font-black uppercase"
                       asChild
                     >
                       <span>
