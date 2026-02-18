@@ -3,8 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
-import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2 } from 'lucide-react';
+import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
