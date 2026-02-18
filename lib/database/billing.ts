@@ -2,6 +2,7 @@ import { supabaseAdmin } from '@/lib/supabase/client';
 
 export type PlanTier = 'freemium' | 'pro';
 export type TokenPackId = 'job-search-5' | 'job-search-10';
+export type CvImportPackId = 'cv-import-1' | 'cv-import-10';
 
 type SubscriptionRow = {
   user_id: string;
@@ -23,6 +24,8 @@ type UsageRow = {
   freemium_cv_optimizations: number;
   purchased_job_search_tokens: number;
   purchased_optimization_tokens: number;
+  freemium_cv_imports: number;
+  purchased_cv_import_tokens: number;
 };
 
 export type BillingStatus = {
@@ -43,6 +46,8 @@ export type BillingStatus = {
     freemiumCvOptimizations: number;
     purchasedJobSearchTokens: number;
     purchasedOptimizationTokens: number;
+    freemiumCvImports: number;
+    purchasedCvImportTokens: number;
   };
   remaining: {
     jobSearches: number;
@@ -50,6 +55,7 @@ export type BillingStatus = {
     tokenJobSearches: number;
     cvCreations: number | 'unlimited';
     cvOptimizations: number | 'unlimited';
+    cvImports: number | 'unlimited';
   };
 };
 
@@ -94,6 +100,8 @@ async function ensureUsageRow(userId: string): Promise<UsageRow> {
     freemium_cv_optimizations: 0,
     purchased_job_search_tokens: 0,
     purchased_optimization_tokens: 0,
+    freemium_cv_imports: 0,
+    purchased_cv_import_tokens: 0,
   };
 
   const { data: inserted, error: insertError } = await (admin as any)
@@ -146,7 +154,14 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
     ? 'unlimited'
     : Math.max(0, 1 - (usage.freemium_cv_optimizations ?? 0));
 
-  console.log(`[GET_BILLING_STATUS] userId=${userId}, planTier=${planTier}, freemium_cv_creations=${usage.freemium_cv_creations}, cvRemaining=${cvRemaining}`);
+  // CV import: free tier gets 1 free import. Additional imports via purchased tokens.
+  const freeImportsUsed = usage.freemium_cv_imports ?? 0;
+  const purchasedImportTokens = usage.purchased_cv_import_tokens ?? 0;
+  const cvImportRemaining = planTier === 'pro'
+    ? 'unlimited'
+    : Math.max(0, 1 - freeImportsUsed) + purchasedImportTokens;
+
+  console.log(`[GET_BILLING_STATUS] userId=${userId}, planTier=${planTier}, freemium_cv_creations=${usage.freemium_cv_creations}, cvRemaining=${cvRemaining}, cvImportRemaining=${cvImportRemaining}`);
 
   return {
     planTier,
@@ -166,6 +181,8 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
       freemiumCvOptimizations: usage.freemium_cv_optimizations ?? 0,
       purchasedJobSearchTokens: usage.purchased_job_search_tokens ?? 0,
       purchasedOptimizationTokens: usage.purchased_optimization_tokens ?? 0,
+      freemiumCvImports: freeImportsUsed,
+      purchasedCvImportTokens: purchasedImportTokens,
     },
     remaining: {
       jobSearches: remainingJobSearches,
@@ -173,6 +190,7 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
       tokenJobSearches: remainingTokenSearches,
       cvCreations: cvRemaining,
       cvOptimizations: optimizationRemaining,
+      cvImports: cvImportRemaining,
     },
   };
 }
@@ -208,6 +226,21 @@ export async function markCheckoutSuccess(userId: string, planId: 'pro-monthly' 
   if (error) throw error;
 }
 
+export async function addCvImportTokens(userId: string, packId: CvImportPackId) {
+  const admin = requireAdminClient();
+  const usage = await ensureUsageRow(userId);
+
+  const packTokens = packId === 'cv-import-10' ? 10 : 1;
+  const updatedTokens = (usage.purchased_cv_import_tokens ?? 0) + packTokens;
+
+  const { error } = await (admin as any)
+    .from('user_usage_limits')
+    .update({ purchased_cv_import_tokens: updatedTokens })
+    .eq('user_id', userId);
+
+  if (error) throw error;
+}
+
 export async function addJobSearchTokens(userId: string, tokenPackId: TokenPackId) {
   const admin = requireAdminClient();
   const usage = await ensureUsageRow(userId);
@@ -225,7 +258,7 @@ export async function addJobSearchTokens(userId: string, tokenPackId: TokenPackI
 
 export async function consumeUsage(
   userId: string,
-  action: 'job-search' | 'cv-creation' | 'cv-optimization'
+  action: 'job-search' | 'cv-creation' | 'cv-optimization' | 'cv-import'
 ): Promise<{ allowed: boolean; message: string; status: BillingStatus }> {
   const admin = requireAdminClient();
   const status = await getBillingStatus(userId);
@@ -347,6 +380,43 @@ export async function consumeUsage(
     return {
       allowed: true,
       message: 'CV optimization quota consumed.',
+      status: await getBillingStatus(userId),
+    };
+  }
+
+  if (action === 'cv-import') {
+    console.log(`[CONSUME_IMPORT] userId=${userId}, planTier=${status.planTier}, remaining=${status.remaining.cvImports}`);
+
+    if (status.planTier === 'pro') {
+      return { allowed: true, message: 'Pro plan has unlimited CV imports.', status };
+    }
+
+    if (status.remaining.cvImports === 0) {
+      console.log(`[CONSUME_IMPORT_BLOCKED] userId=${userId}, no remaining CV imports`);
+      return {
+        allowed: false,
+        message: 'Free plan allows only 1 CV import. Buy an import pack to continue.',
+        status,
+      };
+    }
+
+    // Use purchased token first, then free allowance
+    const hasPurchasedToken = status.usage.purchasedCvImportTokens > 0;
+    const updates = hasPurchasedToken
+      ? { purchased_cv_import_tokens: status.usage.purchasedCvImportTokens - 1 }
+      : { freemium_cv_imports: status.usage.freemiumCvImports + 1 };
+
+    const { error } = await (admin as any)
+      .from('user_usage_limits')
+      .update(updates)
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    console.log(`[CONSUME_IMPORT_SUCCESS] userId=${userId}`);
+    return {
+      allowed: true,
+      message: hasPurchasedToken ? '1 purchased CV import token consumed.' : 'Free CV import used.',
       status: await getBillingStatus(userId),
     };
   }

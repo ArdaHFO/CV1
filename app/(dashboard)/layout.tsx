@@ -39,6 +39,8 @@ type SubscriptionData = {
 };
 
 type TokenPackId = 'job-search-5' | 'job-search-10';
+type CvImportPackId = 'cv-import-1' | 'cv-import-10';
+type PurchaseType = 'plan' | 'token-pack' | 'cv-import-pack';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -46,8 +48,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<'pro-monthly' | 'pro-yearly'>('pro-yearly');
-  const [selectedPurchaseType, setSelectedPurchaseType] = useState<'plan' | 'token-pack'>('plan');
+  const [selectedPurchaseType, setSelectedPurchaseType] = useState<PurchaseType>('plan');
   const [selectedTokenPackId, setSelectedTokenPackId] = useState<TokenPackId>('job-search-5');
+  const [selectedCvImportPackId, setSelectedCvImportPackId] = useState<CvImportPackId>('cv-import-1');
   const [processingPayment, setProcessingPayment] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState('');
   const [isPro, setIsPro] = useState(false);
@@ -150,6 +153,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           setPaymentMessage(
             `Payment successful! ${tokenPack === 'job-search-10' ? 10 : 5} job-search tokens were added.`
           );
+        } else if (checkoutType === 'cv-import-pack') {
+          const cvImportPack = searchParams.get('cvImportPack');
+          if (cvImportPack === 'cv-import-1' || cvImportPack === 'cv-import-10') {
+            await fetch('/api/billing/checkout-success', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ purchaseType: 'cv-import-pack', cvImportPackId: cvImportPack }),
+            });
+            const cleanUrl = `${window.location.origin}/dashboard`;
+            window.history.replaceState({}, '', cleanUrl);
+            setPaymentMessage(
+              `Payment successful! ${cvImportPack === 'cv-import-10' ? 10 : 1} CV import credit(s) added.`
+            );
+          }
         } else if (paidPlan === 'pro-monthly' || paidPlan === 'pro-yearly') {
           await fetch('/api/billing/checkout-success', {
             method: 'POST',
@@ -170,6 +187,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }
 
       await loadBillingStatus();
+
+      // Open upgrade dialog pre-selected to cv-import packs
+      const openUpgrade = searchParams.get('openUpgrade');
+      if (openUpgrade === 'cv-import') {
+        setSelectedPurchaseType('cv-import-pack');
+        setSelectedCvImportPackId('cv-import-1');
+        setUpgradeOpen(true);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
     };
 
     bootstrap();
@@ -237,9 +263,31 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     },
   ];
 
+  const cvImportPacks = [
+    {
+      id: 'cv-import-1' as const,
+      name: '1 CV Import',
+      price: '$9.99',
+      description: 'Import 1 additional CV.',
+    },
+    {
+      id: 'cv-import-10' as const,
+      name: '10 CV Imports',
+      price: '$14.99',
+      description: 'Import up to 10 CVs.',
+      badge: 'Best Value',
+    },
+  ];
+
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) ?? plans[0];
   const selectedTokenPack = tokenPacks.find((pack) => pack.id === selectedTokenPackId) ?? tokenPacks[0];
-  const selectedPrice = selectedPurchaseType === 'plan' ? selectedPlan.price : selectedTokenPack.price;
+  const selectedCvImportPack = cvImportPacks.find((pack) => pack.id === selectedCvImportPackId) ?? cvImportPacks[0];
+  const selectedPrice =
+    selectedPurchaseType === 'plan'
+      ? selectedPlan.price
+      : selectedPurchaseType === 'cv-import-pack'
+      ? selectedCvImportPack.price
+      : selectedTokenPack.price;
 
   const handlePayment = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -266,6 +314,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         body: JSON.stringify(
           selectedPurchaseType === 'plan'
             ? { purchaseType: 'plan', planId: selectedPlan.id }
+            : selectedPurchaseType === 'cv-import-pack'
+            ? { purchaseType: 'cv-import-pack', cvImportPackId: selectedCvImportPack.id }
             : { purchaseType: 'token-pack', tokenPackId: selectedTokenPack.id }
         ),
       });
@@ -490,6 +540,40 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     onClick={() => {
                       setSelectedPurchaseType('token-pack');
                       setSelectedTokenPackId(pack.id);
+                    }}
+                    className={`border-2 border-black p-4 text-left transition-colors ${
+                      isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-black uppercase tracking-widest">{pack.name}</p>
+                      {pack.badge ? <Badge>{pack.badge}</Badge> : null}
+                    </div>
+                    <p className="mt-2 text-xl font-black uppercase">{pack.price}</p>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-current/70">{pack.description}</p>
+                    {isSelected ? (
+                      <div className="mt-3 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest">
+                        <Check className="h-3.5 w-3.5" /> Selected
+                      </div>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-xs font-black uppercase tracking-widest">CV Import Credits</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {cvImportPacks.map((pack) => {
+                const isSelected = selectedPurchaseType === 'cv-import-pack' && selectedCvImportPackId === pack.id;
+                return (
+                  <button
+                    key={pack.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedPurchaseType('cv-import-pack');
+                      setSelectedCvImportPackId(pack.id);
                     }}
                     className={`border-2 border-black p-4 text-left transition-colors ${
                       isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'

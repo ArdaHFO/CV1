@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerUserId } from '@/lib/auth/server-user';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/client';
+import { consumeUsage } from '@/lib/database/billing';
 import type { ResumeContent } from '@/types';
 
 export const runtime = 'nodejs';
@@ -220,6 +221,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'No file provided' },
         { status: 400 }
+      );
+    }
+
+    // Check CV import billing quota before processing
+    const billingResult = await consumeUsage(userId, 'cv-import');
+    if (!billingResult.allowed) {
+      return NextResponse.json(
+        { success: false, error: billingResult.message, code: 'import_limit_reached' },
+        { status: 403 }
       );
     }
 

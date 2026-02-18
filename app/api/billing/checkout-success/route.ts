@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addJobSearchTokens, markCheckoutSuccess } from '@/lib/database/billing';
+import { addJobSearchTokens, addCvImportTokens, markCheckoutSuccess } from '@/lib/database/billing';
 import { getServerUserId } from '@/lib/auth/server-user';
 
 export async function POST(request: NextRequest) {
@@ -11,12 +11,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as {
-      purchaseType?: 'plan' | 'token-pack';
+      purchaseType?: 'plan' | 'token-pack' | 'cv-import-pack';
       planId?: 'pro-monthly' | 'pro-yearly';
       tokenPackId?: 'job-search-5' | 'job-search-10';
+      cvImportPackId?: 'cv-import-1' | 'cv-import-10';
     };
 
-    const purchaseType = body.purchaseType === 'token-pack' ? 'token-pack' : 'plan';
+    const purchaseType = body.purchaseType ?? 'plan';
 
     if (purchaseType === 'plan') {
       if (!body.planId) {
@@ -30,6 +31,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
+    if (purchaseType === 'cv-import-pack') {
+      if (!body.cvImportPackId) {
+        return NextResponse.json(
+          { success: false, error: 'cvImportPackId is required' },
+          { status: 400 }
+        );
+      }
+      await addCvImportTokens(userId, body.cvImportPackId);
+      return NextResponse.json({ success: true });
+    }
+
+    // token-pack
     if (!body.tokenPackId) {
       return NextResponse.json(
         { success: false, error: 'tokenPackId is required' },
