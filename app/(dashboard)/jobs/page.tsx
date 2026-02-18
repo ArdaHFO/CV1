@@ -258,89 +258,89 @@ export default function JobsPage() {
         {/* Header */}
         <div className="mb-8 animate-in fade-in slide-in-from-top-3 duration-700">
           <div className="flex items-center gap-3 mb-3">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
-              Find Your Next Opportunity
+            <h1 className="text-5xl font-black leading-none text-black dark:text-white uppercase">
+              FIND YOUR NEXT OPPORTUNITY
             </h1>
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#0077B5] to-[#00A0DC] shadow-lg">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+            <div className="flex items-center gap-2 px-3 py-1.5 border-2 border-black bg-white dark:border-white dark:bg-black">
+              <svg className="w-6 h-6 text-black dark:text-white" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
-              <span className="text-white font-semibold text-sm">Powered by LinkedIn</span>
+              <span className="text-black dark:text-white font-black text-sm uppercase">POWERED BY LINKEDIN</span>
             </div>
           </div>
-          <p className="text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0077B5]/10 dark:bg-[#0077B5]/20 text-[#0077B5] dark:text-[#00A0DC] font-medium text-sm border border-[#0077B5]/20">
+          <p className="text-base text-black dark:text-white font-medium flex items-center gap-2 mb-2">
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 border-2 border-black bg-white dark:border-white dark:bg-black text-black dark:text-white font-black text-xs uppercase">
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
               </svg>
-              LinkedIn Jobs
+              LINKEDIN JOBS
             </span>
-            <span>Search and optimize your CV to match job requirements</span>
+            SEARCH AND OPTIMIZE YOUR CV TO MATCH JOB REQUIREMENTS
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500">
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-blue-200 dark:border-blue-900">
-              💾 Smart Caching (5min)
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs font-black uppercase text-black dark:text-white">
+            <Badge className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
+              SMART CACHING (5MIN)
             </Badge>
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-indigo-200 dark:border-indigo-900">
-              🎯 Advanced Filters
+            <Badge className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
+              ADVANCED FILTERS
             </Badge>
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-violet-200 dark:border-violet-900">
-              ⚡ Choose how many job listings to fetch
+            <Badge className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
+              CHOOSE JOB LISTINGS
             </Badge>
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-amber-200 dark:border-amber-900">
+            <Badge className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
               {planTier === 'pro'
-                ? `Pro total searches left: ${remainingSearches} (${remainingTokenSearches} token)`
-                : `Freemium total searches left: ${remainingSearches} (${remainingTokenSearches} token)`}
+                ? `PRO SEARCHES LEFT: ${remainingSearches}`
+                : `FREEMIUM SEARCHES LEFT: ${remainingSearches}`}
             </Badge>
           </div>
           {usageMessage && (
-            <p className="mt-3 text-sm text-amber-700 dark:text-amber-400">{usageMessage}</p>
+            <p className="mt-3 text-sm font-black uppercase text-black dark:text-white border-2 border-black bg-white p-2 dark:border-white dark:bg-black">{usageMessage}</p>
           )}
         </div>
 
         {/* Search Form */}
-        <Card className="mb-8 bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+        <Card className="mb-8 bg-white dark:bg-black border-2 border-black dark:border-white animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
           <CardContent className="pt-6">
             {/* Row 1: Main Search Fields */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
               <div className="md:col-span-5">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black dark:text-white w-4 h-4" />
                   <Input
                     placeholder="Job title, keywords, or company"
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="pl-9"
+                    className="pl-9 border-2 border-black bg-white text-black placeholder:text-black/50 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-white/50"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-4">
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black dark:text-white w-4 h-4" />
                   <Input
                     placeholder="Location (optional)"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="pl-9"
+                    className="pl-9 border-2 border-black bg-white text-black placeholder:text-black/50 dark:border-white dark:bg-black dark:text-white dark:placeholder:text-white/50"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-3">
-                <Button onClick={handleSearch} disabled={loading} className="w-full gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
+                <Button onClick={handleSearch} disabled={loading} className="w-full gap-2 border-2 border-black bg-black text-white hover:bg-white hover:text-black font-black uppercase dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white">
                   <Search className="w-4 h-4" />
-                  {loading ? 'Searching...' : 'Search Jobs'}
+                  {loading ? 'Searching...' : 'SEARCH JOBS'}
                 </Button>
               </div>
             </div>
 
             {/* Row 2: Advanced Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 pt-4 border-t-2 border-black dark:border-white">
               <Select value={employmentType} onValueChange={setEmploymentType}>
-                <SelectTrigger>
+                <SelectTrigger className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -353,7 +353,7 @@ export default function JobsPage() {
               </Select>
 
               <Select value={experienceLevel} onValueChange={setExperienceLevel}>
-                <SelectTrigger>
+                <SelectTrigger className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
                   <SelectValue placeholder="Experience Level" />
                 </SelectTrigger>
                 <SelectContent>
@@ -366,7 +366,7 @@ export default function JobsPage() {
               </Select>
 
               <Select value={datePosted} onValueChange={setDatePosted}>
-                <SelectTrigger>
+                <SelectTrigger className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
                   <SelectValue placeholder="Date Posted" />
                 </SelectTrigger>
                 <SelectContent>
@@ -378,7 +378,7 @@ export default function JobsPage() {
               </Select>
 
               <Select value={resultLimit} onValueChange={setResultLimit}>
-                <SelectTrigger>
+                <SelectTrigger className="border-2 border-black bg-white text-black dark:border-white dark:bg-black dark:text-white">
                   <SelectValue placeholder="Listings to Show" />
                 </SelectTrigger>
                 <SelectContent>
@@ -394,7 +394,7 @@ export default function JobsPage() {
 
               <div className="flex gap-2">
                 <div className="flex items-center flex-1">
-                  <label className="w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/40 px-3 py-2 transition-all hover:border-blue-300 dark:hover:border-blue-700 hover:bg-white/90 dark:hover:bg-zinc-900/70">
+                  <label className="w-full cursor-pointer border-2 border-black bg-white px-3 py-2 transition-all hover:bg-black hover:text-white dark:border-white dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
                     <input
                       type="checkbox"
                       checked={remoteOnly}
