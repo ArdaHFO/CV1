@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Search, MapPin, Briefcase, ExternalLink, Sparkles } from 'lucide-react';
+import { Search, MapPin, Briefcase, ExternalLink } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
 import { Input } from '@/components/ui/input';
@@ -485,15 +485,15 @@ export default function JobsPage() {
 
               <div className="mt-4 flex justify-end">
                 <Button
-                  variant="accent"
+                  variant="outline"
                   size="sm"
-                  className="gap-2 group-hover:bg-white group-hover:text-black group-hover:border-white"
+                  className="gap-2 border-2 border-black bg-white text-black hover:bg-black hover:text-white group-hover:bg-white group-hover:text-black group-hover:border-black"
                   onClick={(e) => {
                     e.stopPropagation();
                     router.push(`/jobs/${job.id}`);
                   }}
                 >
-                  <Sparkles className="w-4 h-4" />
+                  <img src="/meta-llama.png" alt="AI" className="w-4 h-4 object-contain" />
                   Optimize CV
                 </Button>
               </div>

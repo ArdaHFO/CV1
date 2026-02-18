@@ -152,7 +152,7 @@ export async function getBillingStatus(userId: string): Promise<BillingStatus> {
 
   const optimizationRemaining = planTier === 'pro'
     ? 'unlimited'
-    : Math.max(0, 1 - (usage.freemium_cv_optimizations ?? 0));
+    : Math.max(0, 2 - (usage.freemium_cv_optimizations ?? 0));
 
   // CV import: free tier gets 1 free import. Additional imports via purchased tokens.
   const freeImportsUsed = usage.freemium_cv_imports ?? 0;

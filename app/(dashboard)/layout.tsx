@@ -428,7 +428,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {([
                   { label: 'CV Creation', value: quotas.cvCreations, max: 1 },
                   { label: 'CV Import', value: quotas.cvImports, max: 1 },
-                  { label: 'AI Optimize', value: quotas.cvOptimizations, max: 1 },
+                  { label: 'AI Optimize', value: quotas.cvOptimizations, max: 2 },
                   { label: 'Job Search', value: quotas.jobSearches, max: 1 },
                 ] as { label: string; value: number | 'unlimited'; max: number }[]).map(({ label, value, max }) => (
                   <div key={label}>
