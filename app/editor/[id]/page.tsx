@@ -641,28 +641,28 @@ export default function EditorPage() {
       <header className="sticky top-0 z-50 bg-white border-b-4 border-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4">
               <Button 
                 onClick={() => router.push('/dashboard')} 
                 size="sm"
                 variant="outline"
-                className="gap-2"
+                className="gap-2 shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
               </Button>
-              <div>
-                <h1 className="text-lg font-black uppercase tracking-widest">
+              <div className="min-w-0">
+                <h1 className="text-base font-black uppercase tracking-widest leading-none">
                   Edit CV
                 </h1>
                 {isDirty && (
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF3000]">Unsaved changes</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#FF3000] mt-0.5">Unsaved changes</p>
                 )}
               </div>
               
               {/* Template Selector */}
-              <div className="flex items-center gap-2 ml-4">
-                <label htmlFor="template-select" className="text-xs font-black uppercase tracking-widest">
+              <div className="flex items-center gap-2 ml-4 shrink-0">
+                <label htmlFor="template-select" className="text-xs font-black uppercase tracking-widest whitespace-nowrap">
                   Template:
                 </label>
                 <select
@@ -678,10 +678,11 @@ export default function EditorPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button 
                 size="sm" 
-                className="gap-2 bg-zinc-700 hover:bg-zinc-800 text-white" 
+                variant="secondary"
+                className="gap-2" 
                 onClick={handleAIExtractKeywords}
                 disabled={aiLoading}
               >
@@ -690,25 +691,26 @@ export default function EditorPage() {
               </Button>
               <Button 
                 size="sm" 
-                className="gap-2 bg-zinc-700 hover:bg-zinc-800 text-white" 
+                variant="secondary"
+                className="gap-2" 
                 onClick={() => setOptimizeDialogOpen(true)}
               >
                 <Sparkles className="w-4 h-4" />
                 Optimize for Job
               </Button>
-              <Button size="sm" className="gap-2 bg-zinc-700 hover:bg-zinc-800 text-white" onClick={handleDownloadPDF}>
+              <Button size="sm" variant="secondary" className="gap-2" onClick={handleDownloadPDF}>
                 <Download className="w-4 h-4" />
                 Download PDF
               </Button>
-              <Button size="sm" className="gap-2 bg-zinc-700 hover:bg-zinc-800 text-white" onClick={handleCopyLink}>
+              <Button size="sm" variant="secondary" className="gap-2" onClick={handleCopyLink}>
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 {copied ? 'Copied' : 'Copy Link'}
               </Button>
-              <Button size="sm" className="gap-2 bg-zinc-700 hover:bg-zinc-800 text-white" onClick={handleGenerateQR}>
+              <Button size="sm" variant="secondary" className="gap-2" onClick={handleGenerateQR}>
                 <QrCode className="w-4 h-4" />
                 QR Code
               </Button>
-              <Button onClick={handleSave} disabled={!isDirty || isSaving} size="sm" className="gap-2">
+              <Button onClick={handleSave} disabled={!isDirty || isSaving} size="sm" variant="accent" className="gap-2">
                 <Save className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Save'}
               </Button>

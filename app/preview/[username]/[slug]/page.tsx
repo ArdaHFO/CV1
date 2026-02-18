@@ -228,21 +228,21 @@ export default function PreviewPage() {
     <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1000px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header with Share Options */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-8 border-4 border-black bg-white p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              <h1 className="text-2xl font-black uppercase tracking-widest">
                 {cvData.content.personal_info.first_name} {cvData.content.personal_info.last_name}
               </h1>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                CV View • {cvData.view_count} views total
+              <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
+                CV Preview
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button onClick={handleDownloadPDF} className="gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <Button onClick={handleDownloadPDF} variant="accent" className="gap-2">
                 <Download className="w-4 h-4" />
                 Download PDF
               </Button>
@@ -261,72 +261,52 @@ export default function PreviewPage() {
 
           {/* QR Code Section */}
           {showQR && qrUrl && (
-            <Card className="mt-4">
-              <CardHeader>
-                <CardTitle>QR Code</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <img src={qrUrl} alt="QR Code" className="w-64 h-64 border border-zinc-200 rounded-lg" />
-                  </div>
-                  <div className="ml-8">
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-                      Scan this QR code to share this CV. You can save it and print it on your CV or cover letter.
-                    </p>
-                    <Button onClick={handleDownloadQR} variant="outline" className="gap-2">
-                      <Download className="w-4 h-4" />
-                      Download QR Code
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="mt-4 border-t-2 border-black pt-4 flex flex-col sm:flex-row gap-6 items-start">
+              <img src={qrUrl} alt="QR Code" className="w-48 h-48 border-2 border-black" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-black/70 mb-3">
+                  Scan to share this CV. Print it on your CV or cover letter.
+                </p>
+                <Button onClick={handleDownloadQR} variant="outline" className="gap-2">
+                  <Download className="w-4 h-4" />
+                  Download QR
+                </Button>
+              </div>
+            </div>
           )}
         </div>
 
-        {/* CV Preview */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0">
-            <CardTitle>Preview</CardTitle>
-            <div className="flex items-center gap-2">
-              <label htmlFor="template-select" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Template:
-              </label>
-              <select
-                id="template-select"
-                value={selectedTemplate}
-                onChange={(e) => setSelectedTemplate(e.target.value as TemplateType)}
-                className="px-3 py-1.5 text-sm rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="modern">Modern</option>
-                <option value="azurill">Azurill</option>
-                <option value="academic">Academic (LaTeX)</option>
-              </select>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 shadow-sm overflow-auto max-h-[900px] p-8">
-              {selectedTemplate === 'azurill' ? (
-                <AzurillTemplate content={cvData.content} />
-              ) : selectedTemplate === 'academic' ? (
-                <AcademicTemplate content={cvData.content} />
-              ) : (
-                <ModernTemplate content={cvData.content} />
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Template selector */}
+        <div className="mb-4 flex items-center gap-3 border-2 border-black bg-white px-4 py-2">
+          <span className="text-xs font-black uppercase tracking-widest">Template:</span>
+          <select
+            value={selectedTemplate}
+            onChange={(e) => setSelectedTemplate(e.target.value as TemplateType)}
+            className="text-xs font-black uppercase tracking-widest border-2 border-black bg-white text-black px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#FF3000]"
+          >
+            <option value="modern">Modern</option>
+            <option value="azurill">Azurill</option>
+            <option value="academic">Academic (LaTeX)</option>
+          </select>
+        </div>
 
-        {/* Footer with Share Info */}
-        <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-2">Share this CV</h3>
-          <p className="text-sm text-blue-800 dark:text-blue-300 mb-4">
-            Share the link or QR code below to let others view your CV:
-          </p>
-          <div className="bg-white dark:bg-zinc-800 p-3 rounded border border-blue-200 dark:border-zinc-700 font-mono text-xs break-all text-zinc-600 dark:text-zinc-400">
-            {window.location.href}
+        {/* CV Preview — A4 natural size */}
+        <div className="border-4 border-black bg-white overflow-x-auto">
+          <div className="min-w-[794px] p-0">
+            {selectedTemplate === 'azurill' ? (
+              <AzurillTemplate content={cvData.content} />
+            ) : selectedTemplate === 'academic' ? (
+              <AcademicTemplate content={cvData.content} />
+            ) : (
+              <ModernTemplate content={cvData.content} />
+            )}
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-6 border-2 border-black bg-[#F2F2F2] p-4">
+          <p className="text-[10px] font-black uppercase tracking-widest">Share link</p>
+          <p className="mt-1 font-mono text-xs break-all text-black/70">{typeof window !== 'undefined' ? window.location.href : ''}</p>
         </div>
       </div>
       </div>
