@@ -428,7 +428,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
+    <div suppressHydrationWarning className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10">
         {/* Mobile Header */}

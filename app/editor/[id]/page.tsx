@@ -683,7 +683,7 @@ export default function EditorPage() {
 
       // Add missing skills
       for (const skill of optimizationResult.missing_skills) {
-        const clean = skill.trim();
+        const clean = (typeof skill === 'string' ? skill : (skill as { name?: string })?.name ?? '').trim();
         if (!clean) continue;
         const alreadyExists = updatedContent.skills.some(
           (s) => s.name.toLowerCase() === clean.toLowerCase()
@@ -1176,7 +1176,7 @@ export default function EditorPage() {
                     {optimizationResult.top_keywords.map((kw) => {
                       const inCV =
                         optimizationResult.matching_skills.some(
-                          (s) => s.toLowerCase() === kw.toLowerCase()
+                          (s) => (typeof s === 'string' ? s : (s as { name?: string })?.name ?? '').toLowerCase() === kw.toLowerCase()
                         ) ||
                         (content?.summary || '').toLowerCase().includes(kw.toLowerCase()) ||
                         (content?.experience || []).some((e) =>
@@ -1204,14 +1204,17 @@ export default function EditorPage() {
                 <div className="space-y-2">
                   <p className="text-[10px] font-black uppercase tracking-widest">Missing Skills</p>
                   <div className="flex flex-wrap gap-2">
-                    {optimizationResult.missing_skills.map((skill) => (
-                      <span
-                        key={skill}
-                        className="border-2 border-[#FF3000] text-[#FF3000] text-xs font-black uppercase tracking-widest px-2 py-0.5"
-                      >
-                        {skill}
-                      </span>
-                    ))}
+                    {optimizationResult.missing_skills.map((skill, idx) => {
+                      const skillStr = typeof skill === 'string' ? skill : (skill as { name?: string })?.name ?? '';
+                      return (
+                        <span
+                          key={`${skillStr}-${idx}`}
+                          className="border-2 border-[#FF3000] text-[#FF3000] text-xs font-black uppercase tracking-widest px-2 py-0.5"
+                        >
+                          {skillStr}
+                        </span>
+                      );
+                    })}
                   </div>
                   <p className="text-[10px] font-bold text-black/50 uppercase tracking-widest">
                     These will be added to your Skills section when you apply changes.
