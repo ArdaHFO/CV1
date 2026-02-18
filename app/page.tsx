@@ -444,15 +444,15 @@ export default function Home() {
               ].map((item) => (
                 <div
                   key={item.title}
-                  className="border-4 border-black bg-white p-6 transition-all hover:bg-[#FF3000] hover:text-white"
+                  className="group border-4 border-black bg-white p-6 transition-all hover:bg-[#FF3000] hover:text-white"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2]">
-                    <item.icon className="h-6 w-6" />
+                  <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2] group-hover:bg-white group-hover:border-white">
+                    <item.icon className="h-6 w-6 text-black group-hover:text-[#FF3000]" />
                   </div>
                   <h3 className="mt-5 text-lg font-black uppercase tracking-widest">
                     {item.title}
                   </h3>
-                  <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70">
+                  <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70 group-hover:text-white/80">
                     {item.text}
                   </p>
                 </div>
