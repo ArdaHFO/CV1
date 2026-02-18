@@ -24,7 +24,7 @@ export default function JobsPage() {
   const [datePosted, setDatePosted] = useState('all');
   const [resultLimit, setResultLimit] = useState('25');
   const [remoteOnly, setRemoteOnly] = useState(false);
-  const [platform, setPlatform] = useState<'linkedin' | 'workday'>('linkedin');
+  const [platform, setPlatform] = useState<'linkedin' | 'workday' | 'careerone'>('linkedin');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -312,10 +312,21 @@ export default function JobsPage() {
                   <Briefcase className="h-4 w-4" />
                   <span className="text-[10px] font-black uppercase tracking-widest">Workday</span>
                 </button>
+                <div className="w-[2px] bg-black" />
+                <button
+                  type="button"
+                  onClick={() => setPlatform('careerone')}
+                  className={`flex items-center gap-2 px-3 py-1.5 transition-colors ${
+                    platform === 'careerone' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                  }`}
+                >
+                  <Search className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">CareerOne</span>
+                </button>
               </div>
               <div className="px-3 py-1.5 border-2 border-black bg-white">
                 <span className="text-[10px] font-black uppercase tracking-widest">
-                  {platform === 'linkedin' ? 'Powered by LinkedIn' : 'Powered by Workday'}
+                  {platform === 'linkedin' ? 'Powered by LinkedIn' : platform === 'workday' ? 'Powered by Workday' : 'Powered by CareerOne'}
                 </span>
               </div>
             </div>

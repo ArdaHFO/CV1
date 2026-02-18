@@ -6,6 +6,8 @@ const APIFY_API_TOKEN = process.env.APIFY_API_TOKEN;
 const APIFY_ACTOR_ID = 'curious_coder~linkedin-jobs-scraper';
 const WORKDAY_APIFY_TOKEN = process.env.APIFY_WORKDAY_TOKEN;
 const WORKDAY_ACTOR_ID = 'jobo.world~workday-jobs-search';
+const CAREERONE_APIFY_TOKEN = process.env.APIFY_CAREERONE_TOKEN;
+const CAREERONE_ACTOR_ID = 'websift~careerone-job-scraper';
 
 // Function to call Apify LinkedIn Jobs Scraper
 async function searchLinkedInJobs(
@@ -318,6 +320,129 @@ async function searchLinkedInJobs(
   }
 }
 
+// Function to call Apify CareerOne Job Scraper (run-sync then fetch dataset)
+async function searchCareerOneJobs(
+  keywords: string,
+  location: string,
+  limit: number | null
+): Promise<Job[]> {
+  if (!CAREERONE_APIFY_TOKEN) {
+    console.warn('APIFY_CAREERONE_TOKEN not configured, skipping CareerOne search');
+    return [];
+  }
+  try {
+    const maxItems = limit ?? 25;
+
+    const body: Record<string, unknown> = {
+      keyword: keywords || 'developer',
+      ...(location ? { location } : {}),
+      maxItems,
+    };
+
+    console.log('Calling CareerOne Apify actor (run-sync):', body);
+
+    // run-sync blocks until the actor finishes and returns the run object
+    const runResponse = await fetch(
+      `https://api.apify.com/v2/acts/${CAREERONE_ACTOR_ID}/run-sync?token=${CAREERONE_APIFY_TOKEN}&timeout=120`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(130_000),
+      }
+    );
+
+    if (!runResponse.ok) {
+      const err = await runResponse.text();
+      console.error('CareerOne Apify run-sync error:', runResponse.statusText, err);
+      return [];
+    }
+
+    const runData = await runResponse.json();
+    const datasetId = runData?.data?.defaultDatasetId;
+
+    if (!datasetId) {
+      console.error('CareerOne: no defaultDatasetId in run response');
+      return [];
+    }
+
+    // Fetch dataset items
+    const itemsResponse = await fetch(
+      `https://api.apify.com/v2/datasets/${datasetId}/items?token=${CAREERONE_APIFY_TOKEN}${limit !== null ? `&limit=${limit}` : ''}`,
+    );
+
+    if (!itemsResponse.ok) {
+      console.error('CareerOne dataset fetch error:', itemsResponse.statusText);
+      return [];
+    }
+
+    const items: any[] = await itemsResponse.json();
+    console.log(`CareerOne actor returned ${items.length} items`);
+    if (items.length > 0) console.log('Sample CareerOne item fields:', Object.keys(items[0]));
+
+    const validTypes = ['full-time', 'part-time', 'contract', 'internship'] as const;
+    type EmpType = typeof validTypes[number];
+
+    const jobs: Job[] = items.map((item: any, index: number) => {
+      const jobId = item.id || item.jobId || `careerone-${Date.now()}-${index}`;
+      const title = item.title || item.jobTitle || item.position || 'No Title';
+      const company = item.company || item.companyName || item.advertiser || item.employer || 'Unknown Company';
+      const loc = item.location || item.locationName || item.suburb || item.city || 'Location not specified';
+
+      const rawDesc = item.description || item.jobDescription || item.summary || item.teaser || '';
+      const description = typeof rawDesc === 'string'
+        ? rawDesc.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'No description available'
+        : 'No description available';
+
+      const url = item.url || item.jobUrl || item.applyUrl || item.link || '#';
+      const salary = item.salary || item.salaryRange || item.wage || 'Not specified';
+
+      const skills: string[] = [];
+      if (Array.isArray(item.skills)) skills.push(...item.skills);
+      if (item.classification) skills.push(item.classification);
+      if (item.subClassification) skills.push(item.subClassification);
+      if (item.workType) skills.push(item.workType);
+
+      const requirements: string[] = [];
+      const descLower = description.toLowerCase();
+      if (descLower.includes('bachelor') || descLower.includes('degree')) {
+        requirements.push("Bachelor's degree or equivalent experience");
+      }
+      const expMatch = description.match(/(\d+)\+?\s*years?\s*(?:of\s*)?experience/i);
+      if (expMatch) requirements.push(`${expMatch[1]}+ years of experience`);
+
+      let rawType = (item.workType || item.employmentType || item.jobType || '').toLowerCase().replace(/[_\s]/g, '-');
+      if (rawType.includes('full')) rawType = 'full-time';
+      else if (rawType.includes('part')) rawType = 'part-time';
+      else if (rawType.includes('contract') || rawType.includes('casual')) rawType = 'contract';
+      else if (rawType.includes('intern')) rawType = 'internship';
+      const employmentType: EmpType = (validTypes.includes(rawType as EmpType) ? rawType : 'full-time') as EmpType;
+
+      const postedDate = item.listingDate || item.postedDate || item.datePosted || item.publishedAt || new Date().toISOString().split('T')[0];
+
+      return {
+        id: String(jobId),
+        title,
+        company,
+        location: typeof loc === 'string' ? loc : JSON.stringify(loc),
+        description,
+        requirements,
+        skills: [...new Set(skills)].filter(Boolean),
+        salary_range: salary,
+        employment_type: employmentType,
+        posted_date: postedDate,
+        apply_url: url,
+        source: 'careerone',
+      } satisfies Job;
+    });
+
+    return jobs;
+  } catch (error) {
+    console.error('Error calling CareerOne Apify actor:', error);
+    return [];
+  }
+}
+
 // Function to call Apify Workday Jobs Search (synchronous run)
 async function searchWorkdayJobs(
   keywords: string,
@@ -623,11 +748,15 @@ export async function GET(request: NextRequest) {
     const limit = limitParam === 'all'
       ? null
       : Math.min(Math.max(parseInt(limitParam, 10) || 25, 1), 50);
-    const source = searchParams.get('source') || 'linkedin'; // 'linkedin' | 'workday'
+    const source = searchParams.get('source') || 'linkedin'; // 'linkedin' | 'workday' | 'careerone'
 
     let jobs: Job[] = [];
 
-    if (source === 'workday') {
+    if (source === 'careerone') {
+      console.log('Fetching jobs from CareerOne via Apify...');
+      jobs = await searchCareerOneJobs(keywords, location, limit);
+      console.log(`CareerOne actor returned ${jobs.length} jobs`);
+    } else if (source === 'workday') {
       // Workday via Apify synchronous actor
       console.log('Fetching jobs from Workday via Apify...');
       jobs = await searchWorkdayJobs(keywords, location, limit);
