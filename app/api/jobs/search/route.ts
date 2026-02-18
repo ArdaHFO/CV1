@@ -377,7 +377,12 @@ async function searchCareerOneJobs(
 
     if (!runResponse.ok) {
       const err = await runResponse.text();
-      console.error('CareerOne Apify error:', runResponse.status, runResponse.statusText, err);
+      const isLocationError = err.includes('IndexError') || err.includes('list index out of range') || err.includes('get_best_fit_location');
+      if (isLocationError) {
+        console.error('CareerOne: location not found in AU/NZ database. Try an Australian city (Sydney, Melbourne, Brisbane, Perth, Adelaide).');
+      } else {
+        console.error('CareerOne Apify error:', runResponse.status, runResponse.statusText, err);
+      }
       return [];
     }
 
@@ -777,7 +782,8 @@ export async function GET(request: NextRequest) {
     }
 
     // If Apify returned no results or is not configured, use mock data
-    if (jobs.length === 0) {
+    // NOTE: Do NOT fall back to mock for careerone/workday — those are real searches
+    if (jobs.length === 0 && source !== 'careerone' && source !== 'workday') {
       console.log('Using mock data as fallback');
       let filteredJobs = mockJobs;
 

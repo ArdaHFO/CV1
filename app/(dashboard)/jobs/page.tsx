@@ -641,9 +641,20 @@ export default function JobsPage() {
           <div className="border-4 border-black bg-white py-16 text-center">
             <Briefcase className="w-12 h-12 mx-auto mb-4 text-black/30" />
             <h3 className="text-base font-black uppercase tracking-widest mb-2">No jobs found</h3>
-            <p className="text-xs font-bold uppercase tracking-widest text-black/60">
-              Try adjusting your search criteria or keywords
-            </p>
+            {platform === 'careerone' ? (
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#FF3000]">
+                  CareerOne only covers Australia &amp; New Zealand
+                </p>
+                <p className="text-xs font-bold uppercase tracking-widest text-black/60">
+                  Try: Sydney · Melbourne · Brisbane · Perth · Adelaide
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs font-bold uppercase tracking-widest text-black/60">
+                Try adjusting your search criteria or keywords
+              </p>
+            )}
           </div>
         )}
 
