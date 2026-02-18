@@ -226,7 +226,7 @@ export interface Job {
   employment_type: 'full-time' | 'part-time' | 'contract' | 'internship';
   posted_date: string;
   apply_url?: string;
-  source: 'linkedin' | 'indeed' | 'mock';
+  source: 'linkedin' | 'indeed' | 'mock' | 'workday';
 }
 
 export interface JobSearchParams {

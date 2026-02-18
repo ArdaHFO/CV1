@@ -24,6 +24,7 @@ export default function JobsPage() {
   const [datePosted, setDatePosted] = useState('all');
   const [resultLimit, setResultLimit] = useState('25');
   const [remoteOnly, setRemoteOnly] = useState(false);
+  const [platform, setPlatform] = useState<'linkedin' | 'workday'>('linkedin');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -162,7 +163,7 @@ export default function JobsPage() {
 
     try {
       // Check cache first (5 minutes validity)
-      const cacheKey = `job-search-${keywords}-${location}-${employmentType}-${experienceLevel}-${datePosted}-${effectiveLimit}-${remoteOnly}`;
+      const cacheKey = `job-search-${platform}-${keywords}-${location}-${employmentType}-${experienceLevel}-${datePosted}-${effectiveLimit}-${remoteOnly}`;
       const cached = localStorage.getItem(cacheKey);
       const cacheTime = localStorage.getItem(`${cacheKey}-time`);
       
@@ -185,6 +186,7 @@ export default function JobsPage() {
       const params = new URLSearchParams({
         keywords,
         limit: effectiveLimit,
+        source: platform,
         ...(location && { location }),
         ...(employmentType !== 'all' && { employment_type: employmentType }),
         ...(experienceLevel !== 'all' && { experience_level: experienceLevel }),
@@ -287,15 +289,34 @@ export default function JobsPage() {
               <h1 className="text-3xl font-black uppercase tracking-widest">
                 Job Search
               </h1>
-              <div className="flex items-center gap-2 px-3 py-1.5 border-2 border-black bg-white">
-                <Image
-                  src="/linkedin.png"
-                  alt="LinkedIn logo"
-                  width={20}
-                  height={20}
-                  className="h-5 w-5"
-                />
-                <span className="text-[10px] font-black uppercase tracking-widest">Powered by LinkedIn</span>
+              {/* Platform toggle */}
+              <div className="flex border-2 border-black overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setPlatform('linkedin')}
+                  className={`flex items-center gap-2 px-3 py-1.5 transition-colors ${
+                    platform === 'linkedin' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                  }`}
+                >
+                  <Image src="/linkedin.png" alt="LinkedIn" width={16} height={16} className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">LinkedIn</span>
+                </button>
+                <div className="w-[2px] bg-black" />
+                <button
+                  type="button"
+                  onClick={() => setPlatform('workday')}
+                  className={`flex items-center gap-2 px-3 py-1.5 transition-colors ${
+                    platform === 'workday' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                  }`}
+                >
+                  <Briefcase className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Workday</span>
+                </button>
+              </div>
+              <div className="px-3 py-1.5 border-2 border-black bg-white">
+                <span className="text-[10px] font-black uppercase tracking-widest">
+                  {platform === 'linkedin' ? 'Powered by LinkedIn' : 'Powered by Workday'}
+                </span>
               </div>
             </div>
             <p className="text-xs font-bold uppercase tracking-widest text-black/60">

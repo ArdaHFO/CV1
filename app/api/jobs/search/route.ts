@@ -4,6 +4,8 @@ import type { Job, JobSearchParams } from '@/types';
 // Apify API configuration
 const APIFY_API_TOKEN = process.env.APIFY_API_TOKEN;
 const APIFY_ACTOR_ID = 'curious_coder~linkedin-jobs-scraper';
+const WORKDAY_APIFY_TOKEN = process.env.APIFY_WORKDAY_TOKEN;
+const WORKDAY_ACTOR_ID = 'jobo.world~workday-jobs-search';
 
 // Function to call Apify LinkedIn Jobs Scraper
 async function searchLinkedInJobs(
@@ -316,6 +318,117 @@ async function searchLinkedInJobs(
   }
 }
 
+// Function to call Apify Workday Jobs Search (synchronous run)
+async function searchWorkdayJobs(
+  keywords: string,
+  location: string,
+  limit: number | null
+): Promise<Job[]> {
+  if (!WORKDAY_APIFY_TOKEN) {
+    console.warn('APIFY_WORKDAY_TOKEN not configured, skipping Workday search');
+    return [];
+  }
+  try {
+    const maxItems = limit ?? 25;
+
+    const body: Record<string, unknown> = {
+      position: keywords || 'developer',
+      ...(location ? { location } : {}),
+      maxItems,
+    };
+
+    console.log('Calling Workday Apify actor (sync):', body);
+
+    const response = await fetch(
+      `https://api.apify.com/v2/acts/${WORKDAY_ACTOR_ID}/run-sync-get-dataset-items?token=${WORKDAY_APIFY_TOKEN}&timeout=120`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        // 2 minute timeout for sync run
+        signal: AbortSignal.timeout(130_000),
+      }
+    );
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error('Workday Apify error:', response.statusText, err);
+      return [];
+    }
+
+    const raw = await response.json();
+
+    // run-sync-get-dataset-items returns an array directly
+    const items: any[] = Array.isArray(raw) ? raw : (raw?.items ?? raw?.data ?? []);
+
+    console.log(`Workday actor returned ${items.length} items`);
+    if (items.length > 0) {
+      console.log('Sample Workday item fields:', Object.keys(items[0]));
+    }
+
+    const jobs: Job[] = items.map((item: any, index: number) => {
+      const jobId = item.id || item.jobId || item.requisitionId || `workday-${Date.now()}-${index}`;
+      const title = item.title || item.jobTitle || item.positionTitle || 'No Title';
+      const company = item.company || item.companyName || item.organization || item.employer || 'Unknown Company';
+      const loc = item.location || item.locationName || item.jobLocation || item.primaryLocation || 'Location not specified';
+
+      const rawDesc = item.description || item.jobDescription || item.summary || '';
+      const description = typeof rawDesc === 'string'
+        ? rawDesc.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'No description available'
+        : 'No description available';
+
+      const url = item.url || item.applyUrl || item.externalJobUrl || item.jobUrl || item.link || '#';
+
+      const salary = item.salaryRange || item.compensation || item.salary || 'Not specified';
+
+      const skills: string[] = [];
+      if (Array.isArray(item.skills)) skills.push(...item.skills);
+      if (item.jobCategory) skills.push(item.jobCategory);
+      if (item.department) skills.push(item.department);
+
+      const requirements: string[] = [];
+      if (item.experienceLevel || item.seniorityLevel) requirements.push(item.experienceLevel || item.seniorityLevel);
+      const descLower = description.toLowerCase();
+      if (descLower.includes('bachelor') || descLower.includes('degree')) {
+        requirements.push("Bachelor's degree or equivalent experience");
+      }
+      const expMatch = description.match(/(\d+)\+?\s*years?\s*(?:of\s*)?experience/i);
+      if (expMatch) requirements.push(`${expMatch[1]}+ years of experience`);
+
+      const validTypes = ['full-time', 'part-time', 'contract', 'internship'] as const;
+      type EmpType = typeof validTypes[number];
+      let employmentType: EmpType = 'full-time';
+      if (item.employmentType || item.jobType || item.timeType) {
+        const raw = (item.employmentType || item.jobType || item.timeType)
+          .toLowerCase().replace(/[_\s]/g, '-');
+        employmentType = (validTypes.includes(raw as EmpType) ? raw : 'full-time') as EmpType;
+      }
+
+      const postedDate = item.postedDate || item.datePosted || item.startDate || new Date().toISOString().split('T')[0];
+
+      return {
+        id: String(jobId),
+        title,
+        company,
+        location: typeof loc === 'string' ? loc : JSON.stringify(loc),
+        description,
+        requirements,
+        skills: [...new Set(skills)].filter(Boolean),
+        salary_range: salary,
+        employment_type: employmentType,
+        posted_date: postedDate,
+        apply_url: url,
+        source: 'workday',
+      } satisfies Job;
+    });
+
+    return jobs;
+  } catch (error) {
+    console.error('Error calling Workday Apify actor:', error);
+    return [];
+  }
+}
+
 // Mock job data - fallback when Apify is not configured or fails
 const mockJobs: Job[] = [
   {
@@ -510,11 +623,17 @@ export async function GET(request: NextRequest) {
     const limit = limitParam === 'all'
       ? null
       : Math.min(Math.max(parseInt(limitParam, 10) || 25, 1), 50);
+    const source = searchParams.get('source') || 'linkedin'; // 'linkedin' | 'workday'
 
     let jobs: Job[] = [];
 
-    // Try to fetch from Apify LinkedIn Jobs Scraper first
-    if (APIFY_API_TOKEN) {
+    if (source === 'workday') {
+      // Workday via Apify synchronous actor
+      console.log('Fetching jobs from Workday via Apify...');
+      jobs = await searchWorkdayJobs(keywords, location, limit);
+      console.log(`Workday actor returned ${jobs.length} jobs`);
+    } else if (APIFY_API_TOKEN) {
+      // LinkedIn via Apify
       console.log('Fetching jobs from LinkedIn via Apify...');
       console.log('Search params:', { keywords, location, employmentType, experienceLevel, datePosted, remoteOnly, limit: limit ?? 'all' });
       jobs = await searchLinkedInJobs(keywords, location, employmentType, experienceLevel, datePosted, remoteOnly, limit);
