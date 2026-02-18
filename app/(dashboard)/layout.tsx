@@ -625,7 +625,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           setSelectedPlanId(plan.id);
                         }}
                         className={`group relative border-2 border-black p-2 text-left transition-colors ${
-                          isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                          isSelected ? 'bg-black text-white' : 'bg-white text-black hover:bg-black hover:text-white'
                         }`}
                       >
                         {/* Name row with inline badge */}
