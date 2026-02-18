@@ -181,7 +181,8 @@ export default function JobsPage() {
           const cachedData = JSON.parse(cached);
           if (Array.isArray(cachedData) && cachedData.length > 0) {
             console.log('✅ Using cached results (age:', Math.round(age / 1000), 'seconds) - API call saved!');
-            setJobs(applySelectedLimit(cachedData, effectiveLimit));
+            const normalizedCached = cachedData.map(normalizeJob);
+            setJobs(applySelectedLimit(normalizedCached, effectiveLimit));
             setLoading(false);
             return;
           }
@@ -235,10 +236,11 @@ export default function JobsPage() {
 
         setRemainingSearches(consumePayload.status?.remaining.jobSearches ?? 0);
 
-        const limitedJobs = applySelectedLimit(data.jobs || [], effectiveLimit);
+        const rawJobs: Job[] = (data.jobs || []).map(normalizeJob);
+        const limitedJobs = applySelectedLimit(rawJobs, effectiveLimit);
         setJobs(limitedJobs);
         refreshStatuses(limitedJobs);
-        console.log('Jobs state updated with', data.jobs.length, 'jobs');
+        console.log('Jobs state updated with', rawJobs.length, 'jobs');
         // Save to cache
         localStorage.setItem(cacheKey, JSON.stringify(limitedJobs));
         localStorage.setItem(`${cacheKey}-time`, Date.now().toString());

@@ -256,9 +256,23 @@ export default function EditorPage() {
 
       localStorage.removeItem('pendingOptimization');
 
+      // Normalize skills arrays in case they contain old-format objects
+      const normalizeOptResult = (r: CVOptimizationResult): CVOptimizationResult => ({
+        ...r,
+        missing_skills: (r.missing_skills || []).map((s) =>
+          typeof s === 'string' ? s : (s as { name?: string })?.name ?? ''
+        ).filter(Boolean),
+        matching_skills: (r.matching_skills || []).map((s) =>
+          typeof s === 'string' ? s : (s as { name?: string })?.name ?? ''
+        ).filter(Boolean),
+        top_keywords: (r.top_keywords || []).map((s) =>
+          typeof s === 'string' ? s : (s as { name?: string })?.name ?? String(s)
+        ).filter(Boolean),
+      });
+
       // Set up fake job for history saving
       setSelectedOptimizeJob({ id: 'jobs-page', title: jobTitle, company: jobCompany } as Job);
-      setOptimizationResult(optimization);
+      setOptimizationResult(normalizeOptResult(optimization));
       setSelectedSuggestionIndexes(selectedIndexes);
 
       // Start step-by-step review
@@ -1196,24 +1210,25 @@ export default function EditorPage() {
                   <p className="text-[10px] font-black uppercase tracking-widest">Critical Keywords</p>
                   <div className="flex flex-wrap gap-2">
                     {optimizationResult.top_keywords.map((kw) => {
+                      const kwStr = typeof kw === 'string' ? kw : (kw as { name?: string })?.name ?? '';
                       const inCV =
                         optimizationResult.matching_skills.some(
-                          (s) => (typeof s === 'string' ? s : (s as { name?: string })?.name ?? '').toLowerCase() === kw.toLowerCase()
+                          (s) => (typeof s === 'string' ? s : (s as { name?: string })?.name ?? '').toLowerCase() === kwStr.toLowerCase()
                         ) ||
-                        (content?.summary || '').toLowerCase().includes(kw.toLowerCase()) ||
+                        (content?.summary || '').toLowerCase().includes(kwStr.toLowerCase()) ||
                         (content?.experience || []).some((e) =>
-                          e.description?.toLowerCase().includes(kw.toLowerCase())
+                          e.description?.toLowerCase().includes(kwStr.toLowerCase())
                         );
                       return (
                         <span
-                          key={kw}
+                          key={kwStr}
                           className={`text-xs font-black uppercase tracking-widest px-2 py-0.5 border-2 ${
                             inCV
                               ? 'border-black bg-black text-white'
                               : 'border-[#FF3000] text-[#FF3000]'
                           }`}
                         >
-                          {inCV ? '✓ ' : '✗ '}{kw}
+                          {inCV ? '✓ ' : '✗ '}{kwStr}
                         </span>
                       );
                     })}

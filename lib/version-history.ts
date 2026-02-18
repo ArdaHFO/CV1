@@ -189,16 +189,25 @@ export function diffVersions(
     }
   }
 
-  // Skills
-  const oldSkillSet = new Set((oldContent.skills ?? []).map((s) => s.name.toLowerCase()));
-  const newSkillSet = new Set((newContent.skills ?? []).map((s) => s.name.toLowerCase()));
+  // Skills — guard against malformed entries where name may be an object or undefined
+  const toSkillName = (s: { name: string } | unknown): string => {
+    if (!s || typeof s !== 'object') return String(s ?? '');
+    const obj = s as Record<string, unknown>;
+    if (typeof obj.name === 'string') return obj.name;
+    if (obj.name && typeof obj.name === 'object') return String((obj.name as Record<string, unknown>).name ?? '');
+    return '';
+  };
+  const oldSkillSet = new Set((oldContent.skills ?? []).map((s) => toSkillName(s).toLowerCase()));
+  const newSkillSet = new Set((newContent.skills ?? []).map((s) => toSkillName(s).toLowerCase()));
 
   const addedSkills = (newContent.skills ?? [])
-    .filter((s) => !oldSkillSet.has(s.name.toLowerCase()))
-    .map((s) => s.name);
+    .filter((s) => !oldSkillSet.has(toSkillName(s).toLowerCase()))
+    .map((s) => toSkillName(s))
+    .filter(Boolean);
   const removedSkills = (oldContent.skills ?? [])
-    .filter((s) => !newSkillSet.has(s.name.toLowerCase()))
-    .map((s) => s.name);
+    .filter((s) => !newSkillSet.has(toSkillName(s).toLowerCase()))
+    .map((s) => toSkillName(s))
+    .filter(Boolean);
 
   if (addedSkills.length > 0 || removedSkills.length > 0) {
     diffs.push({
