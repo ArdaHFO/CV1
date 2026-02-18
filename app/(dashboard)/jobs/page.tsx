@@ -345,9 +345,9 @@ export default function JobsPage() {
                   <Image
                     src="/workday-hcm.png"
                     alt="Workday"
-                    width={16}
-                    height={16}
-                    className={`h-4 w-auto ${platform === 'workday' ? 'brightness-0 invert' : ''}`}
+                    width={423}
+                    height={200}
+                    className={`h-4 w-auto [image-rendering:crisp-edges] ${platform === 'workday' ? 'brightness-0 invert' : ''}`}
                   />
                   <span className="text-[10px] font-black uppercase tracking-widest">Workday</span>
                 </button>
@@ -362,9 +362,9 @@ export default function JobsPage() {
                   <Image
                     src="/careerone.png"
                     alt="CareerOne"
-                    width={16}
-                    height={16}
-                    className={`h-4 w-auto ${platform === 'careerone' ? 'brightness-0 invert' : ''}`}
+                    width={247}
+                    height={53}
+                    className={`h-4 w-auto [image-rendering:crisp-edges] ${platform === 'careerone' ? 'brightness-0 invert' : ''}`}
                   />
                   <span className="text-[10px] font-black uppercase tracking-widest">CareerOne</span>
                 </button>
