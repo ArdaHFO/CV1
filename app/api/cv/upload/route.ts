@@ -3,9 +3,13 @@ import { getServerUserId } from '@/lib/auth/server-user';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabase/client';
 import type { ResumeContent } from '@/types';
+
+export const runtime = 'nodejs';
+
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require('pdf-parse') as (buffer: Buffer) => Promise<{ text: string }>;
-import mammoth from 'mammoth';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mammoth = require('mammoth') as { extractRawText: (opts: { buffer: Buffer }) => Promise<{ value: string }> };
 
 // Helper function to create empty resume template
 function createEmptyResumeContent(fileName: string): ResumeContent {
