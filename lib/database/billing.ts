@@ -132,7 +132,7 @@ async function getSubscription(userId: string): Promise<SubscriptionRow | null> 
 }
 
 function getJobSearchQuota(planTier: PlanTier): number {
-  return planTier === 'pro' ? 10 : 1;
+  return planTier === 'pro' ? 999999 : 1;
 }
 
 export async function getBillingStatus(userId: string): Promise<BillingStatus> {
@@ -321,7 +321,7 @@ export async function consumeUsage(
         allowed: false,
         message:
           status.planTier === 'pro'
-            ? 'You reached your Pro quota (10 searches). Buy token packs to continue.'
+            ? 'You reached your Pro job search limit. Buy token packs to continue.'
             : 'Freemium allows only 1 job search. Upgrade or buy token packs to continue.',
         status,
       };
