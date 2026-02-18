@@ -356,7 +356,8 @@ async function searchCareerOneJobs(
       maxResults,
       sortBy: 'Date Posted',
       allowSurrounding: true,
-      ...(location ? { location } : {}),
+      // NOTE: Do NOT send location — the actor's geocoding service returns 403.
+      // CareerOne is AU/NZ only; keyword search returns relevant results without location.
       ...(dayRange !== undefined ? { dayRange } : {}),
       ...(jobTypes ? { jobTypes } : {}),
       ...(contractTypes ? { contractTypes } : {}),

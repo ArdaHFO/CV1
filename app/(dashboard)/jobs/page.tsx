@@ -389,11 +389,12 @@ export default function JobsPage() {
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40 w-4 h-4" />
                   <Input
-                    placeholder={platform === 'careerone' ? 'e.g. Sydney, Melbourne, Brisbane' : 'Location (optional)'}
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder={platform === 'careerone' ? 'Location not supported for CareerOne' : 'Location (optional)'}
+                    value={platform === 'careerone' ? '' : location}
+                    onChange={(e) => { if (platform !== 'careerone') setLocation(e.target.value); }}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="pl-9 border-2 border-black focus:ring-2 focus:ring-[#FF3000] focus:border-[#FF3000]"
+                    disabled={platform === 'careerone'}
+                    className={`pl-9 border-2 border-black focus:ring-2 focus:ring-[#FF3000] focus:border-[#FF3000] ${platform === 'careerone' ? 'opacity-40 cursor-not-allowed' : ''}`}
                   />
                 </div>
               </div>
@@ -647,7 +648,7 @@ export default function JobsPage() {
                   CareerOne only covers Australia &amp; New Zealand
                 </p>
                 <p className="text-xs font-bold uppercase tracking-widest text-black/60">
-                  Try: Sydney · Melbourne · Brisbane · Perth · Adelaide
+                  Try different keywords — location filter is not supported
                 </p>
               </div>
             ) : (
