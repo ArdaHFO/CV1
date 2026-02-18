@@ -16,9 +16,7 @@ import {
   Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   APP_SETTINGS_STORAGE_KEY,
@@ -184,20 +182,24 @@ export default function SettingsPage() {
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8 animate-in fade-in slide-in-from-top-3 duration-700">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent mb-2">Settings</h1>
-          <p className="text-zinc-600 dark:text-zinc-400">
-            Customize your CSpark experience with comprehensive settings and preferences
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Tab Navigation */}
-          <div className="lg:col-span-1">
-            <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl">
-              <CardContent className="p-4">
-                <nav className="space-y-2">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-black uppercase tracking-widest">Settings</h1>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
+              Customize your CSpark experience
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            {/* Sidebar nav */}
+            <div className="lg:col-span-1">
+              <div className="border-4 border-black bg-white">
+                <div className="p-4 border-b-2 border-black">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-black/60">Navigation</p>
+                </div>
+                <nav className="p-2">
                   {[
                     { id: 'profile', label: 'Profile', icon: User },
                     { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -209,478 +211,319 @@ export default function SettingsPage() {
                     <button
                       key={id}
                       onClick={() => setActiveTab(id as keyof Settings)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${
                         activeTab === id
-                          ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
-                          : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/80 dark:hover:bg-zinc-800/80 hover:translate-x-1'
+                          ? 'bg-black text-white'
+                          : 'hover:bg-[#F2F2F2] text-black'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      {label}
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="text-xs font-black uppercase tracking-widest">{label}</span>
                     </button>
                   ))}
                 </nav>
 
-                <div className="mt-6 pt-4 border-t border-zinc-200 dark:border-zinc-700 space-y-2">
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 text-xs" onClick={exportSettings}>
+                <div className="p-3 border-t-2 border-black space-y-2">
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-2 border-black text-[10px] font-black uppercase tracking-widest" onClick={exportSettings}>
                     <Download className="w-4 h-4" />
-                    Export Settings
+                    Export
                   </Button>
                   <label className="block">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full justify-start gap-2 text-xs"
-                      asChild
-                    >
+                    <Button variant="outline" size="sm" className="w-full justify-start gap-2 border-2 border-black text-[10px] font-black uppercase tracking-widest" asChild>
                       <span>
                         <Upload className="w-4 h-4" />
-                        Import Settings
+                        Import
                       </span>
                     </Button>
-                    <input
-                      type="file"
-                      accept=".json"
-                      onChange={importSettings}
-                      className="hidden"
-                    />
+                    <input type="file" accept=".json" onChange={importSettings} className="hidden" />
                   </label>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start gap-2 text-xs text-red-600 dark:text-red-400"
+                    className="w-full justify-start gap-2 border-2 border-[#FF3000] text-[#FF3000] hover:bg-[#FF3000] hover:text-white text-[10px] font-black uppercase tracking-widest"
                     onClick={resetSettings}
                   >
                     <Trash2 className="w-4 h-4" />
-                    Reset to Defaults
+                    Reset
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
 
-          {/* Settings Content */}
-          <div className="lg:col-span-3">
-            {/* Profile Settings */}
-            {activeTab === 'profile' && (
-              <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500">
-                <CardHeader>
-                  <CardTitle>Profile Settings</CardTitle>
-                  <CardDescription>Manage your personal information</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Full Name
-                    </label>
-                    <Input
-                      value={settings.profile.fullName}
-                      onChange={(e) => updateSetting('profile', 'fullName', e.target.value)}
-                      placeholder="Enter your full name"
-                    />
+            {/* Content panels */}
+            <div className="lg:col-span-3">
+
+              {/* Profile */}
+              {activeTab === 'profile' && (
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Profile Settings</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Manage your personal information</p>
                   </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Email
-                    </label>
-                    <Input
-                      type="email"
-                      value={settings.profile.email}
-                      onChange={(e) => updateSetting('profile', 'email', e.target.value)}
-                      placeholder="Enter your email"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Phone
-                    </label>
-                    <Input
-                      value={settings.profile.phone}
-                      onChange={(e) => updateSetting('profile', 'phone', e.target.value)}
-                      placeholder="Enter your phone number"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Location
-                    </label>
-                    <Input
-                      value={settings.profile.location}
-                      onChange={(e) => updateSetting('profile', 'location', e.target.value)}
-                      placeholder="City, Country"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Bio
-                    </label>
-                    <textarea
-                      value={settings.profile.bio}
-                      onChange={(e) => updateSetting('profile', 'bio', e.target.value)}
-                      placeholder="Tell us about yourself"
-                      className="w-full px-3 py-2 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 min-h-24"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Appearance Settings */}
-            {activeTab === 'appearance' && (
-              <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500">
-                <CardHeader>
-                  <CardTitle>Appearance Settings</CardTitle>
-                  <CardDescription>Customize how CSpark looks</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Theme
-                    </label>
-                    <Select
-                      value={settings.appearance.theme}
-                      onValueChange={(value) => updateSetting('appearance', 'theme', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="light">
-                          <span className="flex items-center gap-2">
-                            <Sun className="w-4 h-4" /> Light
-                          </span>
-                        </SelectItem>
-                        <SelectItem value="dark">
-                          <span className="flex items-center gap-2">
-                            <Moon className="w-4 h-4" /> Dark
-                          </span>
-                        </SelectItem>
-                        <SelectItem value="system">System</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Font Size
-                    </label>
-                    <Select
-                      value={settings.appearance.fontSize}
-                      onValueChange={(value) => updateSetting('appearance', 'fontSize', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="sm">Small</SelectItem>
-                        <SelectItem value="base">Normal</SelectItem>
-                        <SelectItem value="lg">Large</SelectItem>
-                        <SelectItem value="xl">Extra Large</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Color Scheme
-                    </label>
-                    <Select
-                      value={settings.appearance.colorScheme}
-                      onValueChange={(value) => updateSetting('appearance', 'colorScheme', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="zinc">Zinc (Default)</SelectItem>
-                        <SelectItem value="blue">Blue</SelectItem>
-                        <SelectItem value="purple">Purple</SelectItem>
-                        <SelectItem value="green">Green</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-zinc-100/80 dark:bg-zinc-800/70 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70">
-                    <div>
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Compact Mode</p>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400">Reduce spacing and padding</p>
+                  <div className="p-5 space-y-5">
+                    {[
+                      { key: 'fullName', label: 'Full Name', type: 'text', placeholder: 'Enter your full name' },
+                      { key: 'email', label: 'Email', type: 'email', placeholder: 'Enter your email' },
+                      { key: 'phone', label: 'Phone', type: 'text', placeholder: 'Enter your phone number' },
+                      { key: 'location', label: 'Location', type: 'text', placeholder: 'City, Country' },
+                    ].map(({ key, label, type, placeholder }) => (
+                      <div key={key} className="space-y-1.5">
+                        <label className="text-[10px] font-black uppercase tracking-widest block">{label}</label>
+                        <Input
+                          type={type}
+                          value={settings.profile[key as keyof typeof settings.profile] as string}
+                          onChange={(e) => updateSetting('profile', key, e.target.value)}
+                          placeholder={placeholder}
+                          className="border-2 border-black"
+                        />
+                      </div>
+                    ))}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase tracking-widest block">Bio</label>
+                      <textarea
+                        value={settings.profile.bio}
+                        onChange={(e) => updateSetting('profile', 'bio', e.target.value)}
+                        placeholder="Tell us about yourself"
+                        className="w-full px-3 py-2 border-2 border-black bg-white text-black min-h-24 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF3000]"
+                      />
                     </div>
-                    <input
-                      type="checkbox"
-                      checked={settings.appearance.compactMode}
-                      onChange={(e) => updateSetting('appearance', 'compactMode', e.target.checked)}
-                      className="w-5 h-5 text-blue-600 rounded"
-                    />
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              )}
 
-            {/* Notifications Settings */}
-            {activeTab === 'notifications' && (
-              <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500">
-                <CardHeader>
-                  <CardTitle>Notification Preferences</CardTitle>
-                  <CardDescription>Control how and when you receive notifications</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    {
-                      key: 'emailNotifications',
-                      label: 'Email Notifications',
-                      description: 'Receive email updates about your account',
-                    },
-                    {
-                      key: 'jobAlerts',
-                      label: 'Job Alerts',
-                      description: 'Get notified about new job opportunities matching your skills',
-                    },
-                    {
-                      key: 'aiSuggestions',
-                      label: 'AI Suggestions',
-                      description: 'Receive AI-powered suggestions for CV improvements',
-                    },
-                    {
-                      key: 'weeklyDigest',
-                      label: 'Weekly Digest',
-                      description: 'Send a summary email every Sunday',
-                    },
-                    {
-                      key: 'soundEnabled',
-                      label: 'Sound Effects',
-                      description: 'Play sounds for important notifications',
-                    },
-                  ].map(({ key, label, description }) => (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between p-4 bg-zinc-100/80 dark:bg-zinc-800/70 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70"
-                    >
+              {/* Appearance */}
+              {activeTab === 'appearance' && (
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Appearance</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Customize how CSpark looks</p>
+                  </div>
+                  <div className="p-5 space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase tracking-widest block">Theme</label>
+                      <Select value={settings.appearance.theme} onValueChange={(v) => updateSetting('appearance', 'theme', v)}>
+                        <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="light"><span className="flex items-center gap-2"><Sun className="w-4 h-4" /> Light</span></SelectItem>
+                          <SelectItem value="dark"><span className="flex items-center gap-2"><Moon className="w-4 h-4" /> Dark</span></SelectItem>
+                          <SelectItem value="system">System</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase tracking-widest block">Font Size</label>
+                      <Select value={settings.appearance.fontSize} onValueChange={(v) => updateSetting('appearance', 'fontSize', v)}>
+                        <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sm">Small</SelectItem>
+                          <SelectItem value="base">Normal</SelectItem>
+                          <SelectItem value="lg">Large</SelectItem>
+                          <SelectItem value="xl">Extra Large</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase tracking-widest block">Color Scheme</label>
+                      <Select value={settings.appearance.colorScheme} onValueChange={(v) => updateSetting('appearance', 'colorScheme', v)}>
+                        <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="zinc">Zinc (Default)</SelectItem>
+                          <SelectItem value="blue">Blue</SelectItem>
+                          <SelectItem value="purple">Purple</SelectItem>
+                          <SelectItem value="green">Green</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center justify-between p-4 border-2 border-black bg-[#F2F2F2]">
                       <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{label}</p>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400">{description}</p>
+                        <p className="text-xs font-black uppercase tracking-widest">Compact Mode</p>
+                        <p className="text-[10px] font-bold text-black/60 mt-0.5">Reduce spacing and padding</p>
                       </div>
                       <input
                         type="checkbox"
-                        checked={settings.notifications[key as keyof typeof settings.notifications] === true}
-                        onChange={(e) =>
-                          updateSetting('notifications', key, e.target.checked)
-                        }
-                        className="w-5 h-5 text-blue-600 rounded"
+                        checked={settings.appearance.compactMode}
+                        onChange={(e) => updateSetting('appearance', 'compactMode', e.target.checked)}
+                        className="w-5 h-5 accent-black cursor-pointer"
                       />
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Privacy Settings */}
-            {activeTab === 'privacy' && (
-              <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500">
-                <CardHeader>
-                  <CardTitle>Privacy & Data</CardTitle>
-                  <CardDescription>Manage your privacy settings and data preferences</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Profile Visibility
-                    </label>
-                    <Select
-                      value={settings.privacy.profileVisibility}
-                      onValueChange={(value) => updateSetting('privacy', 'profileVisibility', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="private">Private (Only you)</SelectItem>
-                        <SelectItem value="linked-in-only">LinkedIn Only</SelectItem>
-                        <SelectItem value="public">Public</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
+                </div>
+              )}
 
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Data Retention
-                    </label>
-                    <Select
-                      value={settings.privacy.dataRetention}
-                      onValueChange={(value) => updateSetting('privacy', 'dataRetention', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="30">30 Days</SelectItem>
-                        <SelectItem value="90">90 Days</SelectItem>
-                        <SelectItem value="180">6 Months</SelectItem>
-                        <SelectItem value="365">1 Year</SelectItem>
-                        <SelectItem value="forever">Forever</SelectItem>
-                      </SelectContent>
-                    </Select>
+              {/* Notifications */}
+              {activeTab === 'notifications' && (
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Notification Preferences</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Control how and when you receive notifications</p>
                   </div>
-
-                  <div className="space-y-4">
+                  <div className="p-5 space-y-3">
                     {[
-                      {
-                        key: 'shareMetrics',
-                        label: 'Share Usage Metrics',
-                        description: 'Help us improve by sharing anonymous usage data',
-                      },
-                      {
-                        key: 'allowAnalytics',
-                        label: 'Analytics',
-                        description: 'Allow tracking for analytics and improvements',
-                      },
+                      { key: 'emailNotifications', label: 'Email Notifications', description: 'Receive email updates about your account' },
+                      { key: 'jobAlerts', label: 'Job Alerts', description: 'Get notified about new job opportunities' },
+                      { key: 'aiSuggestions', label: 'AI Suggestions', description: 'Receive AI-powered CV improvement suggestions' },
+                      { key: 'weeklyDigest', label: 'Weekly Digest', description: 'Summary email every Sunday' },
+                      { key: 'soundEnabled', label: 'Sound Effects', description: 'Play sounds for important notifications' },
                     ].map(({ key, label, description }) => (
-                      <div
-                        key={key}
-                        className="flex items-center justify-between p-4 bg-zinc-100/80 dark:bg-zinc-800/70 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70"
-                      >
+                      <div key={key} className="flex items-center justify-between p-4 border-2 border-black bg-[#F2F2F2]">
                         <div>
-                          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{label}</p>
-                          <p className="text-xs text-zinc-600 dark:text-zinc-400">{description}</p>
+                          <p className="text-xs font-black uppercase tracking-widest">{label}</p>
+                          <p className="text-[10px] font-bold text-black/60 mt-0.5">{description}</p>
                         </div>
                         <input
                           type="checkbox"
-                          checked={settings.privacy[key as keyof typeof settings.privacy] === true}
-                          onChange={(e) => updateSetting('privacy', key, e.target.checked)}
-                          className="w-5 h-5 text-blue-600 rounded"
+                          checked={settings.notifications[key as keyof typeof settings.notifications] === true}
+                          onChange={(e) => updateSetting('notifications', key, e.target.checked)}
+                          className="w-5 h-5 accent-black cursor-pointer"
                         />
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              )}
 
-            {/* Integrations */}
-            {activeTab === 'integrations' && (
-              <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500">
-                <CardHeader>
-                  <CardTitle>Integrations</CardTitle>
-                  <CardDescription>Connect third-party services to CSpark</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {[
-                    {
-                      name: 'LinkedIn',
-                      description: 'Connect your LinkedIn account for job search integration',
-                      key: 'linkedinConnected',
-                    },
-                    {
-                      name: 'Google Drive',
-                      description: 'Sync your CVs with Google Drive storage',
-                      key: 'googleDriveConnected',
-                    },
-                    {
-                      name: 'Slack',
-                      description: 'Get CV improvement suggestions in your Slack',
-                      key: 'slackConnected',
-                    },
-                  ].map(({ name, description, key }) => (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between p-4 bg-zinc-100/80 dark:bg-zinc-800/70 rounded-lg border border-zinc-200/70 dark:border-zinc-700/70"
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{name}</p>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400">{description}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={
-                            settings.integrations[key as keyof typeof settings.integrations]
-                              ? 'default'
-                              : 'outline'
-                          }
-                        >
-                          {settings.integrations[key as keyof typeof settings.integrations]
-                            ? 'Connected'
-                            : 'Not Connected'}
-                        </Badge>
-                        <Button
-                          size="sm"
-                          variant={
-                            settings.integrations[key as keyof typeof settings.integrations]
-                              ? 'outline'
-                              : 'default'
-                          }
-                          onClick={() =>
-                            updateSetting(
-                              'integrations',
-                              key,
-                              !settings.integrations[key as keyof typeof settings.integrations]
-                            )
-                          }
-                        >
-                          {settings.integrations[key as keyof typeof settings.integrations]
-                            ? 'Disconnect'
-                            : 'Connect'}
-                        </Button>
-                      </div>
+              {/* Privacy */}
+              {activeTab === 'privacy' && (
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Privacy & Data</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Manage your privacy settings and data preferences</p>
+                  </div>
+                  <div className="p-5 space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase tracking-widest block">Profile Visibility</label>
+                      <Select value={settings.privacy.profileVisibility} onValueChange={(v) => updateSetting('privacy', 'profileVisibility', v)}>
+                        <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="private">Private (Only you)</SelectItem>
+                          <SelectItem value="linked-in-only">LinkedIn Only</SelectItem>
+                          <SelectItem value="public">Public</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Language Settings */}
-            {activeTab === 'language' && (
-              <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-3 duration-500">
-                <CardHeader>
-                  <CardTitle>Language & Localization</CardTitle>
-                  <CardDescription>Choose your preferred language</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
-                      Interface Language
-                    </label>
-                    <Select
-                      value={settings.language}
-                      onValueChange={(value) => updateSetting('language', 'language', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="en">English</SelectItem>
-                        <SelectItem value="tr">Türkçe (Turkish)</SelectItem>
-                        <SelectItem value="es">Español (Spanish)</SelectItem>
-                        <SelectItem value="de">Deutsch (German)</SelectItem>
-                        <SelectItem value="fr">Français (French)</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase tracking-widest block">Data Retention</label>
+                      <Select value={settings.privacy.dataRetention} onValueChange={(v) => updateSetting('privacy', 'dataRetention', v)}>
+                        <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="30">30 Days</SelectItem>
+                          <SelectItem value="90">90 Days</SelectItem>
+                          <SelectItem value="180">6 Months</SelectItem>
+                          <SelectItem value="365">1 Year</SelectItem>
+                          <SelectItem value="forever">Forever</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-3">
+                      {[
+                        { key: 'shareMetrics', label: 'Share Usage Metrics', description: 'Help us improve by sharing anonymous usage data' },
+                        { key: 'allowAnalytics', label: 'Analytics', description: 'Allow tracking for analytics and improvements' },
+                      ].map(({ key, label, description }) => (
+                        <div key={key} className="flex items-center justify-between p-4 border-2 border-black bg-[#F2F2F2]">
+                          <div>
+                            <p className="text-xs font-black uppercase tracking-widest">{label}</p>
+                            <p className="text-[10px] font-bold text-black/60 mt-0.5">{description}</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={settings.privacy[key as keyof typeof settings.privacy] === true}
+                            onChange={(e) => updateSetting('privacy', key, e.target.checked)}
+                            className="w-5 h-5 accent-black cursor-pointer"
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                </div>
+              )}
 
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <p className="text-sm text-blue-900 dark:text-blue-200">
-                      💡 Language preference is applied immediately and saved automatically.
-                    </p>
+              {/* Integrations */}
+              {activeTab === 'integrations' && (
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Integrations</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Connect third-party services to CSpark</p>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                  <div className="p-5 space-y-3">
+                    {[
+                      { name: 'LinkedIn', description: 'Connect your LinkedIn account for job search integration', key: 'linkedinConnected' },
+                      { name: 'Google Drive', description: 'Sync your CVs with Google Drive storage', key: 'googleDriveConnected' },
+                      { name: 'Slack', description: 'Get CV improvement suggestions in your Slack', key: 'slackConnected' },
+                    ].map(({ name, description, key }) => {
+                      const isConnected = settings.integrations[key as keyof typeof settings.integrations];
+                      return (
+                        <div key={key} className="flex items-center justify-between p-4 border-2 border-black bg-[#F2F2F2]">
+                          <div>
+                            <p className="text-xs font-black uppercase tracking-widest">{name}</p>
+                            <p className="text-[10px] font-bold text-black/60 mt-0.5">{description}</p>
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className={`border-2 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 ${
+                              isConnected ? 'border-black bg-black text-white' : 'border-black text-black'
+                            }`}>
+                              {isConnected ? 'Connected' : 'Not Connected'}
+                            </span>
+                            <Button
+                              size="sm"
+                              variant={isConnected ? 'outline' : 'accent'}
+                              className={isConnected ? 'border-2 border-[#FF3000] text-[#FF3000] hover:bg-[#FF3000] hover:text-white' : ''}
+                              onClick={() => updateSetting('integrations', key, !isConnected)}
+                            >
+                              {isConnected ? 'Disconnect' : 'Connect'}
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-            {/* Save Button */}
-            <div className="mt-6 flex items-center justify-between">
-              <div className="text-xs text-zinc-600 dark:text-zinc-400">
-                {saved && '✅ Settings saved successfully!'}
+              {/* Language */}
+              {activeTab === 'language' && (
+                <div className="border-4 border-black bg-white">
+                  <div className="p-5 border-b-2 border-black">
+                    <p className="text-base font-black uppercase tracking-widest">Language & Localization</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Choose your preferred language</p>
+                  </div>
+                  <div className="p-5 space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-black uppercase tracking-widest block">Interface Language</label>
+                      <Select value={settings.language} onValueChange={(v) => updateSetting('language', 'language', v)}>
+                        <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="en">English</SelectItem>
+                          <SelectItem value="tr">Türkçe (Turkish)</SelectItem>
+                          <SelectItem value="es">Español (Spanish)</SelectItem>
+                          <SelectItem value="de">Deutsch (German)</SelectItem>
+                          <SelectItem value="fr">Français (French)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="border-2 border-black bg-[#F2F2F2] p-4">
+                      <p className="text-xs font-black uppercase tracking-widest">Note</p>
+                      <p className="text-[10px] font-bold text-black/60 mt-1">
+                        Language preference is applied immediately and saved automatically.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Save row */}
+              <div className="mt-6 flex items-center justify-between">
+                <div className="text-[10px] font-black uppercase tracking-widest text-black/60">
+                  {saved && '✓ Settings saved!'}
+                </div>
+                <Button onClick={saveSettings} variant="accent" className="gap-2">
+                  <Save className="w-4 h-4" />
+                  Save Settings
+                </Button>
               </div>
-              <Button onClick={saveSettings} className="gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300">
-                <Save className="w-4 h-4" />
-                Save Settings
-              </Button>
+
             </div>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );
