@@ -309,7 +309,13 @@ export default function JobsPage() {
                     platform === 'workday' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
                   }`}
                 >
-                  <Briefcase className="h-4 w-4" />
+                  <Image
+                    src="/workday-hcm.png"
+                    alt="Workday"
+                    width={16}
+                    height={16}
+                    className={`h-4 w-auto ${platform === 'workday' ? 'brightness-0 invert' : ''}`}
+                  />
                   <span className="text-[10px] font-black uppercase tracking-widest">Workday</span>
                 </button>
                 <div className="w-[2px] bg-black" />
@@ -320,7 +326,13 @@ export default function JobsPage() {
                     platform === 'careerone' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
                   }`}
                 >
-                  <Search className="h-4 w-4" />
+                  <Image
+                    src="/careerone.png"
+                    alt="CareerOne"
+                    width={16}
+                    height={16}
+                    className={`h-4 w-auto ${platform === 'careerone' ? 'brightness-0 invert' : ''}`}
+                  />
                   <span className="text-[10px] font-black uppercase tracking-widest">CareerOne</span>
                 </button>
               </div>
