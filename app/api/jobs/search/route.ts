@@ -361,11 +361,11 @@ async function searchCareerOneJobs(
       ...(contractTypes ? { contractTypes } : {}),
     };
 
-    console.log('Calling CareerOne Apify actor (run-sync):', body);
+    console.log('Calling CareerOne Apify actor (run-sync-get-dataset-items):', body);
 
-    // run-sync blocks until the actor finishes and returns the run object
+    // run-sync-get-dataset-items blocks until done and returns items array directly
     const runResponse = await fetch(
-      `https://api.apify.com/v2/acts/${CAREERONE_ACTOR_ID}/run-sync?token=${CAREERONE_APIFY_TOKEN}&timeout=120`,
+      `https://api.apify.com/v2/acts/${CAREERONE_ACTOR_ID}/run-sync-get-dataset-items?token=${CAREERONE_APIFY_TOKEN}&timeout=120${limit !== null ? `&limit=${limit}` : ''}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -376,29 +376,11 @@ async function searchCareerOneJobs(
 
     if (!runResponse.ok) {
       const err = await runResponse.text();
-      console.error('CareerOne Apify run-sync error:', runResponse.statusText, err);
+      console.error('CareerOne Apify error:', runResponse.status, runResponse.statusText, err);
       return [];
     }
 
-    const runData = await runResponse.json();
-    const datasetId = runData?.data?.defaultDatasetId;
-
-    if (!datasetId) {
-      console.error('CareerOne: no defaultDatasetId in run response');
-      return [];
-    }
-
-    // Fetch dataset items
-    const itemsResponse = await fetch(
-      `https://api.apify.com/v2/datasets/${datasetId}/items?token=${CAREERONE_APIFY_TOKEN}${limit !== null ? `&limit=${limit}` : ''}`,
-    );
-
-    if (!itemsResponse.ok) {
-      console.error('CareerOne dataset fetch error:', itemsResponse.statusText);
-      return [];
-    }
-
-    const items: any[] = await itemsResponse.json();
+    const items: any[] = await runResponse.json();
     console.log(`CareerOne actor returned ${items.length} items`);
     if (items.length > 0) console.log('Sample CareerOne item fields:', Object.keys(items[0]));
 
