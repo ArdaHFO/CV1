@@ -774,58 +774,59 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             ) : null}
 
-            {/* Promo code input */}
-            {!isPro && (
-              <div className="border-2 border-black p-2 space-y-1.5">
-                <p className="text-[10px] font-black uppercase tracking-widest">Promo Code</p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => {
-                      setPromoCode(e.target.value.toUpperCase());
-                      setPromoStatus('idle');
-                      setPromoId(null);
-                      setPromoLabel('');
-                    }}
-                    onKeyDown={(e) => e.key === 'Enter' && handleValidatePromo()}
-                    placeholder="e.g. WELCOME10"
-                    className="flex-1 border-2 border-black px-3 py-1 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-[#FF3000] bg-white"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="border-2 border-black text-[10px] font-black uppercase tracking-widest h-8 px-3 flex-shrink-0"
-                    onClick={handleValidatePromo}
-                    disabled={promoStatus === 'checking' || !promoCode.trim()}
-                  >
-                    {promoStatus === 'checking' ? '...' : 'Apply'}
-                  </Button>
-                </div>
-                {promoStatus === 'valid' && (
-                  <p className="text-[10px] font-black uppercase tracking-widest text-green-700 flex items-center gap-1">
-                    <Check className="w-3 h-3" /> {promoLabel}
-                  </p>
-                )}
-                {promoStatus === 'invalid' && (
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#FF3000]">
-                    {promoLabel}
-                  </p>
-                )}
-              </div>
-            )}
-
             {paymentMessage ? (
               <p className={`text-[10px] font-bold uppercase tracking-widest ${paymentMessage.includes('successful') ? 'text-black' : 'text-[#FF3000]'}`}>
                 {paymentMessage}
               </p>
             ) : null}
 
-            <DialogFooter>
+            <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <Button type="button" variant="outline" onClick={() => setUpgradeOpen(false)} disabled={processingPayment}>
                 Close
               </Button>
+
+              {!isPro && (
+                <div className="w-full sm:flex-1 sm:px-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => {
+                        setPromoCode(e.target.value.toUpperCase());
+                        setPromoStatus('idle');
+                        setPromoId(null);
+                        setPromoLabel('');
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key !== 'Enter') return;
+                        e.preventDefault();
+                        handleValidatePromo();
+                      }}
+                      placeholder="Promo code"
+                      className="h-9 w-full border-2 border-black px-3 text-xs font-bold uppercase tracking-widest focus:outline-none focus:border-[#FF3000] bg-white"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-9 border-2 border-black text-[10px] font-black uppercase tracking-widest px-3 flex-shrink-0"
+                      onClick={handleValidatePromo}
+                      disabled={promoStatus === 'checking' || !promoCode.trim()}
+                    >
+                      {promoStatus === 'checking' ? '...' : 'Apply'}
+                    </Button>
+                  </div>
+
+                  {promoStatus === 'valid' && (
+                    <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-green-700 flex items-center gap-1">
+                      <Check className="w-3 h-3" /> {promoLabel}
+                    </p>
+                  )}
+                  {promoStatus === 'invalid' && (
+                    <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-[#FF3000]">{promoLabel}</p>
+                  )}
+                </div>
+              )}
+
               <Button type="submit" className="gap-2" disabled={processingPayment}>
                 {processingPayment ? 'Redirecting to Stripe...' : `Continue to Stripe (${selectedPrice})`}
               </Button>
