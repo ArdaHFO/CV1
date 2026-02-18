@@ -129,26 +129,21 @@ export default function Home() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-3.5">
               <Image src="/cspark-logo.png" alt="CSpark logo" width={68} height={68} className="w-[68px] h-[68px] object-contain shrink-0 ml-1" />
-              <span className={`text-3xl leading-none font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent`}>
-                CSpark
+              <span className={`text-3xl leading-none font-black text-black`}>
+                cspark
               </span>
             </div>
             <div className="flex gap-4 items-center">
-              <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
               <Link
                 href={currentUser ? '/dashboard' : '/login'}
-                className={`px-4 py-2 text-sm font-medium transition-colors ${
-                  isDark 
-                    ? 'text-white/80 hover:text-white' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`px-4 py-2 text-sm font-bold uppercase tracking-wider text-black hover:bg-black hover:text-white transition-all`}
               >
                 {currentUser ? displayName : 'Sign In'}
               </Link>
               {!currentUser && (
                 <Link
                   href="/register"
-                  className="px-6 py-2.5 text-sm font-semibold rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                  className="px-6 py-2.5 text-sm font-bold uppercase tracking-wider border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] transition-all"
                 >
                   Sign Up
                 </Link>
@@ -165,96 +160,49 @@ export default function Home() {
         />
         {/* Hero Section */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-          <div className="text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="text-left space-y-12">
             {/* Trust Badge */}
-            <div className="flex justify-center">
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border ${
-                isDark 
-                  ? 'bg-green-500/20 border-green-500/30 text-green-300' 
-                  : 'bg-green-100 border-green-300 text-green-700'
-              }`}>
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Trusted by 50,000+ professionals</span>
+            <div className="flex items-center">
+              <div className={`inline-flex items-center gap-2 px-6 py-3 border-2 border-black bg-white`}>
+                <span className="text-xs font-black uppercase tracking-widest text-[#FF3000]">NEW</span>
+                <span className="text-sm font-bold text-black">Trusted by 50,000+ professionals</span>
               </div>
             </div>
 
-            <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight ${
-              isDark ? 'text-white' : 'text-gray-900'
-            }`}>
-              <span className="block">Search LinkedIn jobs</span>
-              <span className={`block ${
-                isDark
-                  ? 'text-violet-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]'
-                  : 'bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent'
-              }`}>
-                Tailor your CV with{' '}
-                <AnimatedTextCycle
-                  words={['Precision', 'Speed', 'Clarity', 'Confidence']}
-                  interval={2600}
-                  className={`${
-                    isDark
-                      ? 'text-fuchsia-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]'
-                      : 'bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent'
-                  }`}
-                />
-              </span>
-            </h1>
-
-            <p className={`max-w-3xl mx-auto text-xl leading-relaxed ${
-              isDark ? 'text-white/95 drop-shadow-[0_2px_8px_rgba(0,0,0,0.75)]' : 'text-gray-700'
-            }`}>
-              CSpark combines real-time LinkedIn search with AI CV optimization, so every application
-              is job-specific without copy-paste chaos or scattered tools.
-            </p>
-
-            {/* AI Badge */}
-            <div className="flex justify-center">
-              <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-md border transition-all hover:scale-105 ${
-                isDark 
-                  ? 'bg-gradient-to-r from-blue-500/30 via-violet-500/30 to-purple-500/30 border-blue-400/50 shadow-lg shadow-blue-500/30' 
-                  : 'bg-gradient-to-r from-blue-100 to-violet-100 border-blue-400/60 shadow-lg'
-              }`}>
-                <MetaLogo className="h-5 w-5" />
-                <span className={`text-sm font-bold tracking-wide ${
-                  isDark ? 'text-blue-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]' : 'text-blue-700'
-                }`}>
-                  Powered by Meta LLAMA 3.3 70B
-                </span>
-                <div className={`w-2 h-2 rounded-full animate-pulse ${
-                  isDark ? 'bg-blue-400' : 'bg-blue-500'
-                }`}></div>
-              </div>
+            <div className="max-w-4xl space-y-6">
+              <h1 className={`text-9xl font-black leading-none lowercase text-black`}>
+                search<br/>jobs at scale
+              </h1>
+              <p className="text-2xl font-bold text-black">
+                Browse LinkedIn job postings. AI tailors your CV to match each position instantly. Apply with precision.
+              </p>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-start pt-8">
               <Link
                 href="/register"
-                className="group px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-2xl hover:shadow-blue-500/50 transition-all hover:scale-105 flex items-center gap-2"
+                className="group px-8 py-4 text-lg font-black uppercase tracking-wider border-2 border-black bg-black text-white hover:bg-[#FF3000] hover:border-[#FF3000] transition-all flex items-center gap-2"
               >
-                Search LinkedIn Jobs
+                Start Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="#workflow"
-                className={`px-8 py-4 text-lg font-semibold border-2 rounded-xl backdrop-blur-sm transition-all hover:scale-105 ${
-                  isDark 
-                    ? 'border-white/30 bg-white/10 text-white hover:bg-white/20' 
-                    : 'border-gray-300 bg-white text-gray-900 hover:bg-gray-50'
-                }`}
+                className={`px-8 py-4 text-lg font-black uppercase tracking-wider border-2 border-black bg-white text-black hover:bg-black hover:text-white transition-all`}
               >
-                See CV Tailoring
+                See Demo
               </Link>
             </div>
 
             {/* Social Proof */}
-            <div className="pt-8 flex flex-wrap justify-center items-center gap-8">
+            <div className="pt-12 flex items-center gap-8">
               <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  <Star key={i} className="w-5 h-5 fill-black text-black" />
                 ))}
-                <span className={`ml-2 text-sm font-medium ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
-                  4.9/5 from 12,000+ reviews
+                <span className={`ml-3 text-sm font-bold text-black`}>
+                  4.9/5 from thousands
                 </span>
               </div>
             </div>
