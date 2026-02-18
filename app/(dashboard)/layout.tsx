@@ -617,13 +617,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     ) : null}
                   </div>
                   {/* Hover benefits panel */}
-                  <div className="absolute inset-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-center bg-black text-white">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-[#FF3000] mb-2">What you get</p>
-                    <ul className="space-y-1">
+                  <div className="absolute inset-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col bg-black text-white overflow-hidden">
+                    <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000] mb-1.5 shrink-0">What you get</p>
+                    <ul className="space-y-0.5 overflow-hidden">
                       {'benefits' in plan && plan.benefits?.map((b) => (
-                        <li key={b} className="flex items-start gap-1.5 text-[10px] font-bold uppercase tracking-widest">
-                          <Check className="h-3 w-3 mt-0.5 flex-shrink-0 text-[#FF3000]" />
-                          {b}
+                        <li key={b} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest leading-tight">
+                          <Check className="h-2.5 w-2.5 shrink-0 text-[#FF3000]" />
+                          <span className="truncate">{b}</span>
                         </li>
                       ))}
                     </ul>
