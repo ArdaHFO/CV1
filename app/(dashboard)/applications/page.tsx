@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -33,20 +31,14 @@ import type { Application, ApplicationStatus, Resume } from '@/types';
 
 const STATUS_OPTIONS: ApplicationStatus[] = ['Applied', 'Screening', 'Interview', 'Offer', 'Rejected'];
 
-const getStatusColor = (status: ApplicationStatus) => {
+const getStatusStyle = (status: ApplicationStatus) => {
   switch (status) {
-    case 'Applied':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    case 'Screening':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-    case 'Interview':
-      return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-    case 'Offer':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-    case 'Rejected':
-      return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-    default:
-      return 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200';
+    case 'Applied':    return 'border-black bg-black text-white';
+    case 'Screening':  return 'border-black bg-[#F2F2F2] text-black';
+    case 'Interview':  return 'border-black bg-white text-black';
+    case 'Offer':      return 'border-black bg-black text-white';
+    case 'Rejected':   return 'border-[#FF3000] bg-[#FF3000] text-white';
+    default:           return 'border-black bg-white text-black';
   }
 };
 
@@ -91,6 +83,9 @@ export default function ApplicationsPage() {
   const [interviewNotes, setInterviewNotes] = useState('');
   const [saving, setSaving] = useState(false);
   const [createError, setCreateError] = useState('');
+  const [reminderSending, setReminderSending] = useState<string | null>(null);
+  const [reminderSuccess, setReminderSuccess] = useState<string | null>(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
 
   const resumeOptions = useMemo(() => resumes, [resumes]);
 
@@ -232,6 +227,37 @@ export default function ApplicationsPage() {
     setSaving(false);
   };
 
+  const handleSendReminder = async (application: Application) => {
+    if (!application.reminder_at) {
+      alert('No reminder date set. Edit the application to set a reminder date and time.');
+      return;
+    }
+    setReminderSending(application.id);
+    setReminderSuccess(null);
+    try {
+      const response = await fetch('/api/reminders/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobTitle: application.job_title,
+          company: application.company,
+          reminderAt: application.reminder_at,
+        }),
+      });
+      const data = await response.json() as { success: boolean; error?: string };
+      if (data.success) {
+        setReminderSuccess(application.id);
+        setTimeout(() => setReminderSuccess(null), 4000);
+      } else {
+        alert(`Could not schedule reminder: ${data.error || 'Unknown error'}`);
+      }
+    } catch {
+      alert('Could not reach the reminder service. Please try again.');
+    } finally {
+      setReminderSending(null);
+    }
+  };
+
   const handleAddInterview = async () => {
     if (!selectedApplication || !currentUserId) return;
 
@@ -265,7 +291,7 @@ export default function ApplicationsPage() {
       <div className={`min-h-screen relative flex items-center justify-center ${isDark ? 'dark' : ''} bg-white text-black`}>
         <ShaderBackground isDark={isDark} />
         <div className="relative z-10">
-          <div className="animate-spin rounded-full h-12 w-12 border-2 border-blue-500 border-t-transparent" />
+          <div className="w-10 h-10 border-4 border-black border-t-[#FF3000] animate-spin" />
         </div>
       </div>
     );
@@ -275,391 +301,317 @@ export default function ApplicationsPage() {
     <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              Application Tracker
-            </h1>
-            <p className={`text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
-              Track your applications, interviews, and CV versions in one workflow.
+            <h1 className="text-3xl font-black uppercase tracking-widest">Application Tracker</h1>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
+              Track applications, interviews, and CV versions in one workflow.
             </p>
           </div>
-          <Button onClick={openCreate} className="gap-2">
+          <Button onClick={openCreate} variant="accent" className="gap-2">
             + Add Application
           </Button>
         </div>
 
-        <div className="grid gap-6">
+        {/* Application list */}
+        <div className="space-y-4">
           {applications.length === 0 && (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className={`text-sm ${isDark ? 'text-white/70' : 'text-gray-600'}`}>
-                  No applications yet. Add your first application to start tracking progress.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="border-4 border-black bg-white py-16 text-center">
+              <p className="text-[10px] font-black uppercase tracking-widest text-black/60">
+                No applications yet. Add your first application to start tracking progress.
+              </p>
+            </div>
           )}
 
           {applications.map((application) => (
-            <Card key={application.id}>
-              <CardHeader className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div>
-                  <CardTitle className="text-xl">
-                    {application.job_title}
-                  </CardTitle>
-                  <CardDescription className="text-base">
-                    {application.company}
-                    {application.location ? ` • ${application.location}` : ''}
-                  </CardDescription>
+            <div key={application.id} className="border-4 border-black bg-white">
+
+              {/* Card header */}
+              <div className="p-5 border-b-2 border-black flex flex-wrap items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <h2 className="text-base font-black uppercase tracking-widest leading-tight">{application.job_title}</h2>
+                  <p className="text-xs font-bold uppercase tracking-widest text-black/60 mt-1">
+                    {application.company}{application.location ? ` · ${application.location}` : ''}
+                  </p>
                   {application.job_url && (
-                    <a
-                      href={application.job_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      View job posting
+                    <a href={application.job_url} target="_blank" rel="noopener noreferrer"
+                      className="text-[10px] font-black uppercase tracking-widest text-[#FF3000] hover:underline mt-1 inline-block">
+                      View posting ↗
                     </a>
                   )}
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Badge className={getStatusColor(application.status)}>{application.status}</Badge>
-                  <Button variant="outline" size="sm" onClick={() => openEdit(application)}>
-                    Edit
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDelete(application.id)}>
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <span className={`px-2 py-0.5 border-2 text-[10px] font-black uppercase tracking-widest ${getStatusStyle(application.status)}`}>
+                    {application.status}
+                  </span>
+                  <Button variant="outline" size="sm" onClick={() => openEdit(application)}>Edit</Button>
+                  <Button variant="outline" size="sm"
+                    className="border-[#FF3000] text-[#FF3000] hover:bg-[#FF3000] hover:text-white hover:border-[#FF3000]"
+                    onClick={() => handleDelete(application.id)}>
                     Delete
                   </Button>
                 </div>
-              </CardHeader>
-              <CardContent className="grid gap-6 md:grid-cols-3">
-                <div className="space-y-2">
-                  <p className={`text-xs uppercase tracking-wide ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
-                    Dates
-                  </p>
-                  <p className={`text-sm ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                    Applied: {application.applied_at ? application.applied_at : 'Not set'}
-                  </p>
-                  <p className={`text-sm ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                    Reminder: {application.reminder_at ? application.reminder_at : 'Not set'}
-                  </p>
+              </div>
+
+              {/* Card body — 3 columns */}
+              <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x-2 divide-black">
+
+                {/* Dates + Reminder */}
+                <div className="p-5 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Dates</p>
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold uppercase tracking-widest">
+                      Applied: <span className="font-normal normal-case tracking-normal">{application.applied_at ?? 'Not set'}</span>
+                    </p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="text-xs font-bold uppercase tracking-widest">
+                        Reminder:{' '}
+                        <span className="font-normal normal-case tracking-normal">
+                          {application.reminder_at
+                            ? new Date(application.reminder_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+                            : 'Not set'}
+                        </span>
+                      </p>
+                      {/* Tooltip */}
+                      <div className="relative inline-flex items-center">
+                        <button type="button"
+                          onMouseEnter={() => setTooltipVisible(true)}
+                          onMouseLeave={() => setTooltipVisible(false)}
+                          onFocus={() => setTooltipVisible(true)}
+                          onBlur={() => setTooltipVisible(false)}
+                          className="w-4 h-4 rounded-full border-2 border-black bg-[#F2F2F2] flex items-center justify-center text-[9px] font-black cursor-default"
+                          aria-label="Reminder info">?</button>
+                        {tooltipVisible && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 border-2 border-black bg-white p-3 shadow-[4px_4px_0px_#000] z-50">
+                            <p className="text-[10px] font-black uppercase tracking-widest mb-1">Email Reminder</p>
+                            <p className="text-[10px] text-black/70 leading-relaxed">
+                              Click &quot;Send Reminder&quot; to schedule an email to your account address at the selected date and time. Delivered automatically — no action needed at reminder time.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    {reminderSuccess === application.id ? (
+                      <p className="text-[10px] font-black uppercase tracking-widest border-2 border-black bg-[#F2F2F2] px-3 py-1.5 inline-block">
+                        ✓ Reminder scheduled!
+                      </p>
+                    ) : (
+                      <Button size="sm" variant="secondary" className="gap-1.5 text-[10px]"
+                        disabled={!application.reminder_at || reminderSending === application.id}
+                        onClick={() => handleSendReminder(application)}>
+                        {reminderSending === application.id ? 'Scheduling...' : 'Send Reminder'}
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <p className={`text-xs uppercase tracking-wide ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
-                    Notes
+
+                {/* Notes */}
+                <div className="p-5 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Notes</p>
+                  <p className="text-xs font-bold uppercase tracking-widest">
+                    {application.notes?.length ?? 0} note{(application.notes?.length ?? 0) !== 1 ? 's' : ''}
                   </p>
-                  <p className={`text-sm ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                    {application.notes?.length ?? 0} notes
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedApplication(application);
-                      setNoteOpen(true);
-                    }}
-                  >
+                  <Button size="sm" variant="outline"
+                    onClick={() => { setSelectedApplication(application); setNoteOpen(true); }}>
                     Add Note
                   </Button>
                 </div>
-                <div className="space-y-2">
-                  <p className={`text-xs uppercase tracking-wide ${isDark ? 'text-white/50' : 'text-gray-500'}`}>
-                    Interviews
+
+                {/* Interviews */}
+                <div className="p-5 space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Interviews</p>
+                  <p className="text-xs font-bold uppercase tracking-widest">
+                    {application.interviews?.length ?? 0} interview{(application.interviews?.length ?? 0) !== 1 ? 's' : ''}
                   </p>
-                  <p className={`text-sm ${isDark ? 'text-white/80' : 'text-gray-700'}`}>
-                    {application.interviews?.length ?? 0} interviews
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedApplication(application);
-                      setInterviewOpen(true);
-                    }}
-                  >
+                  <Button size="sm" variant="outline"
+                    onClick={() => { setSelectedApplication(application); setInterviewOpen(true); }}>
                     Log Interview
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
+      {/* ── Create Dialog ── */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl border-4 border-black">
           <DialogHeader>
-            <DialogTitle>Add Application</DialogTitle>
-            <DialogDescription>Track a new job application.</DialogDescription>
+            <DialogTitle className="font-black uppercase tracking-widest">Add Application</DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">Track a new job application.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 md:grid-cols-2">
             {createError && (
-              <div className="md:col-span-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-                {createError}
-              </div>
+              <div className="md:col-span-2 border-2 border-[#FF3000] p-3 text-xs font-bold text-[#FF3000] uppercase tracking-widest">{createError}</div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="job-title">Job Title</Label>
-              <Input
-                id="job-title"
-                value={formState.job_title}
-                onChange={(e) => setFormState((prev) => ({ ...prev, job_title: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Job Title</Label>
+              <Input value={formState.job_title} onChange={(e) => setFormState((prev) => ({ ...prev, job_title: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company">Company</Label>
-              <Input
-                id="company"
-                value={formState.company}
-                onChange={(e) => setFormState((prev) => ({ ...prev, company: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Company</Label>
+              <Input value={formState.company} onChange={(e) => setFormState((prev) => ({ ...prev, company: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                value={formState.location}
-                onChange={(e) => setFormState((prev) => ({ ...prev, location: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Location</Label>
+              <Input value={formState.location} onChange={(e) => setFormState((prev) => ({ ...prev, location: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="job-url">Job URL</Label>
-              <Input
-                id="job-url"
-                value={formState.job_url}
-                onChange={(e) => setFormState((prev) => ({ ...prev, job_url: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Job URL</Label>
+              <Input value={formState.job_url} onChange={(e) => setFormState((prev) => ({ ...prev, job_url: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={formState.status}
-                onValueChange={(value) => setFormState((prev) => ({ ...prev, status: value as ApplicationStatus }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+              <Label className="text-[10px] font-black uppercase tracking-widest">Status</Label>
+              <Select value={formState.status} onValueChange={(v) => setFormState((prev) => ({ ...prev, status: v as ApplicationStatus }))}>
+                <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                <SelectContent>{STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Applied Date</Label>
-              <Input
-                type="date"
-                value={formState.applied_at}
-                onChange={(e) => setFormState((prev) => ({ ...prev, applied_at: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Applied Date</Label>
+              <Input type="date" value={formState.applied_at} onChange={(e) => setFormState((prev) => ({ ...prev, applied_at: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label>Reminder</Label>
-              <Input
-                type="datetime-local"
-                value={formState.reminder_at}
-                onChange={(e) => setFormState((prev) => ({ ...prev, reminder_at: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                Reminder Date &amp; Time
+                <span className="relative group/tip">
+                  <span className="w-4 h-4 rounded-full border-2 border-black bg-[#F2F2F2] flex items-center justify-center text-[9px] font-black cursor-default inline-flex">?</span>
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 border-2 border-black bg-white p-3 shadow-[4px_4px_0px_#000] z-50 hidden group-hover/tip:block text-[10px] font-normal normal-case tracking-normal text-black/70 leading-relaxed whitespace-normal">
+                    Set a date and time. After saving, click &quot;Send Reminder&quot; on the card — an email will be automatically sent to your account address at that exact time.
+                  </span>
+                </span>
+              </Label>
+              <Input type="datetime-local" value={formState.reminder_at} onChange={(e) => setFormState((prev) => ({ ...prev, reminder_at: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label>Resume</Label>
-              <Select
-                value={formState.resume_id}
-                onValueChange={(value) => setFormState((prev) => ({ ...prev, resume_id: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select resume" />
-                </SelectTrigger>
-                <SelectContent>
-                  {resumeOptions.map((resume) => (
-                    <SelectItem key={resume.id} value={resume.id}>
-                      {resume.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+              <Label className="text-[10px] font-black uppercase tracking-widest">Resume</Label>
+              <Select value={formState.resume_id} onValueChange={(v) => setFormState((prev) => ({ ...prev, resume_id: v }))}>
+                <SelectTrigger className="border-2 border-black"><SelectValue placeholder="Select resume" /></SelectTrigger>
+                <SelectContent>{resumeOptions.map((r) => <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreate} disabled={saving}>
-              {saving ? 'Saving...' : 'Add Application'}
-            </Button>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
+            <Button variant="accent" onClick={handleCreate} disabled={saving}>{saving ? 'Saving...' : 'Add Application'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* ── Edit Dialog ── */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl border-4 border-black">
           <DialogHeader>
-            <DialogTitle>Edit Application</DialogTitle>
-            <DialogDescription>Update status, dates, and linked CV.</DialogDescription>
+            <DialogTitle className="font-black uppercase tracking-widest">Edit Application</DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">Update status, dates, and linked CV.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="job-title-edit">Job Title</Label>
-              <Input
-                id="job-title-edit"
-                value={formState.job_title}
-                onChange={(e) => setFormState((prev) => ({ ...prev, job_title: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Job Title</Label>
+              <Input value={formState.job_title} onChange={(e) => setFormState((prev) => ({ ...prev, job_title: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company-edit">Company</Label>
-              <Input
-                id="company-edit"
-                value={formState.company}
-                onChange={(e) => setFormState((prev) => ({ ...prev, company: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Company</Label>
+              <Input value={formState.company} onChange={(e) => setFormState((prev) => ({ ...prev, company: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="location-edit">Location</Label>
-              <Input
-                id="location-edit"
-                value={formState.location}
-                onChange={(e) => setFormState((prev) => ({ ...prev, location: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Location</Label>
+              <Input value={formState.location} onChange={(e) => setFormState((prev) => ({ ...prev, location: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="job-url-edit">Job URL</Label>
-              <Input
-                id="job-url-edit"
-                value={formState.job_url}
-                onChange={(e) => setFormState((prev) => ({ ...prev, job_url: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Job URL</Label>
+              <Input value={formState.job_url} onChange={(e) => setFormState((prev) => ({ ...prev, job_url: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={formState.status}
-                onValueChange={(value) => setFormState((prev) => ({ ...prev, status: value as ApplicationStatus }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {STATUS_OPTIONS.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+              <Label className="text-[10px] font-black uppercase tracking-widest">Status</Label>
+              <Select value={formState.status} onValueChange={(v) => setFormState((prev) => ({ ...prev, status: v as ApplicationStatus }))}>
+                <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
+                <SelectContent>{STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Applied Date</Label>
-              <Input
-                type="date"
-                value={formState.applied_at}
-                onChange={(e) => setFormState((prev) => ({ ...prev, applied_at: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Applied Date</Label>
+              <Input type="date" value={formState.applied_at} onChange={(e) => setFormState((prev) => ({ ...prev, applied_at: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label>Reminder</Label>
-              <Input
-                type="datetime-local"
-                value={formState.reminder_at}
-                onChange={(e) => setFormState((prev) => ({ ...prev, reminder_at: e.target.value }))}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                Reminder Date &amp; Time
+                <span className="relative group/tip">
+                  <span className="w-4 h-4 rounded-full border-2 border-black bg-[#F2F2F2] flex items-center justify-center text-[9px] font-black cursor-default inline-flex">?</span>
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 border-2 border-black bg-white p-3 shadow-[4px_4px_0px_#000] z-50 hidden group-hover/tip:block text-[10px] font-normal normal-case tracking-normal text-black/70 leading-relaxed whitespace-normal">
+                    Set a date and time. After saving, click &quot;Send Reminder&quot; on the card — an email will be automatically sent to your account address at that exact time.
+                  </span>
+                </span>
+              </Label>
+              <Input type="datetime-local" value={formState.reminder_at} onChange={(e) => setFormState((prev) => ({ ...prev, reminder_at: e.target.value }))} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label>Resume</Label>
-              <Select
-                value={formState.resume_id}
-                onValueChange={(value) => setFormState((prev) => ({ ...prev, resume_id: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select resume" />
-                </SelectTrigger>
-                <SelectContent>
-                  {resumeOptions.map((resume) => (
-                    <SelectItem key={resume.id} value={resume.id}>
-                      {resume.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+              <Label className="text-[10px] font-black uppercase tracking-widest">Resume</Label>
+              <Select value={formState.resume_id} onValueChange={(v) => setFormState((prev) => ({ ...prev, resume_id: v }))}>
+                <SelectTrigger className="border-2 border-black"><SelectValue placeholder="Select resume" /></SelectTrigger>
+                <SelectContent>{resumeOptions.map((r) => <SelectItem key={r.id} value={r.id}>{r.title}</SelectItem>)}</SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdate} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Changes'}
-            </Button>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button variant="accent" onClick={handleUpdate} disabled={saving}>{saving ? 'Saving...' : 'Save Changes'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* ── Note Dialog ── */}
       <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg border-4 border-black">
           <DialogHeader>
-            <DialogTitle>Add Note</DialogTitle>
-            <DialogDescription>Capture key details or feedback.</DialogDescription>
+            <DialogTitle className="font-black uppercase tracking-widest">Add Note</DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">Capture key details or feedback.</DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            <Label>Note</Label>
-            <Textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} rows={4} />
+            <Label className="text-[10px] font-black uppercase tracking-widest">Note</Label>
+            <Textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} rows={4} className="border-2 border-black" />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setNoteOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddNote} disabled={saving}>
-              {saving ? 'Saving...' : 'Add Note'}
-            </Button>
+            <Button variant="outline" onClick={() => setNoteOpen(false)}>Cancel</Button>
+            <Button variant="accent" onClick={handleAddNote} disabled={saving}>{saving ? 'Saving...' : 'Add Note'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* ── Interview Dialog ── */}
       <Dialog open={interviewOpen} onOpenChange={setInterviewOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg border-4 border-black">
           <DialogHeader>
-            <DialogTitle>Log Interview</DialogTitle>
-            <DialogDescription>Track interview stages and notes.</DialogDescription>
+            <DialogTitle className="font-black uppercase tracking-widest">Log Interview</DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">Track interview stages and notes.</DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-2">
-              <Label>Stage</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest">Stage</Label>
               <Select value={interviewStage} onValueChange={setInterviewStage}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select stage" />
-                </SelectTrigger>
+                <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {['Screening', 'Interview', 'Offer'].map((stage) => (
-                    <SelectItem key={stage} value={stage}>
-                      {stage}
-                    </SelectItem>
-                  ))}
+                  {['Screening', 'Interview', 'Offer'].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Date</Label>
-              <Input
-                type="datetime-local"
-                value={interviewDate}
-                onChange={(e) => setInterviewDate(e.target.value)}
-              />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Date</Label>
+              <Input type="datetime-local" value={interviewDate} onChange={(e) => setInterviewDate(e.target.value)} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
-              <Label>Notes</Label>
-              <Textarea value={interviewNotes} onChange={(e) => setInterviewNotes(e.target.value)} rows={4} />
+              <Label className="text-[10px] font-black uppercase tracking-widest">Notes</Label>
+              <Textarea value={interviewNotes} onChange={(e) => setInterviewNotes(e.target.value)} rows={4} className="border-2 border-black" />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setInterviewOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddInterview} disabled={saving}>
-              {saving ? 'Saving...' : 'Log Interview'}
-            </Button>
+            <Button variant="outline" onClick={() => setInterviewOpen(false)}>Cancel</Button>
+            <Button variant="accent" onClick={handleAddInterview} disabled={saving}>{saving ? 'Saving...' : 'Log Interview'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
