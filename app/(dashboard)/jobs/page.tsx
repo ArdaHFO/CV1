@@ -83,6 +83,14 @@ export default function JobsPage() {
     return { tier: payload.status.planTier, searchesLeft: payload.status.remaining.jobSearches };
   };
 
+  // Normalize a job from localStorage — skills may be stored as {id,name} objects from older sessions
+  const normalizeJob = (job: Job): Job => ({
+    ...job,
+    skills: (job.skills || []).map((s: unknown) =>
+      typeof s === 'string' ? s : ((s as { name?: string })?.name ?? String(s))
+    ),
+  });
+
   const applySelectedLimit = (jobsList: Job[], limitValue: string): Job[] => {
     if (limitValue === 'all') return jobsList;
     const parsedLimit = parseInt(limitValue, 10);
@@ -110,7 +118,7 @@ export default function JobsPage() {
       const savedJobs = localStorage.getItem('lastJobSearch');
       if (savedJobs) {
         try {
-          const jobsData = JSON.parse(savedJobs);
+          const jobsData = (JSON.parse(savedJobs) as Job[]).map(normalizeJob);
           const safeLimit = canUseResultLimitOption(tier, resultLimit) ? resultLimit : '25';
           setJobs(applySelectedLimit(jobsData, safeLimit));
           refreshStatuses(applySelectedLimit(jobsData, safeLimit));
@@ -561,7 +569,7 @@ export default function JobsPage() {
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {job.skills.slice(0, 6).map((skill, idx) => (
                     <span key={`${job.id}-skill-${idx}`} className="px-2 py-0.5 border border-black/30 text-[10px] font-bold uppercase tracking-widest group-hover:border-white/40 group-hover:text-white/80">
-                      {skill}
+                      {typeof skill === 'string' ? skill : (skill as { name?: string })?.name ?? ''}
                     </span>
                   ))}
                   {job.skills.length > 6 && (
