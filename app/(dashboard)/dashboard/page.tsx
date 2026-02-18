@@ -332,7 +332,16 @@ export default function DashboardPage() {
 
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="accent" className="gap-2">
+              <Button
+                variant="accent"
+                className="gap-2"
+                onClick={(e) => {
+                  if (planTier === 'freemium' && remainingCvCreations <= 0) {
+                    e.preventDefault();
+                    setShowUpgradeModal(true);
+                  }
+                }}
+              >
                 <Plus className="w-4 h-4" />
                 Create New CV
               </Button>
