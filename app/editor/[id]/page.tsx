@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
-import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2, MoreVertical } from 'lucide-react';
+import { Save, Eye, ArrowLeft, Sparkles, Download, Share2, QrCode, Copy, Check, ZoomIn, ZoomOut, Clock, Search, AlertCircle, Loader2, MoreVertical, CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -77,6 +77,11 @@ export default function EditorPage() {
   const [optimizationResult, setOptimizationResult] = useState<CVOptimizationResult | null>(null);
   const [selectedSuggestionIndexes, setSelectedSuggestionIndexes] = useState<number[]>([]);
   const [applyingOptimization, setApplyingOptimization] = useState(false);
+  // Step-by-step review mode
+  const [reviewMode, setReviewMode] = useState(false);
+  const [reviewQueue, setReviewQueue] = useState<number[]>([]);
+  const [reviewIndex, setReviewIndex] = useState(0);
+  const [acceptedIndexes, setAcceptedIndexes] = useState<number[]>([]);
   const { isDark } = useAppDarkModeState();
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern');
   const [zoomLevel, setZoomLevel] = useState(70);
@@ -511,13 +516,48 @@ export default function EditorPage() {
     );
   };
 
-  const applySelectedOptimizations = async () => {
-    if (!content || !optimizationResult) return;
+  /** Start the step-by-step review flow for selected suggestions */
+  const startReviewMode = () => {
+    if (!optimizationResult || selectedSuggestionIndexes.length === 0) return;
+    setReviewQueue([...selectedSuggestionIndexes]);
+    setReviewIndex(0);
+    setAcceptedIndexes([]);
+    setReviewMode(true);
+  };
 
-    if (selectedSuggestionIndexes.length === 0) return;
+  /** Accept the current suggestion in the review queue */
+  const handleReviewAccept = () => {
+    const idx = reviewQueue[reviewIndex];
+    const nextAccepted = [...acceptedIndexes, idx];
+    if (reviewIndex + 1 >= reviewQueue.length) {
+      // Last one — finish
+      setAcceptedIndexes(nextAccepted);
+      finishReview(nextAccepted);
+    } else {
+      setAcceptedIndexes(nextAccepted);
+      setReviewIndex(reviewIndex + 1);
+    }
+  };
+
+  /** Skip the current suggestion in the review queue */
+  const handleReviewSkip = () => {
+    if (reviewIndex + 1 >= reviewQueue.length) {
+      finishReview(acceptedIndexes);
+    } else {
+      setReviewIndex(reviewIndex + 1);
+    }
+  };
+
+  /** Apply all accepted suggestions, save, and record history */
+  const finishReview = async (finalAccepted: number[]) => {
+    setReviewMode(false);
+    if (!content || !optimizationResult) return;
+    if (finalAccepted.length === 0) {
+      // Nothing accepted — just close review
+      return;
+    }
 
     setApplyingOptimization(true);
-
     try {
       const updatedContent: ResumeContent = {
         ...content,
@@ -525,7 +565,7 @@ export default function EditorPage() {
         skills: [...content.skills],
       };
 
-      for (const index of selectedSuggestionIndexes) {
+      for (const index of finalAccepted) {
         const suggestion = optimizationResult.suggestions[index];
         if (!suggestion) continue;
 
@@ -534,13 +574,11 @@ export default function EditorPage() {
         }
 
         if (suggestion.section === 'experience') {
-          // Use experience_index if AI provided it, otherwise find the best matching entry
           let targetIndex =
             suggestion.experience_index != null && suggestion.experience_index >= 0
               ? suggestion.experience_index
               : -1;
 
-          // Fallback: find the experience entry whose description most closely matches `suggestion.current`
           if (targetIndex === -1 && suggestion.current) {
             const currentLower = suggestion.current.toLowerCase();
             targetIndex = updatedContent.experience.findIndex(
@@ -549,8 +587,6 @@ export default function EditorPage() {
                 exp.position?.toLowerCase().includes(currentLower.slice(0, 20))
             );
           }
-
-          // Final fallback: first entry
           if (targetIndex === -1) targetIndex = 0;
 
           if (updatedContent.experience[targetIndex]) {
@@ -562,12 +598,10 @@ export default function EditorPage() {
         }
 
         if (suggestion.section === 'skills' && suggestion.suggested) {
-          // suggested may be a comma-separated list or a single skill name
           const newSkillNames = suggestion.suggested
             .split(',')
             .map((s) => s.trim())
             .filter(Boolean);
-
           for (const skillName of newSkillNames) {
             const alreadyExists = updatedContent.skills.some(
               (s) => s.name.toLowerCase() === skillName.toLowerCase()
@@ -587,7 +621,7 @@ export default function EditorPage() {
         }
       }
 
-      // Add missing skills (deduplicated)
+      // Add missing skills
       for (const skill of optimizationResult.missing_skills) {
         const clean = skill.trim();
         if (!clean) continue;
@@ -610,7 +644,6 @@ export default function EditorPage() {
       setContent(updatedContent);
       setIsDirty(true);
 
-      // Auto-save to DB
       if (currentVersion) {
         setIsSaving(true);
         try {
@@ -622,7 +655,30 @@ export default function EditorPage() {
         }
       }
 
-      // Clear optimization panel to reveal the updated editor
+      // Save optimization history record
+      try {
+        const historyEntry = {
+          id: crypto.randomUUID?.() || `opt-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          resumeId,
+          jobTitle: selectedOptimizeJob?.title || 'Unknown Job',
+          company: selectedOptimizeJob?.company || '',
+          jobLocation: selectedOptimizeJob?.location || '',
+          matchScore: optimizationResult.job_match_score,
+          appliedChanges: finalAccepted.map((i) => ({
+            section: optimizationResult.suggestions[i]?.section,
+            current: optimizationResult.suggestions[i]?.current || '',
+            suggested: optimizationResult.suggestions[i]?.suggested || '',
+            reason: optimizationResult.suggestions[i]?.reason || '',
+          })),
+          totalSuggestions: optimizationResult.suggestions.length,
+        };
+        const prev = JSON.parse(localStorage.getItem('cs-optimization-history') || '[]');
+        localStorage.setItem('cs-optimization-history', JSON.stringify([historyEntry, ...prev].slice(0, 50)));
+      } catch {
+        // history save is best-effort
+      }
+
       setOptimizationResult(null);
       setSelectedSuggestionIndexes([]);
     } finally {
@@ -853,7 +909,99 @@ export default function EditorPage() {
         )}
 
         {optimizationResult && (
-          <div className="mb-8 border-4 border-black bg-white">
+          <div className="mb-8 border-4 border-black bg-white relative">
+
+            {/* ── Step-by-step review overlay ── */}
+            {reviewMode && (() => {
+              const currentSuggestion = optimizationResult.suggestions[reviewQueue[reviewIndex]];
+              if (!currentSuggestion) return null;
+              const sectionLabel =
+                currentSuggestion.section === 'experience' && currentSuggestion.experience_index != null
+                  ? `Experience #${currentSuggestion.experience_index + 1}`
+                  : currentSuggestion.section.charAt(0).toUpperCase() + currentSuggestion.section.slice(1);
+              return (
+                <div className="absolute inset-0 z-20 bg-white flex flex-col border-4 border-black overflow-y-auto">
+                  {/* Review header */}
+                  <div className="p-4 border-b-2 border-black bg-black text-white flex items-center justify-between gap-4 shrink-0">
+                    <div className="flex items-center gap-3">
+                      <Sparkles className="w-5 h-5 text-[#FF3000]" />
+                      <span className="text-sm font-black uppercase tracking-widest">Review Changes</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-black uppercase tracking-widest text-white/70">
+                        {reviewIndex + 1} / {reviewQueue.length}
+                      </span>
+                      <button
+                        className="text-xs font-black uppercase tracking-widest text-white/50 hover:text-white"
+                        onClick={() => setReviewMode(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Progress bar */}
+                  <div className="h-1 bg-[#F2F2F2] border-b border-black shrink-0">
+                    <div
+                      className="h-full bg-[#FF3000] transition-all"
+                      style={{ width: `${((reviewIndex) / reviewQueue.length) * 100}%` }}
+                    />
+                  </div>
+
+                  <div className="p-5 flex-1 space-y-4">
+                    {/* Section + meta badges */}
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border-2 border-black">{sectionLabel}</span>
+                      <span className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border border-black/40 text-black/60">{currentSuggestion.impact || 'Relevance'}</span>
+                      <span className={`text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 border ${
+                        currentSuggestion.priority === 'high' ? 'border-[#FF3000] text-[#FF3000]' : 'border-black/40 text-black/40'
+                      }`}>{currentSuggestion.priority}</span>
+                    </div>
+
+                    {/* Reason */}
+                    <p className="text-xs font-bold uppercase tracking-widest text-black/60">{currentSuggestion.reason}</p>
+
+                    {/* Current text — red */}
+                    {currentSuggestion.current ? (
+                      <div className="border-2 border-[#FF3000] bg-[#FF3000]/5 p-3 space-y-1">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000] mb-1">Current Text (will be replaced)</p>
+                        <p className="text-xs text-black leading-relaxed whitespace-pre-wrap">{currentSuggestion.current}</p>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-[#FF3000]/40 bg-[#FF3000]/5 p-3">
+                        <p className="text-[9px] font-black uppercase tracking-widest text-[#FF3000]/60 mb-1">Current Text</p>
+                        <p className="text-xs text-black/40 italic">— empty / not set —</p>
+                      </div>
+                    )}
+
+                    {/* Suggested text — green */}
+                    <div className="border-2 border-green-600 bg-green-50 p-3 space-y-1">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-green-700 mb-1">Suggested Replacement</p>
+                      <p className="text-xs text-black leading-relaxed whitespace-pre-wrap">{currentSuggestion.suggested}</p>
+                    </div>
+
+                    {/* Accept / Skip buttons */}
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        className="flex-1 gap-2 bg-green-600 hover:bg-green-700 text-white border-2 border-green-600 font-black uppercase tracking-widest text-xs"
+                        onClick={handleReviewAccept}
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        Accept
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 gap-2 border-2 border-black font-black uppercase tracking-widest text-xs hover:bg-[#FF3000] hover:text-white hover:border-[#FF3000]"
+                        onClick={handleReviewSkip}
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Skip
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
             {/* Header */}
             <div className="p-5 border-b-2 border-black flex items-start justify-between gap-4">
               <div>
@@ -1114,7 +1262,7 @@ export default function EditorPage() {
               <Button
                 variant="accent"
                 className="w-full gap-2"
-                onClick={applySelectedOptimizations}
+                onClick={startReviewMode}
                 disabled={applyingOptimization || selectedSuggestionIndexes.length === 0}
               >
                 {applyingOptimization ? (
@@ -1125,7 +1273,7 @@ export default function EditorPage() {
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    Apply {selectedSuggestionIndexes.length} Change{selectedSuggestionIndexes.length !== 1 ? 's' : ''} & Save
+                    Review & Apply {selectedSuggestionIndexes.length} Change{selectedSuggestionIndexes.length !== 1 ? 's' : ''}
                   </>
                 )}
               </Button>

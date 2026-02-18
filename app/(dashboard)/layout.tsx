@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
-import { LayoutDashboard, Briefcase, Settings, LogOut, Menu, Crown, Check, Sparkles, ListChecks } from 'lucide-react';
+import { LayoutDashboard, Briefcase, Settings, LogOut, Menu, Crown, Check, Sparkles, ListChecks, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -247,6 +247,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Find Jobs', href: '/jobs', icon: Briefcase },
     { name: 'Applications', href: '/applications', icon: ListChecks },
+    { name: 'Optimizations', href: '/optimizations', icon: History },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 
