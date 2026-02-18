@@ -7,8 +7,6 @@ import { useRouter } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
@@ -228,14 +226,14 @@ export default function JobsPage() {
     setRemoteOnly(false);
   };
 
-  const getEmploymentTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      'full-time': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-      'part-time': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      'contract': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-      'internship': 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+  const getEmploymentTypeBorder = (type: string) => {
+    const borders: Record<string, string> = {
+      'full-time': 'border-black bg-black text-white',
+      'part-time': 'border-black bg-white text-black',
+      'contract': 'border-[#FF3000] bg-[#FF3000] text-white',
+      'internship': 'border-black bg-[#F2F2F2] text-black',
     };
-    return colors[type] || 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200';
+    return borders[type] || 'border-black bg-[#F2F2F2] text-black';
   };
 
   const formatDate = (dateString: string) => {
@@ -257,85 +255,67 @@ export default function JobsPage() {
       <div className="relative z-10 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-          <div className="mb-8 animate-in fade-in slide-in-from-top-3 duration-700">
-          <div className="flex items-center gap-3 mb-3">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
-              Find Your Next Opportunity
-            </h1>
-            <div className="flex items-center gap-2 px-3 py-1.5 border-2 border-black bg-white">
-              <Image
-                src="/linkedin.png"
-                alt="LinkedIn logo"
-                width={24}
-                height={24}
-                className="h-6 w-6"
-              />
-              <span className="text-xs font-black uppercase tracking-widest">Powered by LinkedIn</span>
+          <div className="mb-8">
+            <div className="flex flex-wrap items-center gap-4 mb-2">
+              <h1 className="text-3xl font-black uppercase tracking-widest">
+                Job Search
+              </h1>
+              <div className="flex items-center gap-2 px-3 py-1.5 border-2 border-black bg-white">
+                <Image
+                  src="/linkedin.png"
+                  alt="LinkedIn logo"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5"
+                />
+                <span className="text-[10px] font-black uppercase tracking-widest">Powered by LinkedIn</span>
+              </div>
             </div>
-          </div>
-          <p className="text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0077B5]/10 dark:bg-[#0077B5]/20 text-[#0077B5] dark:text-[#00A0DC] font-medium text-sm border border-[#0077B5]/20">
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-              LinkedIn Jobs
-            </span>
-            <span>Search and optimize your CV to match job requirements</span>
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-500">
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-blue-200 dark:border-blue-900">
-              💾 Smart Caching (5min)
-            </Badge>
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-indigo-200 dark:border-indigo-900">
-              🎯 Advanced Filters
-            </Badge>
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-violet-200 dark:border-violet-900">
-              ⚡ Choose how many job listings to fetch
-            </Badge>
-            <Badge variant="outline" className="text-xs bg-white/70 dark:bg-zinc-900/60 backdrop-blur-sm border-amber-200 dark:border-amber-900">
-              {planTier === 'pro'
-                ? `Pro total searches left: ${remainingSearches} (${remainingTokenSearches} token)`
-                : `Freemium total searches left: ${remainingSearches} (${remainingTokenSearches} token)`}
-            </Badge>
-          </div>
+            <p className="text-xs font-bold uppercase tracking-widest text-black/60">
+              Search and optimize your CV to match job requirements
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="px-3 py-1 border-2 border-black bg-[#F2F2F2] text-[10px] font-black uppercase tracking-widest">
+                {planTier === 'pro' ? 'Pro' : 'Freemium'} — {remainingSearches} search{remainingSearches !== 1 ? 'es' : ''} left{remainingTokenSearches > 0 ? ` + ${remainingTokenSearches} token` : ''}
+              </span>
+            </div>
           {usageMessage && (
-            <p className="mt-3 text-sm text-amber-700 dark:text-amber-400">{usageMessage}</p>
+            <p className="mt-3 text-xs font-bold uppercase tracking-widest text-[#FF3000]">{usageMessage}</p>
           )}
         </div>
 
         {/* Search Form */}
-        <Card className="mb-8 bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-          <CardContent className="pt-6">
+        <div className="mb-8 border-4 border-black bg-white p-6">
             {/* Row 1: Main Search Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 mb-4">
               <div className="md:col-span-5">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40 w-4 h-4" />
                   <Input
                     placeholder="Job title, keywords, or company"
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="pl-9"
+                    className="pl-9 border-2 border-black focus:ring-2 focus:ring-[#FF3000] focus:border-[#FF3000]"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-4">
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-black/40 w-4 h-4" />
                   <Input
                     placeholder="Location (optional)"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="pl-9"
+                    className="pl-9 border-2 border-black focus:ring-2 focus:ring-[#FF3000] focus:border-[#FF3000]"
                   />
                 </div>
               </div>
 
               <div className="md:col-span-3">
-                <Button onClick={handleSearch} disabled={loading} className="w-full gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300">
+                <Button onClick={handleSearch} disabled={loading} variant="accent" className="w-full gap-2">
                   <Search className="w-4 h-4" />
                   {loading ? 'Searching...' : 'Search Jobs'}
                 </Button>
@@ -343,9 +323,9 @@ export default function JobsPage() {
             </div>
 
             {/* Row 2: Advanced Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 pt-4 border-t-2 border-black items-center">
               <Select value={employmentType} onValueChange={setEmploymentType}>
-                <SelectTrigger>
+                <SelectTrigger className="border-2 border-black font-bold uppercase text-xs tracking-widest">
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -358,8 +338,8 @@ export default function JobsPage() {
               </Select>
 
               <Select value={experienceLevel} onValueChange={setExperienceLevel}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Experience Level" />
+                <SelectTrigger className="border-2 border-black font-bold uppercase text-xs tracking-widest">
+                  <SelectValue placeholder="Experience" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Levels</SelectItem>
@@ -371,256 +351,177 @@ export default function JobsPage() {
               </Select>
 
               <Select value={datePosted} onValueChange={setDatePosted}>
-                <SelectTrigger>
+                <SelectTrigger className="border-2 border-black font-bold uppercase text-xs tracking-widest">
                   <SelectValue placeholder="Date Posted" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Any Time</SelectItem>
-                  <SelectItem value="24h">Last 24 hours</SelectItem>
+                  <SelectItem value="24h">Last 24h</SelectItem>
                   <SelectItem value="week">Past Week</SelectItem>
                   <SelectItem value="month">Past Month</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={resultLimit} onValueChange={setResultLimit}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Listings to Show" />
+                <SelectTrigger className="border-2 border-black font-bold uppercase text-xs tracking-widest">
+                  <SelectValue placeholder="Listings" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="25">Show 25 listings</SelectItem>
+                  <SelectItem value="25">25 listings</SelectItem>
                   <SelectItem value="50" disabled={!canUseResultLimitOption(planTier, '50')}>
-                    {canUseResultLimitOption(planTier, '50') ? 'Show 50 listings' : '🔒 Show 50 listings (Pro only)'}
+                    {canUseResultLimitOption(planTier, '50') ? '50 listings' : '🔒 50 listings (Pro)'}
                   </SelectItem>
                   <SelectItem value="all" disabled={!canUseResultLimitOption(planTier, 'all')}>
-                    {canUseResultLimitOption(planTier, 'all') ? 'Show all listings' : '🔒 Show all listings (Pro only)'}
+                    {canUseResultLimitOption(planTier, 'all') ? 'All listings' : '🔒 All listings (Pro)'}
                   </SelectItem>
                 </SelectContent>
               </Select>
 
-              <div className="flex gap-2">
-                <div className="flex items-center flex-1">
-                  <label className="w-full cursor-pointer rounded-md border border-zinc-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/40 px-3 py-2 transition-all hover:border-blue-300 dark:hover:border-blue-700 hover:bg-white/90 dark:hover:bg-zinc-900/70">
-                    <input
-                      type="checkbox"
-                      checked={remoteOnly}
-                      onChange={(e) => setRemoteOnly(e.target.checked)}
-                      className="peer sr-only"
-                    />
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                        Remote Only
-                      </span>
-                      <span className="relative inline-flex h-6 w-11 items-center">
-                        <span className="absolute inset-0 rounded-full bg-zinc-300 dark:bg-zinc-700 transition-colors peer-checked:bg-gradient-to-r peer-checked:from-blue-500 peer-checked:to-indigo-600" />
-                        <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
-                      </span>
-                    </div>
-                  </label>
-                </div>
-                
+              {/* Remote Only + Clear — fixed height row, no layout shift */}
+              <div className="flex items-center gap-2 h-10">
+                <label className="flex items-center gap-2 cursor-pointer select-none h-10 px-3 border-2 border-black bg-white flex-1">
+                  <input
+                    type="checkbox"
+                    checked={remoteOnly}
+                    onChange={(e) => setRemoteOnly(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  {/* Swiss toggle: simple square toggle */}
+                  <span className="relative inline-flex h-5 w-9 shrink-0 items-center">
+                    <span className="absolute inset-0 border-2 border-black bg-white transition-colors peer-checked:bg-black" />
+                    <span className="absolute left-0.5 top-0.5 h-3.5 w-3.5 bg-black transition-transform peer-checked:translate-x-4 peer-checked:bg-white" />
+                  </span>
+                  <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Remote</span>
+                </label>
                 {(employmentType !== 'all' || experienceLevel !== 'all' || datePosted !== 'all' || resultLimit !== '25' || remoteOnly) && (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={clearFilters}
-                    className="text-xs"
+                    className="text-[10px] font-black uppercase tracking-widest h-10 px-3 shrink-0"
                   >
                     Clear
                   </Button>
                 )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
 
-        {/* Results */}
+        {/* Results count */}
         {searched && !loading && (
-          <div className="mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                  {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
-                  {jobs.length > 0 && ` (showing ${jobs.length} results)`}
-                </p>
-                {jobs.length > 0 && (
-                  <p className="text-xs text-zinc-500 dark:text-zinc-500 mt-1">
-                    Source: {jobs[0]?.source || 'unknown'} • 
-                    {localStorage.getItem(`job-search-${keywords}-${location}-${employmentType}-${experienceLevel}-${datePosted}-${resultLimit}-${remoteOnly}-time`) && 
-                     ' Cached results (5min validity)'}
-                  </p>
-                )}
-              </div>
-              
-              {/* Active Filters Display */}
-              {(employmentType !== 'all' || experienceLevel !== 'all' || datePosted !== 'all' || resultLimit !== '25' || remoteOnly) && (
-                <div className="flex flex-wrap gap-2">
-                  {employmentType !== 'all' && (
-                    <Badge variant="secondary" className="capitalize">
-                      {employmentType}
-                    </Badge>
-                  )}
-                  {experienceLevel !== 'all' && (
-                    <Badge variant="secondary" className="capitalize">
-                      {experienceLevel} Level
-                    </Badge>
-                  )}
-                  {datePosted !== 'all' && (
-                    <Badge variant="secondary">
-                      {datePosted === '24h' ? 'Last 24h' : datePosted === 'week' ? 'Past Week' : 'Past Month'}
-                    </Badge>
-                  )}
-                  {resultLimit !== '25' && (
-                    <Badge variant="secondary">
-                      {resultLimit === 'all' ? 'Show all listings' : `Show ${resultLimit} listings`}
-                    </Badge>
-                  )}
-                  {remoteOnly && (
-                    <Badge variant="secondary">
-                      Remote Only
-                    </Badge>
-                  )}
-                </div>
-              )}
-            </div>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <p className="text-xs font-black uppercase tracking-widest">
+              {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} found
+            </p>
+            {employmentType !== 'all' && <span className="px-2 py-0.5 border-2 border-black text-[10px] font-black uppercase tracking-widest">{employmentType}</span>}
+            {experienceLevel !== 'all' && <span className="px-2 py-0.5 border-2 border-black text-[10px] font-black uppercase tracking-widest">{experienceLevel}</span>}
+            {datePosted !== 'all' && <span className="px-2 py-0.5 border-2 border-black text-[10px] font-black uppercase tracking-widest">{datePosted === '24h' ? 'Last 24h' : datePosted === 'week' ? 'Past Week' : 'Past Month'}</span>}
+            {remoteOnly && <span className="px-2 py-0.5 border-2 border-[#FF3000] text-[10px] font-black uppercase tracking-widest text-[#FF3000]">Remote Only</span>}
           </div>
         )}
         
         {/* Loading State */}
         {loading && (
-          <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 shadow-xl">
-            <CardContent className="text-center py-16">
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0077B5]"></div>
-                  <svg className="w-12 h-12 animate-pulse" viewBox="0 0 24 24" fill="#0077B5" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                  Searching LinkedIn jobs...
-                </h3>
-                <p className="text-zinc-600 dark:text-zinc-400 max-w-md">
-                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#0077B5]/10 dark:bg-[#0077B5]/20 text-[#0077B5] dark:text-[#00A0DC] font-medium text-sm border border-[#0077B5]/20 mr-1">
-                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                    </svg>
-                    LinkedIn
-                  </span>
-                  Scraping real-time data from LinkedIn. This typically takes 1-2 minutes.
-                  Please be patient while we fetch the latest job postings.
-                </p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-500">
-                  💡 Tip: Reduce your search scope for faster results
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="border-4 border-black bg-white py-16">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-10 h-10 border-4 border-black border-t-[#FF3000] animate-spin" />
+              <p className="text-xs font-black uppercase tracking-widest">Searching LinkedIn jobs...</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 max-w-xs text-center">
+                Fetching real-time data — typically 1–2 minutes
+              </p>
+            </div>
+          </div>
         )}
 
         {/* Job Listings */}
         {!loading && jobs.length > 0 ? (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-3 duration-700">
-          {jobs.map((job) => {
-            return (
-            <Card
+        <div className="space-y-3">
+          {jobs.map((job) => (
+            <div
               key={job.id}
-              className="hover:shadow-2xl transition-all duration-300 cursor-pointer bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-zinc-200/70 dark:border-zinc-800 hover:scale-[1.01] hover:-translate-y-0.5"
+              className="border-2 border-black bg-white hover:bg-black hover:text-white transition-colors duration-150 cursor-pointer group p-5"
               onClick={() => router.push(`/jobs/${job.id}`)}
             >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-xl mb-1">{job.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-4 text-base">
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                        {job.company}
-                      </span>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-base font-black uppercase tracking-widest leading-tight mb-1 group-hover:text-white">{job.title}</h3>
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-widest text-black/60 group-hover:text-white/60">
+                    <span>{job.company}</span>
+                    {job.location && (
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3 h-3" />
                         {job.location}
                       </span>
-                    </CardDescription>
-                  </div>
-                  <Badge className={getEmploymentTypeColor(job.employment_type)}>
-                    {job.employment_type}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-zinc-700 dark:text-zinc-300 mb-4 line-clamp-3">
-                  {job.description}
-                </p>
-
-                {job.skills && job.skills.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {job.skills.slice(0, 6).map((skill, idx) => (
-                      <Badge key={`${job.id}-skill-${idx}`} variant="secondary">
-                        {skill}
-                      </Badge>
-                    ))}
-                    {job.skills.length > 6 && (
-                      <Badge variant="secondary">+{job.skills.length - 6} more</Badge>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between text-sm text-zinc-600 dark:text-zinc-400">
-                  <div className="flex items-center gap-4">
-                    {job.salary_range && (
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
-                        {job.salary_range}
-                      </span>
                     )}
                     <span>{formatDate(job.posted_date)}</span>
+                    {job.salary_range && <span>{job.salary_range}</span>}
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2 border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950 hover:border-blue-400 dark:hover:border-blue-600 transition-all duration-300"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      router.push(`/jobs/${job.id}`);
-                    }}
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    Optimize CV
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-            );
-          })}
+                <span className={`shrink-0 px-2 py-0.5 border-2 text-[10px] font-black uppercase tracking-widest ${getEmploymentTypeBorder(job.employment_type)} group-hover:bg-white group-hover:text-black group-hover:border-white`}>
+                  {job.employment_type}
+                </span>
+              </div>
+
+              {job.description && (
+                <p className="mt-3 text-xs text-black/70 group-hover:text-white/70 line-clamp-2">
+                  {job.description}
+                </p>
+              )}
+
+              {job.skills && job.skills.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {job.skills.slice(0, 6).map((skill, idx) => (
+                    <span key={`${job.id}-skill-${idx}`} className="px-2 py-0.5 border border-black/30 text-[10px] font-bold uppercase tracking-widest group-hover:border-white/40 group-hover:text-white/80">
+                      {skill}
+                    </span>
+                  ))}
+                  {job.skills.length > 6 && (
+                    <span className="px-2 py-0.5 border border-black/30 text-[10px] font-bold uppercase tracking-widest group-hover:border-white/40 group-hover:text-white/80">
+                      +{job.skills.length - 6}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-4 flex justify-end">
+                <Button
+                  variant="accent"
+                  size="sm"
+                  className="gap-2 group-hover:bg-white group-hover:text-black group-hover:border-white"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/jobs/${job.id}`);
+                  }}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Optimize CV
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
         ) : null}
 
         {/* Empty State */}
         {!loading && searched && jobs.length === 0 && (
-          <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-dashed border-zinc-300 dark:border-zinc-700 shadow-lg">
-            <CardContent className="text-center py-16">
-              <Briefcase className="w-16 h-16 mx-auto mb-4 text-zinc-400 dark:text-zinc-600" />
-              <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-                No jobs found
-              </h3>
-              <p className="text-zinc-600 dark:text-zinc-400 mb-4">
-                Try adjusting your search criteria or keywords
-              </p>
-            </CardContent>
-          </Card>
+          <div className="border-4 border-black bg-white py-16 text-center">
+            <Briefcase className="w-12 h-12 mx-auto mb-4 text-black/30" />
+            <h3 className="text-base font-black uppercase tracking-widest mb-2">No jobs found</h3>
+            <p className="text-xs font-bold uppercase tracking-widest text-black/60">
+              Try adjusting your search criteria or keywords
+            </p>
+          </div>
         )}
 
         {/* Initial State */}
         {!loading && !searched && (
-          <Card className="bg-white/80 dark:bg-zinc-900/70 backdrop-blur-sm border-dashed border-zinc-300 dark:border-zinc-700 shadow-lg">
-            <CardContent className="text-center py-16">
-              <Search className="w-16 h-16 mx-auto mb-4 text-zinc-400 dark:text-zinc-600" />
-              <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-                Start your job search
-              </h3>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                Enter keywords to find relevant job opportunities
-              </p>
-            </CardContent>
-          </Card>
+          <div className="border-4 border-black bg-white py-16 text-center">
+            <Search className="w-12 h-12 mx-auto mb-4 text-black/30" />
+            <h3 className="text-base font-black uppercase tracking-widest mb-2">Start your job search</h3>
+            <p className="text-xs font-bold uppercase tracking-widest text-black/60">
+              Enter keywords to find relevant job opportunities
+            </p>
+          </div>
         )}
         </div>
       </div>
