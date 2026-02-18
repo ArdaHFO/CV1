@@ -547,7 +547,7 @@ export default function Home() {
                     Pro starts at
                   </div>
                   <div className="text-3xl font-black uppercase text-[#FF3000]">
-                    $19.99<span className="text-lg">/mo</span>
+                    $19.99<span className="text-base font-bold">/mo</span> <span className="text-lg">or $199.99<span className="text-base font-bold">/yr</span></span>
                   </div>
                   <Button asChild variant="accent" size="lg">
                     <Link href="/register" className="flex items-center gap-3">

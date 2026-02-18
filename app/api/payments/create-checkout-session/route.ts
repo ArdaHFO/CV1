@@ -10,7 +10,7 @@ const PLAN_CONFIG = {
   },
   'pro-yearly': {
     name: 'CSpark Pro Yearly',
-    amount: 7999,
+    amount: 19999,
     intervalLabel: 'year',
   },
 } as const;
