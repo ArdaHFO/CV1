@@ -198,9 +198,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     {
       id: 'pro-yearly' as const,
       name: 'Pro Yearly',
-      price: '$79.99',
+      price: '$199.99',
       period: '/year',
-      description: 'Best value with 33% savings and priority feature access.',
+      description: 'Best value with priority feature access and unlimited tools.',
       badge: 'Best Value',
     },
   ];

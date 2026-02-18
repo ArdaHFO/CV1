@@ -454,7 +454,7 @@ export default function DashboardPage() {
                     {defaultResume?.title || 'None'}
                   </p>
                   {defaultResume && (
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">Click to edit</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest mt-1">Click to edit</p>
                   )}
                 </div>
                 <div className="border-2 border-black p-2 flex-shrink-0">
@@ -495,7 +495,7 @@ export default function DashboardPage() {
                   <CardTitle className="text-lg font-black uppercase tracking-widest">
                     {resume.title}
                   </CardTitle>
-                  <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+                  <CardDescription className="text-[10px] font-bold uppercase tracking-widest">
                     Updated: {new Date(resume.updated_at).toLocaleDateString('en-US', { 
                       month: 'short', 
                       day: 'numeric',
