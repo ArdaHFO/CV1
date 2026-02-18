@@ -838,7 +838,10 @@ export async function GET(request: NextRequest) {
             job.title.toLowerCase().includes(keywordLower) ||
             job.company.toLowerCase().includes(keywordLower) ||
             job.description.toLowerCase().includes(keywordLower) ||
-            job.skills.some((skill) => skill.toLowerCase().includes(keywordLower))
+            job.skills.some((skill) => {
+              const s = typeof skill === 'string' ? skill : (skill as { name?: string })?.name ?? '';
+              return s.toLowerCase().includes(keywordLower);
+            })
         );
       }
 

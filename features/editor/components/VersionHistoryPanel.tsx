@@ -106,26 +106,32 @@ function DiffSection({ diff }: { diff: SectionDiff }) {
           <div className="space-y-2">
             {diff.removed && diff.removed.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {diff.removed.map((s) => (
+                {diff.removed.map((s, idx) => {
+                  const label = typeof s === 'string' ? s : (s as { name?: string })?.name ?? '';
+                  return (
                   <span
-                    key={s}
+                    key={`${label}-${idx}`}
                     className="bg-red-100 text-red-700 line-through text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border border-red-300 rounded-sm"
                   >
-                    {s}
+                    {label}
                   </span>
-                ))}
+                  );
+                })}
               </div>
             )}
             {diff.added && diff.added.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
-                {diff.added.map((s) => (
+                {diff.added.map((s, idx) => {
+                  const label = typeof s === 'string' ? s : (s as { name?: string })?.name ?? '';
+                  return (
                   <span
-                    key={s}
+                    key={`${label}-${idx}`}
                     className="bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border border-green-300 rounded-sm"
                   >
-                    + {s}
+                    + {label}
                   </span>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
