@@ -389,30 +389,55 @@ async function searchCareerOneJobs(
 
     const items: any[] = await runResponse.json();
     console.log(`CareerOne actor returned ${items.length} items`);
-    if (items.length > 0) console.log('Sample CareerOne item fields:', Object.keys(items[0]));
+    if (items.length > 0) {
+      console.log('Sample CareerOne item fields:', JSON.stringify(Object.keys(items[0])));
+      console.log('Sample CareerOne item:', JSON.stringify(items[0]).substring(0, 500));
+    }
 
     const validTypes = ['full-time', 'part-time', 'contract', 'internship'] as const;
     type EmpType = typeof validTypes[number];
 
     const jobs: Job[] = items.map((item: any, index: number) => {
-      const jobId = item.id || item.jobId || `careerone-${Date.now()}-${index}`;
-      const title = item.title || item.jobTitle || item.position || 'No Title';
-      const company = item.company || item.companyName || item.advertiser || item.employer || 'Unknown Company';
-      const loc = item.location || item.locationName || item.suburb || item.city || 'Location not specified';
+      const jobId = item.id || item.jobId || item.jobAdId || `careerone-${Date.now()}-${index}`;
 
-      const rawDesc = item.description || item.jobDescription || item.summary || item.teaser || '';
+      // CareerOne (Seek-based) uses 'heading' for title
+      const title = item.heading || item.title || item.jobTitle || item.position || 'No Title';
+
+      // CareerOne uses advertiser.description (object) or advertiser as string
+      const advertiser = item.advertiser;
+      const company = (typeof advertiser === 'object' && advertiser !== null)
+        ? (advertiser.description || advertiser.name || advertiser.label || JSON.stringify(advertiser))
+        : (advertiser || item.company || item.companyName || item.employer || 'Unknown Company');
+
+      // Location: may be string or object with 'label'/'area'
+      const locRaw = item.location || item.locationName || item.locationLabel || item.suburb || item.city;
+      const loc = (typeof locRaw === 'object' && locRaw !== null)
+        ? (locRaw.label || locRaw.area || locRaw.description || JSON.stringify(locRaw))
+        : (locRaw || 'Location not specified');
+
+      // Description: CareerOne uses 'content' or 'teaser'
+      const rawDesc = item.content || item.description || item.jobDescription || item.summary || item.teaser || '';
       const description = typeof rawDesc === 'string'
         ? rawDesc.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() || 'No description available'
         : 'No description available';
 
       const url = item.url || item.jobUrl || item.applyUrl || item.link || '#';
-      const salary = item.salary || item.salaryRange || item.wage || 'Not specified';
+
+      // Salary: may be object with label
+      const salaryRaw = item.salary || item.salaryRange || item.wage || item.salaryLabel;
+      const salary = (typeof salaryRaw === 'object' && salaryRaw !== null)
+        ? (salaryRaw.label || salaryRaw.description || salaryRaw.currencyLabel || 'Not specified')
+        : (salaryRaw || 'Not specified');
 
       const skills: string[] = [];
-      if (Array.isArray(item.skills)) skills.push(...item.skills);
-      if (item.classification) skills.push(item.classification);
-      if (item.subClassification) skills.push(item.subClassification);
-      if (item.workType) skills.push(item.workType);
+      if (Array.isArray(item.skills)) skills.push(...item.skills.map((s: any) => typeof s === 'string' ? s : s?.name || '').filter(Boolean));
+      // classification may be object {description:'...'} or string
+      const classif = item.classification;
+      if (classif) skills.push(typeof classif === 'object' ? (classif.description || classif.label || '') : classif);
+      const subClassif = item.subClassification;
+      if (subClassif) skills.push(typeof subClassif === 'object' ? (subClassif.description || subClassif.label || '') : subClassif);
+      const workTypeSkill = item.workType || item.workTypes;
+      if (workTypeSkill && typeof workTypeSkill === 'string') skills.push(workTypeSkill);
 
       const requirements: string[] = [];
       const descLower = description.toLowerCase();
@@ -422,14 +447,20 @@ async function searchCareerOneJobs(
       const expMatch = description.match(/(\d+)\+?\s*years?\s*(?:of\s*)?experience/i);
       if (expMatch) requirements.push(`${expMatch[1]}+ years of experience`);
 
-      let rawType = (item.workType || item.employmentType || item.jobType || '').toLowerCase().replace(/[_\s]/g, '-');
+      // workType can be array ['Full time'] or string or object
+      const workTypeRaw = Array.isArray(item.workType) ? item.workType[0]
+        : (typeof item.workType === 'object' && item.workType !== null) ? (item.workType.label || item.workType.description || '')
+        : (item.workType || item.workTypes || item.employmentType || item.jobType || '');
+      let rawType = String(workTypeRaw).toLowerCase().replace(/[_\s]/g, '-');
       if (rawType.includes('full')) rawType = 'full-time';
       else if (rawType.includes('part')) rawType = 'part-time';
       else if (rawType.includes('contract') || rawType.includes('casual')) rawType = 'contract';
       else if (rawType.includes('intern')) rawType = 'internship';
       const employmentType: EmpType = (validTypes.includes(rawType as EmpType) ? rawType : 'full-time') as EmpType;
 
-      const postedDate = item.listingDate || item.postedDate || item.datePosted || item.publishedAt || new Date().toISOString().split('T')[0];
+      const postedDate = item.listingDate || item.postedDate || item.datePosted || item.publishedAt || item.expiresAt || new Date().toISOString().split('T')[0];
+      // Normalize to YYYY-MM-DD if ISO string
+      const postedDateStr = typeof postedDate === 'string' ? postedDate.split('T')[0] : new Date().toISOString().split('T')[0];
 
       return {
         id: String(jobId),
@@ -439,9 +470,9 @@ async function searchCareerOneJobs(
         description,
         requirements,
         skills: [...new Set(skills)].filter(Boolean),
-        salary_range: salary,
+        salary_range: typeof salary === 'string' ? salary : String(salary),
         employment_type: employmentType,
-        posted_date: postedDate,
+        posted_date: postedDateStr,
         apply_url: url,
         source: 'careerone',
       } satisfies Job;
