@@ -90,6 +90,7 @@ export default function ApplicationsPage() {
   const [interviewDate, setInterviewDate] = useState('');
   const [interviewNotes, setInterviewNotes] = useState('');
   const [saving, setSaving] = useState(false);
+  const [createError, setCreateError] = useState('');
 
   const resumeOptions = useMemo(() => resumes, [resumes]);
 
@@ -123,6 +124,7 @@ export default function ApplicationsPage() {
 
   const openCreate = () => {
     resetForm();
+    setCreateError('');
     setCreateOpen(true);
   };
 
@@ -146,6 +148,7 @@ export default function ApplicationsPage() {
     if (!formState.job_title.trim() || !formState.company.trim()) return;
 
     setSaving(true);
+    setCreateError('');
     const version = formState.resume_id
       ? await getActiveResumeVersion(formState.resume_id)
       : null;
@@ -167,6 +170,8 @@ export default function ApplicationsPage() {
       setApplications((prev) => [created, ...prev]);
       setCreateOpen(false);
       resetForm();
+    } else {
+      setCreateError('Could not add application. Make sure the tracker tables are deployed and try again.');
     }
     setSaving(false);
   };
@@ -388,6 +393,11 @@ export default function ApplicationsPage() {
             <DialogDescription>Track a new job application.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 md:grid-cols-2">
+            {createError && (
+              <div className="md:col-span-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
+                {createError}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="job-title">Job Title</Label>
               <Input

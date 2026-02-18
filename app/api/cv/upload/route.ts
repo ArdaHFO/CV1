@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerUserId } from '@/lib/auth/server-user';
-import { createResume } from '@/lib/database/resumes';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/client';
 import type { ResumeContent } from '@/types';
+import pdfParse from 'pdf-parse';
+import mammoth from 'mammoth';
 
 // Helper function to create empty resume template
 function createEmptyResumeContent(fileName: string): ResumeContent {
@@ -28,19 +31,131 @@ function createEmptyResumeContent(fileName: string): ResumeContent {
   };
 }
 
-// Helper to extract text from PDF/DOCX using AI
-async function parseCVWithAI(fileBuffer: Buffer, fileName: string): Promise<ResumeContent> {
-  // Check if GROQ API key is available
+async function extractTextFromFile(fileBuffer: Buffer, fileExtension: string): Promise<string> {
+  if (fileExtension === 'pdf') {
+    const parsed = await pdfParse(fileBuffer);
+    return parsed.text || '';
+  }
+
+  if (fileExtension === 'docx' || fileExtension === 'doc') {
+    const parsed = await mammoth.extractRawText({ buffer: fileBuffer });
+    return parsed.value || '';
+  }
+
+  return '';
+}
+
+function normalizeResumeContent(input: Partial<ResumeContent>, fileName: string): ResumeContent {
+  const base = createEmptyResumeContent(fileName);
+
+  const safeArray = <T>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
+
+  return {
+    ...base,
+    ...input,
+    personal_info: {
+      ...base.personal_info,
+      ...(input.personal_info || {}),
+    },
+    experience: safeArray(input.experience),
+    education: safeArray(input.education),
+    skills: safeArray(input.skills),
+    languages: safeArray(input.languages),
+    certifications: safeArray(input.certifications),
+    projects: safeArray(input.projects),
+    publications: safeArray(input.publications),
+    custom_sections: safeArray(input.custom_sections),
+  };
+}
+
+function extractJsonPayload(raw: string): string {
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fenced?.[1]) {
+    return fenced[1].trim();
+  }
+
+  const firstBrace = raw.indexOf('{');
+  const lastBrace = raw.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return raw.slice(firstBrace, lastBrace + 1).trim();
+  }
+
+  return raw.trim();
+}
+
+async function parseCVWithAI(
+  fileBuffer: Buffer,
+  fileName: string,
+  fileExtension: string
+): Promise<ResumeContent> {
   if (!process.env.GROQ_API_KEY) {
     console.warn('GROQ_API_KEY not found, returning empty template');
     return createEmptyResumeContent(fileName);
   }
 
   try {
-    // For now, return empty template since we need PDF/DOCX parsing libraries
-    // TODO: Install pdf-parse and mammoth for actual file parsing
-    console.log('AI parsing not fully implemented yet, returning template');
-    return createEmptyResumeContent(fileName);
+    const text = await extractTextFromFile(fileBuffer, fileExtension);
+
+    if (!text.trim()) {
+      return createEmptyResumeContent(fileName);
+    }
+
+    const prompt = `Extract resume data from the text below and return ONLY valid JSON that matches this schema:\n\n{
+  "personal_info": {
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "website": "",
+    "linkedin": "",
+    "github": ""
+  },
+  "summary": "",
+  "experience": [
+    {"company": "", "position": "", "start_date": "", "end_date": "", "description": ""}
+  ],
+  "education": [
+    {"institution": "", "degree": "", "start_date": "", "end_date": "", "description": ""}
+  ],
+  "skills": [
+    {"name": "", "level": ""}
+  ],
+  "languages": [],
+  "certifications": [],
+  "projects": [],
+  "publications": [],
+  "custom_sections": []
+}\n\nResume text:\n${text}`;
+
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [
+          { role: 'system', content: 'Return only JSON. No markdown or commentary.' },
+          { role: 'user', content: prompt },
+        ],
+        temperature: 0.2,
+        max_tokens: 2000,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(`Groq API error: ${data.error?.message || 'Unknown error'}`);
+    }
+
+    const raw = data.choices?.[0]?.message?.content || '';
+    const jsonPayload = extractJsonPayload(raw);
+    const parsed = JSON.parse(jsonPayload) as Partial<ResumeContent>;
+
+    return normalizeResumeContent(parsed, fileName);
   } catch (error) {
     console.error('AI parsing error:', error);
     return createEmptyResumeContent(fileName);
@@ -53,6 +168,43 @@ export async function POST(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const supabase = await createSupabaseServerClient();
+    if (!supabase || !supabaseAdmin) {
+      return NextResponse.json(
+        { success: false, error: 'Supabase is not configured' },
+        { status: 500 }
+      );
+    }
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const email = user.email ?? `user-${user.id}@placeholder.local`;
+      const fullName =
+        (user.user_metadata?.full_name as string | undefined) ||
+        (user.user_metadata?.name as string | undefined) ||
+        null;
+      const avatarUrl =
+        (user.user_metadata?.avatar_url as string | undefined) ||
+        (user.user_metadata?.picture as string | undefined) ||
+        null;
+
+      await (supabaseAdmin as any)
+        .from('profiles')
+        .upsert(
+          {
+            id: user.id,
+            email,
+            full_name: fullName,
+            avatar_url: avatarUrl,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'id' }
+        );
     }
 
     const formData = await request.formData();
@@ -79,7 +231,7 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     // Parse CV (currently returns template)
-    const content = await parseCVWithAI(buffer, file.name);
+    const content = await parseCVWithAI(buffer, file.name, fileExtension);
 
     // Create resume with parsed content
     const title = `Imported CV - ${file.name.replace(/\.[^/.]+$/, '')}`;
@@ -88,20 +240,44 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    const resume = await createResume(userId, title, slug);
+    const { data: resume, error: resumeError } = await (supabaseAdmin as any)
+      .from('resumes')
+      .insert({
+        user_id: userId,
+        title,
+        slug,
+        is_default: false,
+        view_count: 0,
+      })
+      .select()
+      .single();
 
-    if (!resume) {
+    if (resumeError || !resume) {
       return NextResponse.json(
         { success: false, error: 'Failed to create resume' },
         { status: 500 }
       );
     }
 
+    const { error: versionError } = await (supabaseAdmin as any)
+      .from('resume_versions')
+      .insert({
+        resume_id: resume.id,
+        version_number: 1,
+        template_type: 'modern',
+        is_active: true,
+        content,
+      });
+
+    if (versionError) {
+      console.error('Failed to create resume version:', versionError);
+    }
+
     return NextResponse.json({
       success: true,
       resumeId: resume.id,
       content: content,
-      message: 'CV uploaded successfully. Please fill in your information in the editor.',
+      message: 'CV uploaded successfully. Please review and edit your information.',
     });
   } catch (error) {
     console.error('CV upload error:', error);

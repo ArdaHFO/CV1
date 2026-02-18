@@ -181,14 +181,13 @@ export default function Home() {
             <h1 className={`text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight ${
               isDark ? 'text-white' : 'text-gray-900'
             }`}>
-              Search LinkedIn jobs and tailor your CV
-              <br />
-              <span className={`inline-flex flex-wrap items-baseline justify-center gap-2 ${
+              <span className="block">Search LinkedIn jobs</span>
+              <span className={`block ${
                 isDark
                   ? 'text-violet-100 drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]'
                   : 'bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 bg-clip-text text-transparent'
               }`}>
-                with
+                Tailor your CV with{' '}
                 <AnimatedTextCycle
                   words={['Precision', 'Speed', 'Clarity', 'Confidence']}
                   interval={2600}
