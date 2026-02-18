@@ -324,19 +324,41 @@ async function searchLinkedInJobs(
 async function searchCareerOneJobs(
   keywords: string,
   location: string,
-  limit: number | null
+  limit: number | null,
+  employmentType?: string,
+  datePosted?: string,
 ): Promise<Job[]> {
   if (!CAREERONE_APIFY_TOKEN) {
     console.warn('APIFY_CAREERONE_TOKEN not configured, skipping CareerOne search');
     return [];
   }
   try {
-    const maxItems = limit ?? 25;
+    const maxResults = limit ?? 25;
+
+    // Map employment type → CareerOne jobTypes / contractTypes
+    const jobTypesMap: Record<string, string> = {
+      'full-time': 'Full time',
+      'part-time': 'Part time',
+      'internship': 'Casual/Vacation',
+    };
+    const jobTypes = employmentType && jobTypesMap[employmentType]
+      ? [jobTypesMap[employmentType]]
+      : undefined;
+    const contractTypes = employmentType === 'contract' ? ['Contract'] : undefined;
+
+    // Map datePosted → dayRange
+    const dayRangeMap: Record<string, number> = { '24h': 1, 'week': 7, 'month': 30 };
+    const dayRange = datePosted && dayRangeMap[datePosted] ? dayRangeMap[datePosted] : undefined;
 
     const body: Record<string, unknown> = {
-      keyword: keywords || 'developer',
+      searchTerm: keywords || 'developer',
+      maxResults,
+      sortBy: 'Date Posted',
+      allowSurrounding: true,
       ...(location ? { location } : {}),
-      maxItems,
+      ...(dayRange !== undefined ? { dayRange } : {}),
+      ...(jobTypes ? { jobTypes } : {}),
+      ...(contractTypes ? { contractTypes } : {}),
     };
 
     console.log('Calling CareerOne Apify actor (run-sync):', body);
@@ -754,7 +776,7 @@ export async function GET(request: NextRequest) {
 
     if (source === 'careerone') {
       console.log('Fetching jobs from CareerOne via Apify...');
-      jobs = await searchCareerOneJobs(keywords, location, limit);
+      jobs = await searchCareerOneJobs(keywords, location, limit, employmentType, datePosted);
       console.log(`CareerOne actor returned ${jobs.length} jobs`);
     } else if (source === 'workday') {
       // Workday via Apify synchronous actor
