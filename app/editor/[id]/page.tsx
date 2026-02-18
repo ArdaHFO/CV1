@@ -89,6 +89,22 @@ export default function EditorPage() {
   const [isParsingLatex, setIsParsingLatex] = useState(false);
   const [autoSync, setAutoSync] = useState(false);
   const lastParsedLatex = useRef<string>('');
+  const cvInnerRef = useRef<HTMLDivElement>(null);
+  const [cvNativeHeight, setCvNativeHeight] = useState(1123);
+
+  // Measure the actual rendered height of the CV inner content so the outer
+  // wrapper grows correctly for multi-page CVs.
+  useEffect(() => {
+    const el = cvInnerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      if (cvInnerRef.current) {
+        setCvNativeHeight(cvInnerRef.current.offsetHeight || 1123);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [content, selectedTemplate]);
 
   useEffect(() => {
     async function loadResumeVersion() {
@@ -1019,7 +1035,8 @@ export default function EditorPage() {
                     {/* Accept / Skip buttons */}
                     <div className="flex gap-3 pt-2">
                       <Button
-                        className="flex-1 gap-2 bg-green-600 hover:bg-green-700 text-white border-2 border-green-600 font-black uppercase tracking-widest text-xs"
+                        style={{ backgroundColor: '#16a34a', color: 'white', borderColor: '#16a34a' }}
+                        className="flex-1 gap-2 border-2 font-black uppercase tracking-widest text-xs hover:opacity-90"
                         onClick={handleReviewAccept}
                       >
                         <CheckCircle2 className="w-4 h-4" />
@@ -1731,13 +1748,13 @@ export default function EditorPage() {
                 <div
                   style={{
                     width: Math.round(794 * zoomLevel / 100) + 'px',
-                    height: Math.round(1123 * zoomLevel / 100) + 'px',
-                    overflow: 'hidden',
+                    height: Math.round(cvNativeHeight * zoomLevel / 100) + 'px',
                     flexShrink: 0,
                     position: 'relative',
                   }}
                 >
                   <div
+                    ref={cvInnerRef}
                     style={{
                       transform: `scale(${zoomLevel / 100})`,
                       transformOrigin: 'top left',

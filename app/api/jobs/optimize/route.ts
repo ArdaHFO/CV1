@@ -101,12 +101,13 @@ ${JSON.stringify(cvSummary, null, 2)}
 
 RULES:
 - suggestions.suggested must be the ACTUAL FULL TEXT to put in the CV, not a description of what to do.
-- For summary section suggestions, write a complete professional summary paragraph tailored to this exact job.
-- For experience section suggestions, write complete bullet points or description text that integrates keywords from the job posting.
+- For summary section: write a complete 3-4 sentence professional summary paragraph, incorporating the job title, key required skills, years of experience, and value proposition tailored to this exact role.
+- For experience section: rewrite the COMPLETE description text for that job entry. Integrate 3-5 keywords from the job posting naturally. Use strong action verbs. Keep the candidate's real achievements but reframe them to align with the job requirements. The result must read as a real CV bullet/paragraph, NOT as a tip or instruction.
 - For skills section, the "suggested" field is the skill name only (e.g. "Kubernetes").
 - Do NOT suggest adding skills the candidate clearly does not have based on their CV—only rephrase or emphasize existing knowledge.
 - missing_skills should only list skills explicitly required by the posting that are truly absent.
-- Provide 3-6 suggestions maximum. Focus on highest impact changes.
+- Provide 5-8 suggestions. Cover summary, 2-3 experience entries, and skills. Focus on highest impact changes.
+- Each suggestion must be self-contained and immediately usable — paste it directly into the CV with zero editing needed.
 - Respond ONLY with the JSON object. No markdown, no prose, no code fences.`;
 
     try {
@@ -130,7 +131,7 @@ RULES:
             },
           ],
           temperature: 0.7,
-          max_tokens: 2000,
+          max_tokens: 4000,
         }),
       });
 
