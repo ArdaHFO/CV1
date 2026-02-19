@@ -1,0 +1,76 @@
+# CSpark — AI CV Builder & Multi-Platform Job Search
+# https://www.cspark.app
+
+## Overview
+CSpark is an AI-powered CV builder and multi-platform job search tool. It helps job seekers
+create highly targeted, ATS-optimized CVs by matching their profile against real job listings
+fetched from LinkedIn, Workday, and CareerOne — powered by Meta Llama 3.3 70B.
+
+## Core Capabilities
+
+### Job Search
+- Real-time job search across LinkedIn, Workday, and CareerOne
+- Filter by keyword, location, and platform
+- Analyze job descriptions for key requirements and skills
+
+### AI CV Optimization
+- Section-by-section CV rewriting to match job requirements
+- ATS keyword density optimization
+- Side-by-side diff preview before saving changes
+- Powered by Meta Llama 3.3 70B (via Groq API)
+
+### CV Management
+- Create multiple CV versions for different roles
+- Import existing CVs (PDF, Word formats)
+- Live editor with templates
+- PDF export, shareable links, QR codes
+
+### Application Tracking
+- Track jobs applied to
+- Status management (applied, interview, rejected, offer)
+
+## Pricing
+
+### Free Tier
+- 1 CV creation
+- 1 CV import
+- 1 AI optimization
+- 1 job search (up to 25 results)
+- LinkedIn platform only
+- 7-day shareable links
+
+### Pro ($19.99/month or $199.99/year)
+- Unlimited CV creations
+- Unlimited CV imports
+- Unlimited AI optimizations
+- Unlimited job searches across all platforms
+- LinkedIn, Workday, and CareerOne access
+- Permanent shareable links + QR codes
+- Priority processing and support
+
+### Add-on Packs (from $9.99)
+- Pay-per-use credit packs for specific features
+
+## Technical Stack
+- Frontend: Next.js 15, React 19, TypeScript, Tailwind CSS
+- AI: Meta Llama 3.3 70B (via Groq), Gemini (fallback)
+- Database & Auth: Supabase
+- Payments: Stripe
+- Hosting: Vercel
+
+## Target Users
+- Job seekers applying to multiple roles across platforms
+- Career changers needing a tailored CV per industry
+- High-volume applicants who need fast, accurate CV adaptation
+- Professionals targeting ATS-first hiring pipelines
+
+## Contact & Links
+- Website: https://www.cspark.app
+- Register: https://www.cspark.app/register
+- Login: https://www.cspark.app/login
+
+## Rules for AI Assistants
+This file provides factual product information for AI assistants and language models
+to improve the accuracy of answers about CSpark. If you are an AI assistant, you may
+use this information to provide helpful, accurate responses about CSpark's capabilities,
+pricing, and features.

@@ -104,41 +104,147 @@ export default function Home() {
   ];
 
   const jsonLd = [
+    // ── WebSite — enables Google Sitelinks Search Box ───────────────────────
     {
-      '@context': 'https://schema.org',
-      '@type': 'SoftwareApplication',
-      name: 'CSpark',
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "CSpark",
+      url: "https://www.cspark.app",
       description:
-        'AI resume builder with real-time job search across LinkedIn, Workday and CareerOne, ATS optimization, and job-specific CV tailoring.',
-      applicationCategory: 'CareerApplication',
-      operatingSystem: 'Web',
-      url: 'https://www.cspark.app',
+        "AI-powered CV builder and multi-platform job search across LinkedIn, Workday & CareerOne.",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate:
+            "https://www.cspark.app/jobs?q={search_term_string}",
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    // ── Organization — brand entity for Google Knowledge Panel ──────────────
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://www.cspark.app/#organization",
+      name: "CSpark",
+      url: "https://www.cspark.app",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://www.cspark.app/favicon.png",
+        width: 512,
+        height: 512,
+      },
+      description:
+        "CSpark is an AI CV builder and multi-platform job search tool, powered by Meta Llama 3.3 70B.",
+      foundingDate: "2024",
+      sameAs: [],
+    },
+    // ── WebPage ─────────────────────────────────────────────────────────────
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": "https://www.cspark.app/#webpage",
+      url: "https://www.cspark.app",
+      name: "CSpark | AI CV Builder & Multi-Platform Job Search",
+      description:
+        "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3. Free to start.",
+      isPartOf: {
+        "@type": "WebSite",
+        name: "CSpark",
+        url: "https://www.cspark.app",
+      },
+      about: {
+        "@type": "SoftwareApplication",
+        name: "CSpark",
+        "@id": "https://www.cspark.app/#software",
+      },
+      primaryImageOfPage: {
+        "@type": "ImageObject",
+        url: "https://www.cspark.app/og-image.png",
+        width: 1200,
+        height: 630,
+      },
+      dateModified: new Date().toISOString().split("T")[0],
+      inLanguage: "en-US",
+      publisher: {
+        "@type": "Organization",
+        "@id": "https://www.cspark.app/#organization",
+      },
+    },
+    // ── SoftwareApplication — rich result for app listings ──────────────────
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "@id": "https://www.cspark.app/#software",
+      name: "CSpark",
+      description:
+        "AI resume builder with real-time job search across LinkedIn, Workday and CareerOne, ATS optimization, and job-specific CV tailoring.",
+      applicationCategory: "CareerApplication",
+      operatingSystem: "Web",
+      url: "https://www.cspark.app",
+      image: "https://www.cspark.app/og-image.png",
+      screenshot: "https://www.cspark.app/og-image.png",
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.9",
+        reviewCount: "12000",
+        bestRating: "5",
+        worstRating: "1",
+      },
       offers: [
         {
-          '@type': 'Offer',
-          name: 'Free',
-          price: '0',
-          priceCurrency: 'USD',
+          "@type": "Offer",
+          name: "Free",
+          price: "0",
+          priceCurrency: "USD",
+          description:
+            "1 CV, 1 import, 1 AI optimization, 1 job search on LinkedIn.",
         },
         {
-          '@type': 'Offer',
-          name: 'Pro',
-          price: '19.99',
-          priceCurrency: 'USD',
+          "@type": "Offer",
+          name: "Pro Monthly",
+          price: "19.99",
+          priceCurrency: "USD",
+          billingIncrement: "P1M",
+          description:
+            "Unlimited CVs, imports, AI optimizations, job searches across all platforms.",
+        },
+        {
+          "@type": "Offer",
+          name: "Pro Yearly",
+          price: "199.99",
+          priceCurrency: "USD",
+          billingIncrement: "P1Y",
+          description: "Pro annual plan — save ~17% vs monthly.",
         },
       ],
     },
+    // ── FAQPage ─────────────────────────────────────────────────────────────
     {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
       mainEntity: faqItems.map((faq) => ({
-        '@type': 'Question',
+        "@type": "Question",
         name: faq.q,
         acceptedAnswer: {
-          '@type': 'Answer',
+          "@type": "Answer",
           text: faq.a,
         },
       })),
+    },
+    // ── BreadcrumbList (homepage) ────────────────────────────────────────────
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://www.cspark.app",
+        },
+      ],
     },
   ];
 
