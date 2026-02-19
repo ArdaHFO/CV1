@@ -664,7 +664,7 @@ export default function Home() {
                   title: 'Unlimited CVs',
                   text: 'Create and manage as many CV versions as you need — one per role, one per industry.',
                   icon: FileText,
-                  accent: true,
+                  accent: false,
                 },
                 {
                   num: '02',
