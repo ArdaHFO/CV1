@@ -28,8 +28,6 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import type { User } from '@/types';
-import { MasonryGrid } from '@/components/ui/image-testimonial-grid';
-
 function MetaLogo({ className }: { className?: string }) {
   return (
     <Image
@@ -48,15 +46,8 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(true); // start true to avoid flicker
   const [codeCopied, setCodeCopied] = useState(false);
-  const [columns, setColumns] = useState(3);
 
   const PROMO_CODE = process.env.NEXT_PUBLIC_PROMO_CODE ?? 'WELCOME10';
-
-  const getColumns = (width: number) => {
-    if (width < 640) return 1;    // sm - 1 column
-    if (width < 1024) return 2;   // lg - 2 columns
-    return 2;                     // xl+ - 2 columns (wider cards)
-  };
 
   useEffect(() => {
     const loadCurrentUser = async () => {
@@ -65,13 +56,6 @@ export default function Home() {
     };
     setBannerDismissed(localStorage.getItem('promo-banner-dismissed') === '1');
     loadCurrentUser();
-
-    const handleResize = () => {
-      setColumns(getColumns(window.innerWidth));
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const dismissBanner = () => {
@@ -378,8 +362,8 @@ export default function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
-        <section className="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[7fr_5fr]">
+        <section aria-labelledby="hero-heading" className="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 lg:px-8">
+          <div className="max-w-4xl">
             <div>
               <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                 01. System
@@ -462,90 +446,136 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Features Grid Section */}
-            <div className="w-full mt-16">
-              <div className="mb-12">
-                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
-                  01. Features
-                </div>
-                <h2 className="mt-4 text-5xl font-black uppercase leading-tight sm:text-6xl">
-                  Everything you need
-                </h2>
+        {/* ── Feature Bento Section ───────────────────────────────────── */}
+        <section
+          aria-labelledby="features-heading"
+          className="border-t-4 border-black bg-white px-4 pb-24 pt-20 sm:px-6 lg:px-8"
+        >
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-14">
+              <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                01. Features
               </div>
-              
-              <MasonryGrid columns={columns} gap={6} className="w-full">
-                {[
-                  {
-                    num: '01',
-                    label: 'My CVs',
-                    desc: 'Create, manage, and export unlimited CV versions for different roles',
-                    src: '/dashboard.png',
-                  },
-                  {
-                    num: '02',
-                    label: 'Find Jobs',
-                    desc: 'Real-time job search across LinkedIn, Workday & CareerOne platforms',
-                    src: '/jobsearch.png',
-                  },
-                  {
-                    num: '03',
-                    label: 'Application Tracker',
-                    desc: 'Track every application, note and interview in one central dashboard',
-                    src: '/applicationtracker.png',
-                  },
-                  {
-                    num: '04',
-                    label: 'Job Tracker',
-                    desc: 'Mark jobs as applied, skipped, or interested and revisit anytime',
-                    src: '/jobtracker.png',
-                  },
-                  {
-                    num: '05',
-                    label: 'AI Optimizations',
-                    desc: 'Complete history of every AI-driven CV change per job posting',
-                    src: '/optimizations.png',
-                  },
-                  {
-                    num: '06',
-                    label: 'CV vs Job Match',
-                    desc: 'Score your CV against job listings and identify gaps to fix',
-                    src: '/joblistinganalyzeoptimize.png',
-                  },
-                ].map((feature) => (
-                  <div
-                    key={feature.num}
-                    className="relative rounded-xl overflow-hidden group cursor-pointer transition-all duration-500 ease-out hover:shadow-2xl border-4 border-black bg-black h-[520px] sm:h-[480px] lg:h-[550px]"
-                  >
-                    {/* Image */}
-                    <img
-                      src={feature.src}
-                      alt={feature.label}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'block';
-                        e.currentTarget.src = 'https://placehold.co/600x550/1a1a1a/ffffff?text=' + feature.label;
-                      }}
-                    />
-                    
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-100 group-hover:via-black/70 transition-opacity duration-300" />
-                    
-                    {/* Content */}
-                    <div className="absolute inset-x-0 bottom-0 p-6 text-white translate-y-3 group-hover:translate-y-0 transition-transform duration-300">
-                      <div className="text-[12px] font-black uppercase tracking-[0.4em] text-[#FF3000] mb-3">
-                        {feature.num}
-                      </div>
-                      <h3 className="text-2xl font-black uppercase tracking-wider mb-3 leading-tight">
-                        {feature.label}
-                      </h3>
-                      <p className="text-sm font-bold uppercase tracking-widest text-white/80 leading-relaxed">
-                        {feature.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </MasonryGrid>
+              <h2
+                id="features-heading"
+                className="mt-4 text-5xl font-black uppercase leading-tight sm:text-6xl"
+              >
+                Everything in one place
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm font-bold uppercase tracking-widest text-black/50">
+                From job discovery to a tailored, ATS-ready CV — every tool you need, in one workflow.
+              </p>
+            </div>
+
+            {/* Bento grid — alternating wide/narrow cards */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+              {/* 01 — My CVs — 2-col wide */}
+              <article className="group relative overflow-hidden border-4 border-black bg-black sm:col-span-2" style={{ minHeight: '460px' }}>
+                <Image
+                  src="/dashboard.png"
+                  alt="CSPARK CV dashboard — create and manage multiple ATS-optimized CV versions for different job roles"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 66vw, 800px"
+                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
+                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">01</span>
+                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">My CVs</h3>
+                  <p className="mt-1.5 max-w-sm text-sm font-bold uppercase tracking-widest text-white/70">Create, manage & export unlimited CV versions</p>
+                </div>
+              </article>
+
+              {/* 02 — Find Jobs — 1-col */}
+              <article className="group relative overflow-hidden border-4 border-black bg-black" style={{ minHeight: '460px' }}>
+                <Image
+                  src="/jobsearch.png"
+                  alt="CSPARK job search — real-time job listings from LinkedIn, Workday and CareerOne"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 400px"
+                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
+                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">02</span>
+                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">Find Jobs</h3>
+                  <p className="mt-1.5 text-sm font-bold uppercase tracking-widest text-white/70">Search LinkedIn, Workday & CareerOne</p>
+                </div>
+              </article>
+
+              {/* 03 — Application Tracker — 1-col */}
+              <article className="group relative overflow-hidden border-4 border-black bg-black" style={{ minHeight: '460px' }}>
+                <Image
+                  src="/applicationtracker.png"
+                  alt="CSPARK application tracker — manage job applications with notes and interview stages"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 400px"
+                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
+                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">03</span>
+                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">Application Tracker</h3>
+                  <p className="mt-1.5 text-sm font-bold uppercase tracking-widest text-white/70">Track every application, note & interview</p>
+                </div>
+              </article>
+
+              {/* 04 — Job Tracker — 2-col wide */}
+              <article className="group relative overflow-hidden border-4 border-black bg-black sm:col-span-2" style={{ minHeight: '460px' }}>
+                <Image
+                  src="/jobtracker.png"
+                  alt="CSPARK job tracker — save and organise job listings tagged as applied, skipped or interested"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 66vw, 800px"
+                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
+                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">04</span>
+                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">Job Tracker</h3>
+                  <p className="mt-1.5 max-w-sm text-sm font-bold uppercase tracking-widest text-white/70">Mark applied, skipped or interested — revisit anytime</p>
+                </div>
+              </article>
+
+              {/* 05 — AI Optimizations — 1-col */}
+              <article className="group relative overflow-hidden border-4 border-black bg-black" style={{ minHeight: '460px' }}>
+                <Image
+                  src="/optimizations.png"
+                  alt="CSPARK AI CV optimization history — every AI-driven change made to your CV tracked per job posting"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 400px"
+                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
+                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">05</span>
+                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">AI Optimizations</h3>
+                  <p className="mt-1.5 text-sm font-bold uppercase tracking-widest text-white/70">Full history of AI-driven CV changes per job</p>
+                </div>
+              </article>
+
+              {/* 06 — CV vs Job Match — 2-col wide */}
+              <article className="group relative overflow-hidden border-4 border-black bg-black sm:col-span-2" style={{ minHeight: '460px' }}>
+                <Image
+                  src="/joblistinganalyzeoptimize.png"
+                  alt="CSPARK CV versus job match score — compare your CV against a job listing and fix ATS keyword gaps"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 66vw, 800px"
+                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
+                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">06</span>
+                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">CV vs Job Match</h3>
+                  <p className="mt-1.5 max-w-sm text-sm font-bold uppercase tracking-widest text-white/70">Score your CV against a job listing and fix the gaps</p>
+                </div>
+              </article>
+
             </div>
           </div>
         </section>
