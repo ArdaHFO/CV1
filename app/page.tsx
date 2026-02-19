@@ -609,7 +609,7 @@ export default function Home() {
               </div>
 
               {/* Right: concrete before/after example */}
-              <div className="border-4 border-l-0 border-black bg-black text-white">
+              <div className="border-4 border-l-0 border-black bg-black text-white flex flex-col">
                 <div className="border-b-4 border-white/20 px-7 py-5">
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF3000]">Live example</span>
                   <div className="mt-1 text-sm font-black uppercase tracking-widest">Senior Product Manager @ Stripe</div>
@@ -629,7 +629,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="px-7 py-6 border-b-4 border-white/20">
+                <div className="px-7 py-6 border-b-4 border-white/20 flex-1">
                   <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF3000] mb-3">After — AI rewritten for this role</div>
                   <div className="space-y-2">
                     <div className="flex items-start gap-3">
