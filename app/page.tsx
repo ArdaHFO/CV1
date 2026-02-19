@@ -5,8 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
+  Bookmark,
   Download,
   FileText,
+  History,
+  ListChecks,
   PlusSquare,
   QrCode,
   Search,
@@ -625,78 +628,120 @@ export default function Home() {
 
         <section id="faq" className="scroll-mt-20 border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
+
+            {/* Header row */}
             <div className="grid gap-10 lg:grid-cols-[7fr_5fr]">
               <div>
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   03. Advantages
                 </div>
                 <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
-                  Measurable outcomes for every application.
+                  Every tool.<br />One workflow.
                 </h2>
+                <p className="mt-4 max-w-xl text-sm font-bold uppercase tracking-widest text-black/50">
+                  From discovering a job to a tailored, interview-ready application — CSPARK replaces five separate tools.
+                </p>
               </div>
-              <div className="border-4 border-black bg-[#F2F2F2] p-6 swiss-diagonal">
-                <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
-                  Performance
+              <div className="flex flex-col justify-center gap-3">
+                <div className="border-4 border-black bg-[#FF3000] p-5 text-white">
+                  <div className="text-xs font-black uppercase tracking-[0.3em] text-white/70">Meta Llama 3.3</div>
+                  <div className="mt-2 text-4xl font-black uppercase">70B</div>
+                  <div className="mt-1 text-xs font-bold uppercase tracking-widest text-white/80">Parameters powering every optimization</div>
                 </div>
-                <div className="mt-4 text-4xl font-black uppercase">+38%</div>
-                <div className="mt-2 text-sm font-bold uppercase tracking-widest text-black/70">
-                  Higher callback rate
+                <div className="border-4 border-black bg-[#F2F2F2] p-5">
+                  <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">Average time saved</div>
+                  <div className="mt-2 text-4xl font-black uppercase">&lt; 5 min</div>
+                  <div className="mt-1 text-xs font-bold uppercase tracking-widest text-black/60">From job listing to tailored CV</div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {/* 6 feature cards */}
+            <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
-                  title: 'Multi-platform sync',
-                  text: 'Live role imports from LinkedIn, Workday & CareerOne.',
+                  num: '01',
+                  title: 'Unlimited CVs',
+                  text: 'Create and manage as many CV versions as you need — one per role, one per industry.',
+                  icon: FileText,
+                  accent: true,
+                },
+                {
+                  num: '02',
+                  title: '3-Platform Job Search',
+                  text: 'Search LinkedIn, Workday & CareerOne in real-time from a single interface.',
                   icon: Search,
+                  accent: false,
                 },
                 {
-                  title: 'ATS optimized',
-                  text: 'Structured for parsing + keyword density.',
+                  num: '03',
+                  title: 'AI CV vs Job Match',
+                  text: 'Score your CV against any job listing and get a ranked list of keyword gaps to fix.',
                   icon: Target,
+                  accent: false,
                 },
                 {
-                  title: 'Instant export',
-                  text: 'PDF, link, QR, all from one workflow.',
-                  icon: Download,
+                  num: '04',
+                  title: 'Application Tracker',
+                  text: 'Log every application with status, notes and interview stages — never lose track again.',
+                  icon: ListChecks,
+                  accent: false,
+                },
+                {
+                  num: '05',
+                  title: 'Job Tracker',
+                  text: 'Save jobs as Applied, Interested or Skipped and revisit your pipeline any time.',
+                  icon: Bookmark,
+                  accent: false,
+                },
+                {
+                  num: '06',
+                  title: 'Full AI History',
+                  text: 'Every AI optimization is logged per job post — review, compare and revert changes.',
+                  icon: History,
+                  accent: false,
                 },
               ].map((item) => (
                 <div
-                  key={item.title}
-                  className="group border-4 border-black bg-white p-6 transition-all hover:bg-[#FF3000] hover:text-white"
+                  key={item.num}
+                  className={`group relative border-4 border-black p-6 transition-all hover:bg-[#FF3000] hover:text-white ${item.accent ? 'bg-black text-white' : 'bg-white'}`}
                 >
-                  <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2] group-hover:bg-white group-hover:border-white">
-                    <item.icon className="h-6 w-6 text-black group-hover:text-[#FF3000]" />
+                  <div className="flex items-start justify-between">
+                    <div className={`flex h-11 w-11 items-center justify-center border-2 ${item.accent ? 'border-white/30 bg-white/10 group-hover:border-white group-hover:bg-white' : 'border-black bg-[#F2F2F2] group-hover:border-white group-hover:bg-white'}`}>
+                      <item.icon className={`h-5 w-5 ${item.accent ? 'text-white group-hover:text-[#FF3000]' : 'text-black group-hover:text-[#FF3000]'}`} />
+                    </div>
+                    <span className={`text-[11px] font-black uppercase tracking-[0.4em] ${item.accent ? 'text-white/40 group-hover:text-white/60' : 'text-black/30 group-hover:text-white/60'}`}>{item.num}</span>
                   </div>
-                  <h3 className="mt-5 text-lg font-black uppercase tracking-widest">
+                  <h3 className="mt-5 text-base font-black uppercase tracking-widest">
                     {item.title}
                   </h3>
-                  <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70 group-hover:text-white/80">
+                  <p className={`mt-3 text-xs font-bold uppercase tracking-widest leading-relaxed ${item.accent ? 'text-white/70 group-hover:text-white/80' : 'text-black/60 group-hover:text-white/80'}`}>
                     {item.text}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {/* Stats row */}
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               {[
-                { label: 'Profiles optimized', value: '124k' },
-                { label: 'Jobs scanned weekly', value: '52k' },
-                { label: 'Hiring teams reached', value: '8.4k' },
+                { label: 'Job boards integrated', value: '3' },
+                { label: 'CV optimization time', value: '~30s' },
+                { label: 'ATS keyword precision', value: '94%' },
+                { label: 'Tools replaced by CSPARK', value: '5×' },
               ].map((stat) => (
                 <div
                   key={stat.label}
                   className="border-4 border-black bg-[#F2F2F2] p-6 text-center"
                 >
                   <div className="text-4xl font-black uppercase">{stat.value}</div>
-                  <div className="mt-2 text-xs font-bold uppercase tracking-[0.3em] text-black/70">
+                  <div className="mt-2 text-[10px] font-bold uppercase tracking-[0.3em] text-black/60">
                     {stat.label}
                   </div>
                 </div>
               ))}
             </div>
+
           </div>
         </section>
 
