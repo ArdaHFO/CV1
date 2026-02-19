@@ -25,10 +25,10 @@ import { Button } from '@/components/ui/button';
 import { Marquee } from '@/components/ui/marquee';
 import { MorphingText } from '@/components/ui/morphing-text';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import ImageReveal from '@/components/ui/image-reveal';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import type { User } from '@/types';
+import { MasonryGrid } from '@/components/ui/image-testimonial-grid';
 
 function MetaLogo({ className }: { className?: string }) {
   return (
@@ -48,8 +48,16 @@ export default function Home() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(true); // start true to avoid flicker
   const [codeCopied, setCodeCopied] = useState(false);
+  const [columns, setColumns] = useState(3);
 
   const PROMO_CODE = process.env.NEXT_PUBLIC_PROMO_CODE ?? 'WELCOME10';
+
+  const getColumns = (width: number) => {
+    if (width < 640) return 1;    // sm
+    if (width < 1024) return 2;   // lg
+    if (width < 1280) return 3;   // xl
+    return 3;                     // 2xl and up
+  };
 
   useEffect(() => {
     const loadCurrentUser = async () => {
@@ -58,6 +66,13 @@ export default function Home() {
     };
     setBannerDismissed(localStorage.getItem('promo-banner-dismissed') === '1');
     loadCurrentUser();
+
+    const handleResize = () => {
+      setColumns(getColumns(window.innerWidth));
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const dismissBanner = () => {
@@ -449,7 +464,75 @@ export default function Home() {
               </div>
             </div>
 
-            <ImageReveal className="border-4 border-black" />
+            {/* Features Masonry Grid */}
+            <div className="w-full">
+              <MasonryGrid columns={columns} gap={4}>
+                {[
+                  {
+                    num: '01',
+                    label: 'My CVs',
+                    desc: 'Create & manage unlimited versions',
+                    src: '/dashboard.png',
+                  },
+                  {
+                    num: '02',
+                    label: 'Find Jobs',
+                    desc: 'Search across all platforms',
+                    src: '/jobsearch.png',
+                  },
+                  {
+                    num: '03',
+                    label: 'Application Tracker',
+                    desc: 'Track every application',
+                    src: '/applicationtracker.png',
+                  },
+                  {
+                    num: '04',
+                    label: 'Job Tracker',
+                    desc: 'Mark & revisit jobs',
+                    src: '/jobtracker.png',
+                  },
+                  {
+                    num: '05',
+                    label: 'AI Optimizations',
+                    desc: 'History of all changes',
+                    src: '/optimizations.png',
+                  },
+                  {
+                    num: '06',
+                    label: 'CV vs Job Match',
+                    desc: 'Score & fix the gaps',
+                    src: '/joblistinganalyzeoptimize.png',
+                  },
+                ].map((feature) => (
+                  <div
+                    key={feature.num}
+                    className="relative rounded-lg overflow-hidden group transition-all duration-300 ease-out hover:shadow-xl border-4 border-black bg-black"
+                  >
+                    <img
+                      src={feature.src}
+                      alt={feature.label}
+                      className="w-full h-auto object-cover group-hover:opacity-70 transition-opacity duration-300"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://placehold.co/400x300/1a1a1a/ffffff?text=Feature';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-100" />
+                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                      <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000] mb-1">
+                        {feature.num}
+                      </div>
+                      <h3 className="text-sm font-black uppercase tracking-widest mb-2">
+                        {feature.label}
+                      </h3>
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-white/60">
+                        {feature.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </MasonryGrid>
+            </div>
           </div>
         </section>
 
