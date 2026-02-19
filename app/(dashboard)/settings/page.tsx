@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ShaderBackground from '@/components/ui/shader-background';
 import {
   Bell,
@@ -27,9 +27,77 @@ import {
   type AppSettings,
 } from '@/lib/app-settings';
 import { getCurrentUser } from '@/lib/auth/auth';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 type Settings = AppSettings;
 const defaultSettings = defaultAppSettings;
+
+// ─── Memory Card Easter Egg ──────────────────────────────────────────────────────────────────────────────
+const MEM_EMOJIS = ['🎯','🚀','🎮','💡','🔥','⚡','🎨','🏆'];
+type MC = { id: number; emoji: string; flipped: boolean; matched: boolean };
+function MemoryGame() {
+  const shuffle = () =>
+    [...MEM_EMOJIS,...MEM_EMOJIS]
+      .map((emoji,i)=>({id:i,emoji,flipped:false,matched:false}))
+      .sort(()=>Math.random()-0.5);
+  const [board,setBoard] = useState<MC[]>(shuffle);
+  const [sel,setSel] = useState<number[]>([]);
+  const [lock,setLock] = useState(false);
+  const [moves,setMoves] = useState(0);
+  const [won,setWon] = useState(false);
+  const flip = (id:number) => {
+    if(lock) return;
+    const c=board.find(x=>x.id===id);
+    if(!c||c.flipped||c.matched) return;
+    const nb=board.map(x=>x.id===id?{...x,flipped:true}:x);
+    setBoard(nb);
+    const ns=[...sel,id];
+    if(ns.length===2){
+      setMoves(m=>m+1); setLock(true);
+      const [a,b]=ns.map(sid=>nb.find(x=>x.id===sid)!);
+      if(a.emoji===b.emoji){
+        const mb=nb.map(x=>ns.includes(x.id)?{...x,matched:true}:x);
+        setBoard(mb); setSel([]); setLock(false);
+        if(mb.every(x=>x.matched)) setWon(true);
+      } else {
+        setTimeout(()=>{setBoard(p=>p.map(x=>ns.includes(x.id)?{...x,flipped:false}:x));setSel([]);setLock(false);},900);
+      }
+    } else setSel(ns);
+  };
+  const reset=()=>{setBoard(shuffle());setSel([]);setLock(false);setMoves(0);setWon(false);};
+  return (
+    <div className="flex flex-col items-center gap-4 select-none">
+      <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest">
+        <span>Moves: {moves}</span>
+        <span className="text-black/40">·</span>
+        <span>Matched: {board.filter(c=>c.matched).length/2} / {MEM_EMOJIS.length}</span>
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {board.map(card=>(
+          <button key={card.id} type="button" onClick={()=>flip(card.id)}
+            className={`w-14 h-14 border-4 text-2xl flex items-center justify-center transition-all duration-200 ${
+              card.matched?'border-black bg-black text-white cursor-default':
+              card.flipped?'border-[#FF3000] bg-white':
+              'border-black bg-[#F2F2F2] hover:bg-black hover:text-white cursor-pointer'
+            }`}>{card.flipped||card.matched?card.emoji:'?'}</button>
+        ))}
+      </div>
+      {won&&(
+        <div className="text-center space-y-2">
+          <p className="text-base font-black uppercase tracking-widest">🎉 Solved in {moves} moves!</p>
+          <button type="button" onClick={reset} className="border-4 border-black bg-black text-white px-4 py-1.5 text-xs font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors">Play Again</button>
+        </div>
+      )}
+    </div>
+  );
+}
+// ──────────────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
@@ -37,6 +105,17 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isDark, setIsDark] = useState(true);
+
+  // Easter egg: click 'Settings' title 5× to open Memory Card game
+  const [memOpen, setMemOpen] = useState(false);
+  const memCountRef = useRef(0);
+  const memTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleSettingsTitleClick = () => {
+    memCountRef.current += 1;
+    if (memTimerRef.current) clearTimeout(memTimerRef.current);
+    if (memCountRef.current >= 5) { memCountRef.current = 0; setMemOpen(true); return; }
+    memTimerRef.current = setTimeout(() => { memCountRef.current = 0; }, 2000);
+  };
 
   // Load settings from localStorage
   useEffect(() => {
@@ -176,7 +255,7 @@ export default function SettingsPage() {
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-black uppercase tracking-widest">Settings</h1>
+            <h1 className="text-3xl font-black uppercase tracking-widest cursor-default" onClick={handleSettingsTitleClick}>Settings</h1>
             <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
               Customize your CSpark experience
             </p>
@@ -486,6 +565,21 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+      {/* ── Memory Card Easter Egg Dialog ── */}
+      <Dialog open={memOpen} onOpenChange={setMemOpen}>
+        <DialogContent className="sm:max-w-sm border-4 border-black">
+          <DialogHeader>
+            <DialogTitle className="font-black uppercase tracking-widest flex items-center gap-2">
+              🧠 Memory Game
+              <span className="text-[9px] font-black uppercase tracking-[0.3em] border-2 border-black px-2 py-0.5">Easter Egg</span>
+            </DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+              Match all the pairs to win.
+            </DialogDescription>
+          </DialogHeader>
+          <MemoryGame />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

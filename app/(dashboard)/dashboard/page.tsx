@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
 import {
@@ -45,6 +45,64 @@ import type { Resume } from '@/types';
 
 type PlanTier = 'freemium' | 'pro';
 
+// ─── Pong Easter Egg ───────────────────────────────────────────────────────────────────────
+const PW = 400, PH = 260, PPH = 64, PPW = 10, PB = 10;
+function PongGame() {
+  const init = () => ({ py: PH/2-PPH/2, ay: PH/2-PPH/2, bx: PW/2, by: PH/2, vx: 3, vy: 2, ps: 0, as: 0 });
+  const r = useRef(init());
+  const [pY, setPY] = useState(r.current.py);
+  const [aY, setAY] = useState(r.current.ay);
+  const [ball, setBall] = useState({ x: PW/2, y: PH/2 });
+  const [sc, setSc] = useState({ p: 0, a: 0 });
+  const [go, setGo] = useState(false);
+  const [win, setWin] = useState<'p'|'a'|null>(null);
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.key==='ArrowUp'||e.key==='w') { r.current.py=Math.max(0,r.current.py-22); setPY(r.current.py); if(!go)setGo(true); e.preventDefault(); }
+      if (e.key==='ArrowDown'||e.key==='s') { r.current.py=Math.min(PH-PPH,r.current.py+22); setPY(r.current.py); if(!go)setGo(true); e.preventDefault(); }
+    };
+    window.addEventListener('keydown',h); return ()=>window.removeEventListener('keydown',h);
+  },[go]);
+  useEffect(() => {
+    if (!go||win) return;
+    const t = setInterval(() => {
+      const s=r.current; let {bx,by,vx,vy}=s;
+      bx+=vx; by+=vy;
+      if(by<=0){by=0;vy=-vy;} if(by>=PH-PB){by=PH-PB;vy=-vy;}
+      if(vx>0&&bx+PB>=PW-20&&bx+PB<=PW-10&&by+PB>=s.py&&by<=s.py+PPH){bx=PW-20-PB;vx=-(Math.abs(vx)+0.3);vy+=(Math.random()-0.5)*1.5;}
+      if(vx<0&&bx<=20&&bx>=10&&by+PB>=s.ay&&by<=s.ay+PPH){bx=20;vx=Math.abs(vx)+0.3;vy+=(Math.random()-0.5)*1.5;}
+      vx=Math.max(-9,Math.min(9,vx)); vy=Math.max(-7,Math.min(7,vy));
+      const am=s.ay+PPH/2,bm=by+PB/2;
+      if(am<bm-4)s.ay=Math.min(PH-PPH,s.ay+3); else if(am>bm+4)s.ay=Math.max(0,s.ay-3); setAY(s.ay);
+      if(bx<0){s.ps+=1;setSc({p:s.ps,a:s.as});if(s.ps>=5){setWin('p');return;}Object.assign(s,{bx:PW/2,by:PH/2,vx:3,vy:Math.random()>.5?2:-2});bx=s.bx;by=s.by;vx=s.vx;vy=s.vy;}
+      if(bx>PW){s.as+=1;setSc({p:s.ps,a:s.as});if(s.as>=5){setWin('a');return;}Object.assign(s,{bx:PW/2,by:PH/2,vx:-3,vy:Math.random()>.5?2:-2});bx=s.bx;by=s.by;vx=s.vx;vy=s.vy;}
+      s.bx=bx;s.by=by;s.vx=vx;s.vy=vy; setBall({x:bx,y:by});
+    },16); return ()=>clearInterval(t);
+  },[go,win]);
+  const reset=()=>{const i=init();r.current=i;setPY(i.py);setAY(i.ay);setBall({x:i.bx,y:i.by});setSc({p:0,a:0});setGo(false);setWin(null);};
+  const mv=(dy:number)=>{r.current.py=Math.max(0,Math.min(PH-PPH,r.current.py+dy));setPY(r.current.py);if(!go&&!win)setGo(true);};
+  return (
+    <div className="flex flex-col items-center gap-3 select-none">
+      <div className="flex items-center gap-8 text-xs font-black uppercase tracking-widest">
+        <span>AI: {sc.a}</span><span className="text-[#FF3000]">VS</span><span>You: {sc.p}</span>
+      </div>
+      <div className="border-4 border-black bg-white overflow-hidden relative" style={{width:PW,height:PH}}>
+        <div className="absolute left-1/2 top-0 bottom-0 border-l-2 border-dashed border-black/20" />
+        <div className="absolute bg-black/70" style={{left:10,top:aY,width:PPW,height:PPH}} />
+        <div className="absolute bg-[#FF3000]" style={{right:10,top:pY,width:PPW,height:PPH}} />
+        <div className="absolute bg-black" style={{left:ball.x,top:ball.y,width:PB,height:PB}} />
+        {!go&&!win&&<div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/90"><p className="text-[10px] font-black uppercase tracking-widest">↑↓ / W S to start</p><p className="text-[10px] font-bold uppercase tracking-widest text-black/50">First to 5 wins</p></div>}
+        {win&&<div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/95"><p className="text-xl font-black uppercase tracking-widest">{win==='p'?'🏆 You Win!':'🤖 AI Wins'}</p><button type="button" onClick={reset} className="border-4 border-black bg-black text-white px-4 py-1.5 text-xs font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors">Rematch</button></div>}
+      </div>
+      <div className="flex gap-2">
+        <button type="button" onClick={()=>mv(-25)} className="w-9 h-9 border-2 border-black bg-[#F2F2F2] font-black text-sm hover:bg-black hover:text-white transition-colors">▲</button>
+        <button type="button" onClick={()=>mv(25)} className="w-9 h-9 border-2 border-black bg-[#F2F2F2] font-black text-sm hover:bg-black hover:text-white transition-colors">▼</button>
+      </div>
+    </div>
+  );
+}
+// ──────────────────────────────────────────────────────────────────────────────
+
 export default function DashboardPage() {
   const router = useRouter();
   const { resumes, setResumes, addResume, deleteResume: removeResume, updateResume: updateResumeInStore, setDefaultResume } = useDashboardStore();
@@ -62,6 +120,17 @@ export default function DashboardPage() {
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [userId, setUserId] = useState('');
   const { isDark } = useAppDarkModeState();
+
+  // Easter egg: click title 7× to open Pong
+  const [pongOpen, setPongOpen] = useState(false);
+  const eggCountRef = useRef(0);
+  const eggTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleTitleClick = () => {
+    eggCountRef.current += 1;
+    if (eggTimerRef.current) clearTimeout(eggTimerRef.current);
+    if (eggCountRef.current >= 7) { eggCountRef.current = 0; setPongOpen(true); return; }
+    eggTimerRef.current = setTimeout(() => { eggCountRef.current = 0; }, 2000);
+  };
 
   const ensureProfileRow = async (): Promise<boolean> => {
     const response = await fetch('/api/profile/ensure', { method: 'POST' });
@@ -308,7 +377,7 @@ export default function DashboardPage() {
         <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col gap-6 border-4 border-black bg-white p-6 swiss-grid-pattern">
         <div className="space-y-2">
-          <h1 className="text-3xl font-black uppercase tracking-widest">My CVs</h1>
+          <h1 className="text-3xl font-black uppercase tracking-widest cursor-default" onClick={handleTitleClick} title="">My CVs</h1>
           <p className="text-xs font-bold uppercase tracking-widest text-black/70">
             Manage and edit all your CV versions
           </p>
@@ -601,6 +670,22 @@ export default function DashboardPage() {
         onOpenChange={setShowUpgradeModal}
         feature="cv-creation"
       />
+
+      {/* ── Pong Easter Egg Dialog ── */}
+      <Dialog open={pongOpen} onOpenChange={setPongOpen}>
+        <DialogContent className="sm:max-w-[480px] border-4 border-black">
+          <DialogHeader>
+            <DialogTitle className="font-black uppercase tracking-widest flex items-center gap-2">
+              🎮 Hidden Game
+              <span className="text-[9px] font-black uppercase tracking-[0.3em] border-2 border-black px-2 py-0.5">Easter Egg</span>
+            </DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+              You found the secret Pong game. You control the 🟥 red paddle.
+            </DialogDescription>
+          </DialogHeader>
+          <PongGame />
+        </DialogContent>
+      </Dialog>
 
       <UploadCVDialog
         open={uploadDialogOpen}

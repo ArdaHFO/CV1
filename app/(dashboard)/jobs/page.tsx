@@ -218,6 +218,17 @@ export default function JobsPage() {
   const gameVisibleRef = useRef(false);
   const [gameCompleteDialog, setGameCompleteDialog] = useState(false);
   const [searchDoneWhileGaming, setSearchDoneWhileGaming] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const cancelSearch = () => {
+    abortControllerRef.current?.abort();
+    setLoading(false);
+    setLoadingMore(false);
+    setGameVisible(false);
+    gameVisibleRef.current = false;
+    // Return to empty initial state if no results were loaded yet
+    if (jobs.length === 0) setSearched(false);
+  };
 
   // Load tracker statuses from localStorage
   const refreshStatuses = (jobList: Job[]) => {
@@ -322,19 +333,7 @@ export default function JobsPage() {
         setResultLimit('all');
       }
 
-      const savedJobs = localStorage.getItem('lastJobSearch');
-      if (savedJobs) {
-        try {
-          const jobsData = (JSON.parse(savedJobs) as Job[]).map(normalizeJob);
-          const safeLimit = canUseResultLimitOption(tier, resultLimit) ? resultLimit : '25';
-          setJobs(applySelectedLimit(jobsData, safeLimit));
-          refreshStatuses(applySelectedLimit(jobsData, safeLimit));
-          setSearched(true);
-          console.log('✅ Restored', jobsData.length, 'jobs from localStorage');
-        } catch (error) {
-          console.error('Failed to parse saved jobs:', error);
-        }
-      }
+      // Do NOT restore previous session jobs — users should always start fresh
     };
 
     bootstrap();
@@ -385,6 +384,11 @@ export default function JobsPage() {
       setHasMore(false);
     }
 
+    // Create a fresh AbortController for this request
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     try {
       // Check cache first (5 minutes validity)
       const cacheKey = `job-search-${platform}-${keywords}-${location}-${employmentType}-${experienceLevel}-${datePosted}-${apiLimit}-${remoteOnly}-off${overrideOffset}`;
@@ -429,7 +433,7 @@ export default function JobsPage() {
         ...(remoteOnly && { remote: 'true' }),
       });
 
-      const response = await fetch(`/api/jobs/search?${params}`);
+      const response = await fetch(`/api/jobs/search?${params}`, { signal: controller.signal });
       const data = await response.json();
       
       console.log('API response:', data);
@@ -492,6 +496,7 @@ export default function JobsPage() {
         console.error('API returned success=false');
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') return; // user cancelled
       console.error('Search error:', error);
     } finally {
       if (appendToExisting) {
@@ -793,19 +798,24 @@ export default function JobsPage() {
               <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 max-w-xs text-center">
                 Fetching real-time data — typically {resultLimit === 'all' ? '~2 min for first 50' : '1–2 minutes'}
               </p>
-              <button
-                type="button"
-                onClick={() => { setGameVisible(true); gameVisibleRef.current = true; }}
-                className="group mt-2 border-4 border-black bg-white hover:bg-black hover:text-white transition-all duration-200 px-6 py-3 flex items-center gap-3"
-              >
-                <span className="text-xl leading-none">🎮</span>
-                <span className="text-[11px] font-black uppercase tracking-widest">
-                  Play a game while you wait?
-                </span>
-                <span className="text-[9px] font-black uppercase tracking-[0.3em] border-2 border-black group-hover:border-white px-2 py-0.5 transition-colors">
-                  Easter Egg
-                </span>
-              </button>
+              <div className="flex items-center gap-3 mt-2">
+                <button
+                  type="button"
+                  onClick={() => { setGameVisible(true); gameVisibleRef.current = true; }}
+                  className="group border-4 border-black bg-white hover:bg-black hover:text-white transition-all duration-200 px-6 py-3 flex items-center gap-3"
+                >
+                  <span className="text-xl leading-none">🎮</span>
+                  <span className="text-[11px] font-black uppercase tracking-widest">Play while you wait?</span>
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] border-2 border-black group-hover:border-white px-2 py-0.5 transition-colors">Easter Egg</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelSearch}
+                  className="border-4 border-[#FF3000] text-[#FF3000] hover:bg-[#FF3000] hover:text-white transition-colors px-5 py-3 text-[10px] font-black uppercase tracking-widest"
+                >
+                  ✕ Cancel
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -816,13 +826,22 @@ export default function JobsPage() {
                 <div className="w-4 h-4 border-2 border-black border-t-[#FF3000] animate-spin" />
                 Still searching in background...
               </div>
-              <button
-                type="button"
-                onClick={() => { setGameVisible(false); gameVisibleRef.current = false; }}
-                className="text-[10px] font-black uppercase tracking-widest border-2 border-black px-3 py-1 hover:bg-black hover:text-white transition-colors"
-              >
-                Hide
-              </button>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setGameVisible(false); gameVisibleRef.current = false; }}
+                  className="text-[10px] font-black uppercase tracking-widest border-2 border-black px-3 py-1 hover:bg-black hover:text-white transition-colors"
+                >
+                  Hide
+                </button>
+                <button
+                  type="button"
+                  onClick={cancelSearch}
+                  className="text-[10px] font-black uppercase tracking-widest border-2 border-[#FF3000] text-[#FF3000] px-3 py-1 hover:bg-[#FF3000] hover:text-white transition-colors"
+                >
+                  ✕ Cancel
+                </button>
+              </div>
             </div>
             <div className="flex justify-center">
               <SnakeGame searchComplete={searchDoneWhileGaming} />
@@ -999,14 +1018,34 @@ export default function JobsPage() {
           </div>
         )}
 
-        {/* Initial State */}
+        {/* Initial State — shown when user has not yet searched */}
         {!loading && !searched && (
-          <div className="border-4 border-black bg-white py-16 text-center">
-            <Search className="w-12 h-12 mx-auto mb-4 text-black/30" />
-            <h3 className="text-base font-black uppercase tracking-widest mb-2">Start your job search</h3>
-            <p className="text-xs font-bold uppercase tracking-widest text-black/60">
-              Enter keywords to find relevant job opportunities
-            </p>
+          <div className="border-4 border-black bg-white py-20 flex flex-col items-center gap-5">
+            <div className="border-4 border-black p-5 bg-[#F2F2F2]">
+              <Search className="w-14 h-14 text-black" />
+            </div>
+            <div className="text-center max-w-sm space-y-2">
+              <h3 className="text-xl font-black uppercase tracking-widest">Find Your Next Role</h3>
+              <p className="text-xs font-bold uppercase tracking-widest text-black/60 leading-relaxed">
+                Enter keywords above and hit <span className="text-black">Search Jobs</span> to pull real-time listings from {platform === 'linkedin' ? 'LinkedIn' : platform === 'workday' ? 'Workday' : 'CareerOne'}.
+              </p>
+            </div>
+            <div className="flex items-center gap-4 mt-2">
+              <div className="flex flex-col items-center gap-1 border-2 border-black px-4 py-3">
+                <span className="text-lg font-black">01</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-black/60">Search</span>
+              </div>
+              <div className="w-8 h-[2px] bg-black" />
+              <div className="flex flex-col items-center gap-1 border-2 border-black px-4 py-3">
+                <span className="text-lg font-black">02</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-black/60">Explore</span>
+              </div>
+              <div className="w-8 h-[2px] bg-black" />
+              <div className="flex flex-col items-center gap-1 border-2 border-black px-4 py-3">
+                <span className="text-lg font-black">03</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-black/60">Apply</span>
+              </div>
+            </div>
           </div>
         )}
         </div>
