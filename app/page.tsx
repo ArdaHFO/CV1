@@ -55,7 +55,7 @@ export default function Home() {
   const getColumns = (width: number) => {
     if (width < 640) return 1;    // sm - 1 column
     if (width < 1024) return 2;   // lg - 2 columns
-    return 3;                     // xl+ - 3 columns
+    return 2;                     // xl+ - 2 columns (wider cards)
   };
 
   useEffect(() => {
@@ -464,13 +464,13 @@ export default function Home() {
             </div>
 
             {/* Features Grid Section */}
-            <div className="w-full mt-12">
-              <div className="mb-8">
+            <div className="w-full mt-16">
+              <div className="mb-12">
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   01. Features
                 </div>
-                <h2 className="mt-4 text-4xl font-black uppercase leading-tight sm:text-5xl">
-                  Everything you need in one place
+                <h2 className="mt-4 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                  Everything you need
                 </h2>
               </div>
               
@@ -515,7 +515,7 @@ export default function Home() {
                 ].map((feature) => (
                   <div
                     key={feature.num}
-                    className="relative rounded-xl overflow-hidden group cursor-pointer transition-all duration-500 ease-out hover:shadow-2xl border-4 border-black bg-black h-96 sm:h-80 lg:h-96"
+                    className="relative rounded-xl overflow-hidden group cursor-pointer transition-all duration-500 ease-out hover:shadow-2xl border-4 border-black bg-black h-[520px] sm:h-[480px] lg:h-[550px]"
                   >
                     {/* Image */}
                     <img
@@ -523,7 +523,8 @@ export default function Home() {
                       alt={feature.label}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
-                        e.currentTarget.src = 'https://placehold.co/600x400/1a1a1a/ffffff?text=Feature';
+                        e.currentTarget.style.display = 'block';
+                        e.currentTarget.src = 'https://placehold.co/600x550/1a1a1a/ffffff?text=' + feature.label;
                       }}
                     />
                     
@@ -531,14 +532,14 @@ export default function Home() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-100 group-hover:via-black/70 transition-opacity duration-300" />
                     
                     {/* Content */}
-                    <div className="absolute inset-x-0 bottom-0 p-6 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                      <div className="text-[11px] font-black uppercase tracking-[0.35em] text-[#FF3000] mb-2">
+                    <div className="absolute inset-x-0 bottom-0 p-6 text-white translate-y-3 group-hover:translate-y-0 transition-transform duration-300">
+                      <div className="text-[12px] font-black uppercase tracking-[0.4em] text-[#FF3000] mb-3">
                         {feature.num}
                       </div>
-                      <h3 className="text-xl font-black uppercase tracking-widest mb-3 leading-tight">
+                      <h3 className="text-2xl font-black uppercase tracking-wider mb-3 leading-tight">
                         {feature.label}
                       </h3>
-                      <p className="text-sm font-bold uppercase tracking-widest text-white/70 leading-snug">
+                      <p className="text-sm font-bold uppercase tracking-widest text-white/80 leading-relaxed">
                         {feature.desc}
                       </p>
                     </div>
