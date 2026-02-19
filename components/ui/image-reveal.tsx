@@ -13,24 +13,33 @@ interface ImageData {
 const images: ImageData[] = [
   {
     id: 1,
-    // Stable Unsplash image
-    src: 'https://images.unsplash.com/photo-1550439062-609e1531270e?q=80&w=1274&auto=format&fit=crop',
-    alt: 'ATS Match',
+    src: '/dashboard.png',
+    alt: 'My CVs',
   },
   {
     id: 2,
-    src: 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=1274&auto=format&fit=crop',
-    alt: 'LinkedIn Signal',
+    src: '/jobsearch.png',
+    alt: 'Find Jobs',
   },
   {
     id: 3,
-    src: 'https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=1274&auto=format&fit=crop',
-    alt: 'AI Optimize',
+    src: '/applicationtracker.png',
+    alt: 'Application Tracker',
   },
   {
     id: 4,
-    src: 'https://images.unsplash.com/photo-1553484771-371a605b060b?q=80&w=1274&auto=format&fit=crop',
-    alt: 'Share Ready',
+    src: '/jobtracker.png',
+    alt: 'Job Tracker',
+  },
+  {
+    id: 5,
+    src: '/optimizations.png',
+    alt: 'AI Optimizations',
+  },
+  {
+    id: 6,
+    src: '/joblistinganalyzeoptimize.png',
+    alt: 'CV Optimization',
   },
 ];
 
@@ -164,7 +173,7 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
             {!isDesktop && (
               <img
                 src={image.src}
-                className="sm:w-32 sm:h-20 w-full h-52 object-cover rounded-md"
+                className="w-full h-44 object-cover object-top rounded-md border-2 border-black"
                 alt={image.alt}
               />
             )}
@@ -199,7 +208,7 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
           <img
             src={activeImage.src}
             alt={activeImage.alt}
-            className="fixed dark:bg-gray-950 bg-white object-cover pointer-events-none z-10 w-[300px] h-[400px] rounded-lg"
+            className="fixed dark:bg-gray-950 bg-white object-cover pointer-events-none z-10 w-[520px] h-[310px] rounded-lg border-2 border-black shadow-2xl"
             style={{
               left: `${cursorPosition.x}px`,
               top: `${cursorPosition.y}px`,
