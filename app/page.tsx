@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
-  CheckCircle,
   Download,
   FileText,
   PlusSquare,
@@ -219,19 +218,19 @@ export default function Home() {
           <div className="hidden items-center gap-6 lg:flex">
             <Link
               href="#method"
-              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000]"
+              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000] transition-colors"
             >
               Method
             </Link>
             <Link
               href="#pricing"
-              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000]"
+              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000] transition-colors"
             >
               Pricing
             </Link>
             <Link
-              href="#faq"
-              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000]"
+              href="#faq-section"
+              className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000] transition-colors"
             >
               FAQ
             </Link>
@@ -389,9 +388,9 @@ export default function Home() {
                   ].map((item, index) => (
                     <div
                       key={item.title}
-                      className="flex items-center gap-4 border-2 border-black bg-[#F2F2F2] px-5 py-4"
+                      className="group flex items-center gap-4 border-2 border-black bg-[#F2F2F2] px-5 py-4 transition-colors hover:bg-black hover:text-white"
                     >
-                      <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-white">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border-2 border-black bg-white group-hover:border-white group-hover:bg-white/10">
                         <item.icon className="h-6 w-6" />
                       </div>
                       <div className="text-sm font-bold uppercase tracking-widest">
@@ -428,15 +427,15 @@ export default function Home() {
                   ].map((item) => (
                     <div
                       key={item.title}
-                      className="border-2 border-black bg-white p-6 transition-colors hover:bg-black hover:text-white"
+                      className="group border-2 border-black bg-white p-6 transition-colors hover:bg-black hover:text-white"
                     >
-                      <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2]">
+                      <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2] group-hover:border-white/20 group-hover:bg-white/10">
                         <item.icon className="h-6 w-6" />
                       </div>
                       <h3 className="mt-4 text-lg font-black uppercase tracking-widest">
                         {item.title}
                       </h3>
-                      <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70">
+                      <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70 group-hover:text-white/70">
                         {item.text}
                       </p>
                     </div>
@@ -582,10 +581,10 @@ export default function Home() {
                         { feature: 'QR codes', free: 'Limited', pro: 'Unlimited' },
                         { feature: 'Support', free: 'Standard', pro: 'Priority' },
                       ].map((row) => (
-                        <tr key={row.feature} className="border-b-2 border-black">
-                          <td className="px-6 py-4">{row.feature}</td>
-                          <td className="px-6 py-4">{row.free}</td>
-                          <td className="px-6 py-4">{row.pro}</td>
+                        <tr key={row.feature} className="border-b-2 border-black hover:bg-[#F2F2F2] transition-colors">
+                          <td className="px-6 py-3.5">{row.feature}</td>
+                          <td className="px-6 py-3.5 text-black/50">{row.free}</td>
+                          <td className="px-6 py-3.5 font-black text-black">{row.pro}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -655,19 +654,19 @@ export default function Home() {
                       'Our candidates share QR codes instantly after optimization.',
                     name: 'Career Coach, Paris',
                   },
-                ].map((item) => (
-                  <div
-                    key={item.name}
-                    className="border-4 border-black bg-white p-6 transition-transform hover:-translate-y-1"
-                  >
-                    <p className="text-sm font-medium uppercase tracking-widest text-black/80">
-                      {item.quote}
-                    </p>
-                    <div className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
-                      {item.name}
-                    </div>
+                  ].map((item) => (
+                <div
+                  key={item.name}
+                  className="group border-4 border-black bg-white p-6 transition-all hover:bg-black hover:text-white hover:-translate-y-0.5"
+                >
+                  <p className="text-sm font-medium uppercase tracking-widest text-black/80 group-hover:text-white/80">
+                    {item.quote}
+                  </p>
+                  <div className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
+                    {item.name}
                   </div>
-                ))}
+                </div>
+                  ))}
               </div>
             </div>
           </div>
@@ -684,7 +683,7 @@ export default function Home() {
                   Straight answers. Zero noise.
                 </h2>
               </div>
-              <div className="grid gap-4">
+              <div id="faq-section" className="grid gap-4">
                 {faqItems.map((faq, index) => (
                   <div
                     key={faq.q}
