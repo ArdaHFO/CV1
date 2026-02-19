@@ -17,7 +17,8 @@ async function searchLinkedInJobs(
   experienceLevel: string,
   datePosted: string,
   remoteOnly: boolean,
-  limit: number | null
+  limit: number | null,
+  offset: number = 0
 ): Promise<Job[]> {
   if (!APIFY_API_TOKEN) {
     console.log('Apify API token not configured, using mock data');
@@ -84,6 +85,9 @@ async function searchLinkedInJobs(
     if (remoteOnly) {
       params.append('f_WT', '2'); // 2 = Remote
     }
+
+    // Pagination: LinkedIn uses `start=N` to skip to a page of results
+    if (offset > 0) params.append('start', String(offset));
     
     const linkedInSearchUrl = `https://www.linkedin.com/jobs/search/?${params.toString()}`;
     
@@ -882,6 +886,7 @@ export async function GET(request: NextRequest) {
       ? null
       : Math.min(Math.max(parseInt(limitParam, 10) || 25, 1), 50);
     const source = searchParams.get('source') || 'linkedin'; // 'linkedin' | 'workday' | 'careerone'
+    const offset = Math.max(0, parseInt(searchParams.get('offset') || '0', 10) || 0);
 
     let jobs: Job[] = [];
 
@@ -898,7 +903,7 @@ export async function GET(request: NextRequest) {
       // LinkedIn via Apify
       console.log('Fetching jobs from LinkedIn via Apify...');
       console.log('Search params:', { keywords, location, employmentType, experienceLevel, datePosted, remoteOnly, limit: limit ?? 'all' });
-      jobs = await searchLinkedInJobs(keywords, location, employmentType, experienceLevel, datePosted, remoteOnly, limit);
+      jobs = await searchLinkedInJobs(keywords, location, employmentType, experienceLevel, datePosted, remoteOnly, limit, offset);
       console.log(`Apify function returned ${jobs.length} jobs`);
     } else {
       console.log('Apify token not configured');

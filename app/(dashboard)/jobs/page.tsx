@@ -206,6 +206,10 @@ export default function JobsPage() {
   const [usageMessage, setUsageMessage] = useState('');
   // job-tracker statuses (jobId → status)
   const [jobStatuses, setJobStatuses] = useState<Record<string, JobTrackerStatus>>({});
+  // load-more pagination (used when resultLimit === 'all')
+  const [jobOffset, setJobOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const { isDark } = useAppDarkModeState();
 
   // Easter egg game state
@@ -344,7 +348,8 @@ export default function JobsPage() {
     }
   }, [jobs]);
 
-  const handleSearch = async () => {
+  const handleSearch = async (opts: { appendToExisting?: boolean; overrideOffset?: number; skipBilling?: boolean } = {}) => {
+    const { appendToExisting = false, overrideOffset = 0, skipBilling = false } = opts;
     if (!keywords.trim()) return;
 
     setUsageMessage('');
@@ -359,7 +364,7 @@ export default function JobsPage() {
     }
 
     const remainingBeforeSearch = billingStatus.searchesLeft;
-    if (remainingBeforeSearch <= 0) {
+    if (!skipBilling && remainingBeforeSearch <= 0) {
       setUsageMessage(
         effectiveTier === 'pro'
           ? 'You reached your Pro quota (10 searches). Buy token packs to continue.'
@@ -369,12 +374,20 @@ export default function JobsPage() {
       return;
     }
 
-    setLoading(true);
-    setSearched(true);
+    // 'all' mode: fetch in batches of 50 to save API credits
+    const apiLimit = effectiveLimit === 'all' ? '50' : effectiveLimit;
+
+    if (appendToExisting) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setSearched(true);
+      setHasMore(false);
+    }
 
     try {
       // Check cache first (5 minutes validity)
-      const cacheKey = `job-search-${platform}-${keywords}-${location}-${employmentType}-${experienceLevel}-${datePosted}-${effectiveLimit}-${remoteOnly}`;
+      const cacheKey = `job-search-${platform}-${keywords}-${location}-${employmentType}-${experienceLevel}-${datePosted}-${apiLimit}-${remoteOnly}-off${overrideOffset}`;
       const cached = localStorage.getItem(cacheKey);
       const cacheTime = localStorage.getItem(`${cacheKey}-time`);
       
@@ -385,8 +398,17 @@ export default function JobsPage() {
           if (Array.isArray(cachedData) && cachedData.length > 0) {
             console.log('✅ Using cached results (age:', Math.round(age / 1000), 'seconds) - API call saved!');
             const normalizedCached = cachedData.map(normalizeJob);
-            setJobs(applySelectedLimit(normalizedCached, effectiveLimit));
-            setLoading(false);
+            if (appendToExisting) {
+              setJobs((prev) => {
+                const seen = new Set(prev.map((j) => j.id));
+                return [...prev, ...normalizedCached.filter((j) => !seen.has(j.id))];
+              });
+            } else {
+              setJobs(normalizedCached);
+            }
+            refreshStatuses(normalizedCached);
+            setJobOffset(overrideOffset + normalizedCached.length);
+            setHasMore(effectiveLimit === 'all' && normalizedCached.length >= 50);
             return;
           }
           console.log('⚠️ Cached result is empty, fetching fresh data instead');
@@ -397,8 +419,9 @@ export default function JobsPage() {
 
       const params = new URLSearchParams({
         keywords,
-        limit: effectiveLimit,
+        limit: apiLimit,
         source: platform,
+        ...(overrideOffset > 0 ? { offset: String(overrideOffset) } : {}),
         ...(location && { location }),
         ...(employmentType !== 'all' && { employment_type: employmentType }),
         ...(experienceLevel !== 'all' && { experience_level: experienceLevel }),
@@ -413,55 +436,78 @@ export default function JobsPage() {
       console.log('Jobs received:', data.jobs?.length || 0);
 
       if (data.success) {
-        const consumeResponse = await fetch('/api/billing/consume', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'job-search' }),
-        });
+        if (!skipBilling) {
+          const consumeResponse = await fetch('/api/billing/consume', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'job-search' }),
+          });
 
-        const consumePayload = (await consumeResponse.json()) as {
-          success?: boolean;
-          allowed?: boolean;
-          message?: string;
-          status?: { remaining: { jobSearches: number } };
-        };
+          const consumePayload = (await consumeResponse.json()) as {
+            success?: boolean;
+            allowed?: boolean;
+            message?: string;
+            status?: { remaining: { jobSearches: number } };
+          };
 
-        if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
-          setUsageMessage(
-            consumePayload.message ||
-              (effectiveTier === 'pro'
-                ? 'You reached your Pro quota (10 searches). Buy token packs to continue.'
-                : 'Freemium allows 1 job search. Upgrade to Pro or buy token packs to continue.')
-          );
-          setJobs([]);
-          return;
+          if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
+            setUsageMessage(
+              consumePayload.message ||
+                (effectiveTier === 'pro'
+                  ? 'You reached your Pro quota (10 searches). Buy token packs to continue.'
+                  : 'Freemium allows 1 job search. Upgrade to Pro or buy token packs to continue.')
+            );
+            setJobs([]);
+            return;
+          }
+
+          setRemainingSearches(consumePayload.status?.remaining.jobSearches ?? 0);
         }
 
-        setRemainingSearches(consumePayload.status?.remaining.jobSearches ?? 0);
-
         const rawJobs: Job[] = (data.jobs || []).map(normalizeJob);
-        const limitedJobs = applySelectedLimit(rawJobs, effectiveLimit);
-        setJobs(limitedJobs);
+        const limitedJobs = applySelectedLimit(rawJobs, apiLimit);
+
+        if (appendToExisting) {
+          setJobs((prev) => {
+            const seen = new Set(prev.map((j) => j.id));
+            return [...prev, ...limitedJobs.filter((j) => !seen.has(j.id))];
+          });
+        } else {
+          setJobs(limitedJobs);
+        }
         refreshStatuses(limitedJobs);
         console.log('Jobs state updated with', rawJobs.length, 'jobs');
+
+        const nextOffset = overrideOffset + limitedJobs.length;
+        setJobOffset(nextOffset);
+        if (effectiveLimit === 'all') setHasMore(limitedJobs.length >= 50);
+
         // Save to cache
         localStorage.setItem(cacheKey, JSON.stringify(limitedJobs));
         localStorage.setItem(`${cacheKey}-time`, Date.now().toString());
         console.log('💾 Results cached for 5 minutes');
-        // Save jobs to localStorage so detail page can access them
-        localStorage.setItem('lastJobSearch', JSON.stringify(limitedJobs));
+        // Save jobs to localStorage so detail page can access them (only for fresh searches)
+        if (!appendToExisting) localStorage.setItem('lastJobSearch', JSON.stringify(limitedJobs));
       } else {
         console.error('API returned success=false');
       }
     } catch (error) {
       console.error('Search error:', error);
     } finally {
-      setLoading(false);
-      if (gameVisibleRef.current) {
-        setSearchDoneWhileGaming(true);
-        setGameCompleteDialog(true);
+      if (appendToExisting) {
+        setLoadingMore(false);
+      } else {
+        setLoading(false);
+        if (gameVisibleRef.current) {
+          setSearchDoneWhileGaming(true);
+          setGameCompleteDialog(true);
+        }
       }
     }
+  };
+
+  const handleLoadMore = () => {
+    void handleSearch({ appendToExisting: true, overrideOffset: jobOffset, skipBilling: true });
   };
 
   // Wrapper: shows "all listings" warning before actually running the search
@@ -745,7 +791,7 @@ export default function JobsPage() {
               <div className="w-10 h-10 border-4 border-black border-t-[#FF3000] animate-spin" />
               <p className="text-xs font-black uppercase tracking-widest">Searching {platform === 'linkedin' ? 'LinkedIn' : platform === 'workday' ? 'Workday' : 'CareerOne'} jobs...</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 max-w-xs text-center">
-                Fetching real-time data — typically {resultLimit === 'all' ? '3–5 minutes' : '1–2 minutes'}
+                Fetching real-time data — typically {resultLimit === 'all' ? '~2 min for first 50' : '1–2 minutes'}
               </p>
               <button
                 type="button"
@@ -900,6 +946,37 @@ export default function JobsPage() {
         </div>
         ) : null}
 
+        {/* Explore More (load-more for 'all' mode) */}
+        {!loading && hasMore && jobs.length > 0 && (
+          <div className="mt-6 flex flex-col items-center gap-3">
+            <div className="w-full border-t-2 border-black" />
+            <p className="text-[10px] font-bold uppercase tracking-widest text-black/50">
+              Showing {jobs.length} jobs — more available
+            </p>
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="group flex items-center gap-3 border-4 border-black bg-white hover:bg-black hover:text-white px-8 py-3 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {loadingMore ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-black group-disabled:border-black border-t-[#FF3000] animate-spin" />
+                  <span className="text-xs font-black uppercase tracking-widest">Fetching next batch…</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-base">🔍</span>
+                  <span className="text-xs font-black uppercase tracking-widest">Explore More Jobs</span>
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] border-2 border-black group-hover:border-white px-2 py-0.5 transition-colors">
+                    +50
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
+        )}
+
         {/* Empty State */}
         {!loading && searched && jobs.length === 0 && (
           <div className="border-4 border-black bg-white py-16 text-center">
@@ -939,19 +1016,19 @@ export default function JobsPage() {
       <Dialog open={allListingsWarning} onOpenChange={setAllListingsWarning}>
         <DialogContent className="sm:max-w-md border-4 border-black">
           <DialogHeader>
-            <DialogTitle className="font-black uppercase tracking-widest">⚠ This Will Take a While</DialogTitle>
+            <DialogTitle className="font-black uppercase tracking-widest">⚠ All Listings — Batch Mode</DialogTitle>
             <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
-              All Listings mode scrapes every available job.
+              Results load in batches of 50 to keep things fast.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
             <p className="text-sm font-medium leading-relaxed">
-              Fetching <span className="font-black">all listings</span> can take <span className="font-black text-[#FF3000]">3–5 minutes</span> depending on the platform and search terms. During the wait, you&apos;ll be offered a mini-game to pass the time.
+              Instead of waiting 3–5 minutes for everything at once, the first <span className="font-black">50 jobs</span> will load in <span className="font-black text-[#FF3000]">~1–2 minutes</span>. An <span className="font-black">Explore More</span> button will appear so you can load the next 50 whenever you&apos;re ready.
             </p>
             <div className="border-2 border-black bg-[#F2F2F2] p-3 space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-widest">Why so long?</p>
+              <p className="text-[10px] font-black uppercase tracking-widest">While you wait</p>
               <p className="text-[10px] font-bold text-black/60 leading-relaxed">
-                Each page of results is fetched and parsed in real-time. No pre-cached index — you always get fresh listings.
+                A mini-game will be offered on the loading screen. Jobs are fetched fresh in real-time — no stale index.
               </p>
             </div>
           </div>
