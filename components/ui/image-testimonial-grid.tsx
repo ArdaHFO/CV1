@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface MasonryGridProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -26,14 +26,13 @@ const MasonryGrid = React.forwardRef<HTMLDivElement, MasonryGridProps>(
     };
 
     // Animation variants for child elements
-    const cardVariants = {
+    const cardVariants: Variants = {
       hidden: { opacity: 0, y: 20 },
       visible: {
         opacity: 1,
         y: 0,
         transition: {
           duration: 0.5,
-          ease: 'easeOut',
         },
       },
     };
