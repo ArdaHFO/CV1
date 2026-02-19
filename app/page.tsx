@@ -335,7 +335,7 @@ export default function Home() {
               Pricing
             </Link>
             <Link
-              href="#faq-section"
+              href="#faq"
               className="text-xs font-black uppercase tracking-widest text-black hover:text-[#FF3000] transition-colors"
             >
               FAQ
@@ -365,7 +365,7 @@ export default function Home() {
         />
 
         <AuroraBackground className="w-full" showRadialGradient>
-        <section aria-labelledby="hero-heading" className="mx-auto w-full max-w-7xl px-4 pb-20 pt-4 sm:px-6 lg:px-8">
+        <section aria-labelledby="hero-heading" className="mx-auto w-full max-w-7xl px-4 pb-20 pt-10 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <div>
               <h1 className="text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-[9rem]">
@@ -529,7 +529,7 @@ export default function Home() {
 
         <section
           id="method"
-          className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8"
+          className="scroll-mt-20 border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto max-w-7xl">
             <div className="grid gap-12 lg:grid-cols-[5fr_7fr]">
@@ -623,7 +623,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="faq" className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
+        <section id="faq" className="scroll-mt-20 border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="grid gap-10 lg:grid-cols-[7fr_5fr]">
               <div>
@@ -700,7 +700,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="pricing" className="border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
+        <section id="pricing" className="scroll-mt-20 border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="grid gap-10 lg:grid-cols-[5fr_7fr]">
               <div>
