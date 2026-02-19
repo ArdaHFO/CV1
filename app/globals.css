@@ -129,6 +129,17 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
   }
+
+  /* Global placeholder visibility fix */
+  ::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+    opacity: 1; /* Firefox resets opacity */
+  }
+
+  .dark ::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    opacity: 1;
+  }
 }
 
 .swiss-grid-pattern {
