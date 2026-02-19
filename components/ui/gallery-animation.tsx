@@ -38,11 +38,20 @@ const GalleryRow: React.FC<GalleryRowProps> = ({ items, rowIndex, hoveredIndex, 
           onMouseLeave={() => onHover(null)}
           onClick={() => onOpen(globalIndex)}
         >
-          {/* Screenshot — object-contain so nothing is ever cropped */}
+          {/* Blurred background — fills black bars with a soft version of the same image */}
+          <img
+            src={feature.src}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-cover object-center scale-110"
+            style={{ filter: 'blur(12px)', opacity: 0.35 }}
+            draggable={false}
+          />
+          {/* Sharp contained image on top */}
           <img
             src={feature.src}
             alt={feature.alt}
-            className="w-full h-full object-contain object-center"
+            className="relative w-full h-full object-contain object-center"
             style={{ display: 'block' }}
             draggable={false}
           />
@@ -131,10 +140,11 @@ const FeatureGallery: React.FC<FeatureGalleryProps> = ({ features, className = '
           >
             {/* Close */}
             <button
-              className="absolute right-5 top-5 z-10 border-2 border-white/30 bg-white/10 p-2 text-white transition-colors hover:bg-white/20"
+              className="absolute right-5 top-5 z-[60] flex items-center gap-2 border-4 border-white bg-[#FF3000] px-4 py-2 text-sm font-black uppercase tracking-widest text-white transition-opacity hover:opacity-80"
               onClick={closeImage}
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
+              Close
             </button>
 
             {/* Prev */}
