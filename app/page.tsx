@@ -28,6 +28,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import type { User } from '@/types';
+import FeatureGallery from '@/components/ui/gallery-animation';
 function MetaLogo({ className }: { className?: string }) {
   return (
     <Image
@@ -449,7 +450,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Feature Bento Section ───────────────────────────────────── */}
+        {/* ── Feature Gallery Section ─────────────────────────────────── */}
         <section
           aria-labelledby="features-heading"
           className="border-t-4 border-black bg-white px-4 pb-24 pt-20 sm:px-6 lg:px-8"
@@ -470,113 +471,52 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Bento grid — alternating wide/narrow cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
-              {/* 01 — My CVs — 2-col wide */}
-              <article className="group relative overflow-hidden border-4 border-black bg-black sm:col-span-2" style={{ minHeight: '460px' }}>
-                <Image
-                  src="/dashboard.png"
-                  alt="CSPARK CV dashboard — create and manage multiple ATS-optimized CV versions for different job roles"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 66vw, 800px"
-                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
-                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">01</span>
-                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">My CVs</h3>
-                  <p className="mt-1.5 max-w-sm text-sm font-bold uppercase tracking-widest text-white/70">Create, manage & export unlimited CV versions</p>
-                </div>
-              </article>
-
-              {/* 02 — Find Jobs — 1-col */}
-              <article className="group relative overflow-hidden border-4 border-black bg-black" style={{ minHeight: '460px' }}>
-                <Image
-                  src="/jobsearch.png"
-                  alt="CSPARK job search — real-time job listings from LinkedIn, Workday and CareerOne"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 400px"
-                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
-                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">02</span>
-                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">Find Jobs</h3>
-                  <p className="mt-1.5 text-sm font-bold uppercase tracking-widest text-white/70">Search LinkedIn, Workday & CareerOne</p>
-                </div>
-              </article>
-
-              {/* 03 — Application Tracker — 1-col */}
-              <article className="group relative overflow-hidden border-4 border-black bg-black" style={{ minHeight: '460px' }}>
-                <Image
-                  src="/applicationtracker.png"
-                  alt="CSPARK application tracker — manage job applications with notes and interview stages"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 400px"
-                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
-                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">03</span>
-                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">Application Tracker</h3>
-                  <p className="mt-1.5 text-sm font-bold uppercase tracking-widest text-white/70">Track every application, note & interview</p>
-                </div>
-              </article>
-
-              {/* 04 — Job Tracker — 2-col wide */}
-              <article className="group relative overflow-hidden border-4 border-black bg-black sm:col-span-2" style={{ minHeight: '460px' }}>
-                <Image
-                  src="/jobtracker.png"
-                  alt="CSPARK job tracker — save and organise job listings tagged as applied, skipped or interested"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 66vw, 800px"
-                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
-                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">04</span>
-                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">Job Tracker</h3>
-                  <p className="mt-1.5 max-w-sm text-sm font-bold uppercase tracking-widest text-white/70">Mark applied, skipped or interested — revisit anytime</p>
-                </div>
-              </article>
-
-              {/* 05 — AI Optimizations — 1-col */}
-              <article className="group relative overflow-hidden border-4 border-black bg-black" style={{ minHeight: '460px' }}>
-                <Image
-                  src="/optimizations.png"
-                  alt="CSPARK AI CV optimization history — every AI-driven change made to your CV tracked per job posting"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 400px"
-                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
-                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">05</span>
-                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">AI Optimizations</h3>
-                  <p className="mt-1.5 text-sm font-bold uppercase tracking-widest text-white/70">Full history of AI-driven CV changes per job</p>
-                </div>
-              </article>
-
-              {/* 06 — CV vs Job Match — 2-col wide */}
-              <article className="group relative overflow-hidden border-4 border-black bg-black sm:col-span-2" style={{ minHeight: '460px' }}>
-                <Image
-                  src="/joblistinganalyzeoptimize.png"
-                  alt="CSPARK CV versus job match score — compare your CV against a job listing and fix ATS keyword gaps"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1200px) 66vw, 800px"
-                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-7 text-white">
-                  <span className="text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">06</span>
-                  <h3 className="mt-1.5 text-2xl font-black uppercase tracking-widest">CV vs Job Match</h3>
-                  <p className="mt-1.5 max-w-sm text-sm font-bold uppercase tracking-widest text-white/70">Score your CV against a job listing and fix the gaps</p>
-                </div>
-              </article>
-
-            </div>
+            <FeatureGallery
+              features={[
+                {
+                  num: '01',
+                  label: 'My CVs',
+                  desc: 'Create, manage & export unlimited CV versions for different roles',
+                  src: '/dashboard.png',
+                  alt: 'CSPARK CV dashboard — create and manage multiple ATS-optimized CV versions for different job roles',
+                },
+                {
+                  num: '02',
+                  label: 'Find Jobs',
+                  desc: 'Real-time search across LinkedIn, Workday & CareerOne',
+                  src: '/jobsearch.png',
+                  alt: 'CSPARK job search — real-time job listings from LinkedIn, Workday and CareerOne',
+                },
+                {
+                  num: '03',
+                  label: 'Application Tracker',
+                  desc: 'Track every application, note and interview in one place',
+                  src: '/applicationtracker.png',
+                  alt: 'CSPARK application tracker — manage job applications with notes and interview stage tracking',
+                },
+                {
+                  num: '04',
+                  label: 'Job Tracker',
+                  desc: 'Mark applied, skipped or interested — revisit anytime',
+                  src: '/jobtracker.png',
+                  alt: 'CSPARK job tracker — save and organise job listings tagged as applied, skipped or interested',
+                },
+                {
+                  num: '05',
+                  label: 'AI Optimizations',
+                  desc: 'Full history of every AI-driven CV change per job posting',
+                  src: '/optimizations.png',
+                  alt: 'CSPARK AI CV optimization history — track every AI-driven change made to your CV per job',
+                },
+                {
+                  num: '06',
+                  label: 'CV vs Job Match',
+                  desc: 'Score your CV against a job listing and fix the gaps',
+                  src: '/joblistinganalyzeoptimize.png',
+                  alt: 'CSPARK CV versus job match score — compare your CV against a job listing and fix ATS keyword gaps',
+                },
+              ]}
+            />
           </div>
         </section>
 
