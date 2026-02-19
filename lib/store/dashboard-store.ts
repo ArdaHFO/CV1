@@ -7,6 +7,7 @@ interface DashboardStore {
   loading: boolean;
   error: string | null;
   selectedResume: Resume | null;
+  upgradeModalOpen: boolean;
 
   setResumes: (resumes: Resume[]) => void;
   addResume: (resume: Resume) => void;
@@ -16,6 +17,7 @@ interface DashboardStore {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setSelectedResume: (resume: Resume | null) => void;
+  setUpgradeModalOpen: (open: boolean) => void;
 }
 
 export const useDashboardStore = create<DashboardStore>()(
@@ -25,6 +27,7 @@ export const useDashboardStore = create<DashboardStore>()(
       loading: false,
       error: null,
       selectedResume: null,
+      upgradeModalOpen: false,
 
       setResumes: (resumes) => set({ resumes }),
       
@@ -54,6 +57,7 @@ export const useDashboardStore = create<DashboardStore>()(
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
       setSelectedResume: (selectedResume) => set({ selectedResume }),
+      setUpgradeModalOpen: (upgradeModalOpen) => set({ upgradeModalOpen }),
     }),
     {
       name: 'dashboard-storage',

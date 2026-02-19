@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Search, MapPin, Briefcase, ExternalLink, EyeOff, CheckCircle2, RotateCcw } from 'lucide-react';
+import { Search, MapPin, Briefcase, ExternalLink, EyeOff, CheckCircle2, RotateCcw, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import ShaderBackground from '@/components/ui/shader-background';
 import { Input } from '@/components/ui/input';
@@ -11,12 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import { getJobStatus, trackJob, removeTrackedJob, type JobTrackerStatus } from '@/lib/job-tracker';
+import { useDashboardStore } from '@/lib/store/dashboard-store';
 import type { Job } from '@/types';
 
 type PlanTier = 'freemium' | 'pro';
 
 export default function JobsPage() {
   const router = useRouter();
+  const { setUpgradeModalOpen } = useDashboardStore();
   const [keywords, setKeywords] = useState('');
   const [location, setLocation] = useState('');
   const [employmentType, setEmploymentType] = useState('all');
@@ -338,9 +340,12 @@ export default function JobsPage() {
                 <div className="w-[2px] bg-black" />
                 <button
                   type="button"
-                  onClick={() => setPlatform('workday')}
-                  className={`flex items-center gap-2 px-3 py-1.5 transition-colors ${
-                    platform === 'workday' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                  onClick={() => {
+                    if (planTier !== 'pro') { setUpgradeModalOpen(true); return; }
+                    setPlatform('workday');
+                  }}
+                  className={`relative flex items-center gap-2 px-3 py-1.5 transition-colors ${
+                    platform === 'workday' ? 'bg-black text-white' : planTier !== 'pro' ? 'bg-[#F2F2F2] text-black/40 cursor-not-allowed' : 'bg-white text-black hover:bg-[#F2F2F2]'
                   }`}
                 >
                   <Image
@@ -348,16 +353,22 @@ export default function JobsPage() {
                     alt="Workday"
                     width={423}
                     height={200}
-                    className={`h-4 w-auto [image-rendering:crisp-edges] ${platform === 'workday' ? 'brightness-0 invert' : ''}`}
+                    className={`h-4 w-auto [image-rendering:crisp-edges] ${
+                      platform === 'workday' ? 'brightness-0 invert' : planTier !== 'pro' ? 'opacity-40' : ''
+                    }`}
                   />
                   <span className="text-[10px] font-black uppercase tracking-widest">Workday</span>
+                  {planTier !== 'pro' && <Lock className="h-3 w-3 text-[#FF3000]" />}
                 </button>
                 <div className="w-[2px] bg-black" />
                 <button
                   type="button"
-                  onClick={() => setPlatform('careerone')}
-                  className={`flex items-center gap-2 px-3 py-1.5 transition-colors ${
-                    platform === 'careerone' ? 'bg-black text-white' : 'bg-white text-black hover:bg-[#F2F2F2]'
+                  onClick={() => {
+                    if (planTier !== 'pro') { setUpgradeModalOpen(true); return; }
+                    setPlatform('careerone');
+                  }}
+                  className={`relative flex items-center gap-2 px-3 py-1.5 transition-colors ${
+                    platform === 'careerone' ? 'bg-black text-white' : planTier !== 'pro' ? 'bg-[#F2F2F2] text-black/40 cursor-not-allowed' : 'bg-white text-black hover:bg-[#F2F2F2]'
                   }`}
                 >
                   <Image
@@ -365,9 +376,12 @@ export default function JobsPage() {
                     alt="CareerOne"
                     width={247}
                     height={53}
-                    className={`h-4 w-auto [image-rendering:crisp-edges] ${platform === 'careerone' ? 'brightness-0 invert' : ''}`}
+                    className={`h-4 w-auto [image-rendering:crisp-edges] ${
+                      platform === 'careerone' ? 'brightness-0 invert' : planTier !== 'pro' ? 'opacity-40' : ''
+                    }`}
                   />
                   <span className="text-[10px] font-black uppercase tracking-widest">CareerOne</span>
+                  {planTier !== 'pro' && <Lock className="h-3 w-3 text-[#FF3000]" />}
                 </button>
               </div>
               <div className="px-3 py-1.5 border-2 border-black bg-white">

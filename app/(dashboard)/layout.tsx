@@ -26,6 +26,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { getCurrentUser, signOut } from '@/lib/auth/auth';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
+import { useDashboardStore } from '@/lib/store/dashboard-store';
 import type { User } from '@/types';
 
 type SubscriptionData = {
@@ -46,8 +47,10 @@ type PurchaseType = 'plan' | 'token-pack' | 'cv-import-pack' | 'ai-optimize-pack
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { upgradeModalOpen, setUpgradeModalOpen } = useDashboardStore();
+  const upgradeOpen = upgradeModalOpen;
+  const setUpgradeOpen = setUpgradeModalOpen;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<'pro-monthly' | 'pro-yearly'>('pro-yearly');
   const [selectedPurchaseType, setSelectedPurchaseType] = useState<PurchaseType>('plan');
   const [selectedTokenPackId, setSelectedTokenPackId] = useState<TokenPackId>('job-search-5');
