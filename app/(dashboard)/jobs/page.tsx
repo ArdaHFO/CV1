@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Search, MapPin, Briefcase, ExternalLink, EyeOff, CheckCircle2, RotateCcw, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -8,6 +8,14 @@ import ShaderBackground from '@/components/ui/shader-background';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useAppDarkModeState } from '@/hooks/use-app-dark-mode';
 import { getCurrentUser } from '@/lib/auth/auth';
 import { getJobStatus, trackJob, removeTrackedJob, type JobTrackerStatus } from '@/lib/job-tracker';
@@ -15,6 +23,168 @@ import { useDashboardStore } from '@/lib/store/dashboard-store';
 import type { Job } from '@/types';
 
 type PlanTier = 'freemium' | 'pro';
+
+// ─── Snake Easter Egg ─────────────────────────────────────────────────────────
+const SCOLS = 20;
+const SROWS = 14;
+type SC = { x: number; y: number };
+
+function genSnakeFood(sn: SC[]): SC {
+  const occ = new Set(sn.map((c) => `${c.x},${c.y}`));
+  let p: SC;
+  do {
+    p = { x: Math.floor(Math.random() * SCOLS), y: Math.floor(Math.random() * SROWS) };
+  } while (occ.has(`${p.x},${p.y}`));
+  return p;
+}
+
+function SnakeGame({ searchComplete }: { searchComplete: boolean }) {
+  const INIT: SC[] = [{ x: 10, y: 6 }, { x: 9, y: 6 }, { x: 8, y: 6 }];
+  const [snake, setSnake] = useState<SC[]>(INIT);
+  const [food, setFood] = useState<SC>({ x: 15, y: 6 });
+  const [score, setScore] = useState(0);
+  const [best, setBest] = useState(0);
+  const [over, setOver] = useState(false);
+  const [started, setStarted] = useState(false);
+
+  const dirRef  = useRef({ x: 1, y: 0 });
+  const snkRef  = useRef<SC[]>(INIT);
+  const fdRef   = useRef<SC>({ x: 15, y: 6 });
+  const scrRef  = useRef(0);
+  const overRef = useRef(false);
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const d = dirRef.current;
+      if ((e.key === 'ArrowUp'    || e.key === 'w') && d.y !== 1)  { dirRef.current = { x: 0, y: -1 }; e.preventDefault(); }
+      if ((e.key === 'ArrowDown'  || e.key === 's') && d.y !== -1) { dirRef.current = { x: 0, y:  1 }; e.preventDefault(); }
+      if ((e.key === 'ArrowLeft'  || e.key === 'a') && d.x !== 1)  { dirRef.current = { x: -1, y: 0 }; e.preventDefault(); }
+      if ((e.key === 'ArrowRight' || e.key === 'd') && d.x !== -1) { dirRef.current = { x:  1, y: 0 }; e.preventDefault(); }
+      if (!started && !overRef.current) setStarted(true);
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [started]);
+
+  useEffect(() => {
+    if (!started || overRef.current) return;
+    const t = setInterval(() => {
+      const prev = snkRef.current;
+      const d = dirRef.current;
+      const head: SC = {
+        x: (prev[0].x + d.x + SCOLS) % SCOLS,
+        y: (prev[0].y + d.y + SROWS) % SROWS,
+      };
+      if (prev.slice(1).some((c) => c.x === head.x && c.y === head.y)) {
+        overRef.current = true;
+        setBest((b) => Math.max(b, scrRef.current));
+        setOver(true);
+        return;
+      }
+      const ate = head.x === fdRef.current.x && head.y === fdRef.current.y;
+      const next = [head, ...prev];
+      if (!ate) next.pop();
+      else {
+        scrRef.current += 10;
+        setScore(scrRef.current);
+        const nf = genSnakeFood(next);
+        fdRef.current = nf;
+        setFood(nf);
+      }
+      snkRef.current = next;
+      setSnake([...next]);
+    }, 130);
+    return () => clearInterval(t);
+  }, [started]);
+
+  const reset = () => {
+    const init: SC[] = [{ x: 10, y: 6 }, { x: 9, y: 6 }, { x: 8, y: 6 }];
+    snkRef.current = init; dirRef.current = { x: 1, y: 0 };
+    fdRef.current = { x: 15, y: 6 }; scrRef.current = 0; overRef.current = false;
+    setSnake(init); setFood({ x: 15, y: 6 }); setScore(0); setOver(false); setStarted(false);
+  };
+
+  const move = (dx: number, dy: number) => {
+    const d = dirRef.current;
+    if (dx !== 0 && d.x === -dx) return;
+    if (dy !== 0 && d.y === -dy) return;
+    dirRef.current = { x: dx, y: dy };
+    if (!started && !overRef.current) setStarted(true);
+  };
+
+  const sSet = new Set(snake.map((c) => `${c.x},${c.y}`));
+  const headKey = snake.length > 0 ? `${snake[0].x},${snake[0].y}` : '';
+
+  return (
+    <div className="flex flex-col items-center gap-3 select-none w-full">
+      {searchComplete && (
+        <div className="w-full border-2 border-[#FF3000] bg-[#FF3000] text-white px-3 py-2 text-[10px] font-black uppercase tracking-widest text-center animate-pulse">
+          ✓ Your job results are ready!
+        </div>
+      )}
+      <div className="flex w-full items-center justify-between px-1">
+        <span className="text-xs font-black uppercase tracking-widest">Score: {score}</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest text-black/50">Best: {best}</span>
+      </div>
+      <div
+        className="relative border-4 border-black overflow-hidden bg-white"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${SCOLS}, 1fr)`,
+          width: SCOLS * 22,
+          height: SROWS * 22,
+        }}
+      >
+        {Array.from({ length: SROWS * SCOLS }, (_, i) => {
+          const x = i % SCOLS;
+          const y = Math.floor(i / SCOLS);
+          const k = `${x},${y}`;
+          const isHead = k === headKey;
+          const isBody = !isHead && sSet.has(k);
+          const isFd = food.x === x && food.y === y;
+          return (
+            <div
+              key={k}
+              style={{ width: 22, height: 22 }}
+              className={isHead ? 'bg-black' : isBody ? 'bg-black/60' : isFd ? 'bg-[#FF3000]' : ''}
+            />
+          );
+        })}
+        {!started && !over && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 gap-2">
+            <div className="text-3xl">🐍</div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-center px-4 leading-loose">
+              Press arrow keys<br />or WASD to start
+            </p>
+          </div>
+        )}
+        {over && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/95 gap-3">
+            <p className="text-lg font-black uppercase tracking-widest">💀 Game Over</p>
+            <p className="text-sm font-bold uppercase tracking-widest text-black/60">Score: {score}</p>
+            <button
+              type="button"
+              onClick={reset}
+              className="border-4 border-black bg-black text-white px-5 py-2 text-xs font-black uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+      </div>
+      {/* D-pad for touch / mouse */}
+      <div className="flex flex-col items-center gap-1.5">
+        <button type="button" onClick={() => move(0, -1)} className="w-10 h-10 border-2 border-black bg-[#F2F2F2] font-black text-sm hover:bg-black hover:text-white transition-colors active:bg-black active:text-white">▲</button>
+        <div className="flex gap-1.5">
+          <button type="button" onClick={() => move(-1, 0)} className="w-10 h-10 border-2 border-black bg-[#F2F2F2] font-black text-sm hover:bg-black hover:text-white transition-colors active:bg-black active:text-white">◀</button>
+          <button type="button" onClick={() => move(0, 1)}  className="w-10 h-10 border-2 border-black bg-[#F2F2F2] font-black text-sm hover:bg-black hover:text-white transition-colors active:bg-black active:text-white">▼</button>
+          <button type="button" onClick={() => move(1, 0)}  className="w-10 h-10 border-2 border-black bg-[#F2F2F2] font-black text-sm hover:bg-black hover:text-white transition-colors active:bg-black active:text-white">▶</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+// ──────────────────────────────────────────────────────────────────────────────
 
 export default function JobsPage() {
   const router = useRouter();
@@ -37,6 +207,13 @@ export default function JobsPage() {
   // job-tracker statuses (jobId → status)
   const [jobStatuses, setJobStatuses] = useState<Record<string, JobTrackerStatus>>({});
   const { isDark } = useAppDarkModeState();
+
+  // Easter egg game state
+  const [allListingsWarning, setAllListingsWarning] = useState(false);
+  const [gameVisible, setGameVisible] = useState(false);
+  const gameVisibleRef = useRef(false);
+  const [gameCompleteDialog, setGameCompleteDialog] = useState(false);
+  const [searchDoneWhileGaming, setSearchDoneWhileGaming] = useState(false);
 
   // Load tracker statuses from localStorage
   const refreshStatuses = (jobList: Job[]) => {
@@ -280,7 +457,20 @@ export default function JobsPage() {
       console.error('Search error:', error);
     } finally {
       setLoading(false);
+      if (gameVisibleRef.current) {
+        setSearchDoneWhileGaming(true);
+        setGameCompleteDialog(true);
+      }
     }
+  };
+
+  // Wrapper: shows "all listings" warning before actually running the search
+  const startSearch = () => {
+    if (resultLimit === 'all') {
+      setAllListingsWarning(true);
+      return;
+    }
+    void handleSearch();
   };
 
   const clearFilters = () => {
@@ -419,7 +609,7 @@ export default function JobsPage() {
                     placeholder="Job title, keywords, or company"
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    onKeyDown={(e) => e.key === 'Enter' && startSearch()}
                     className="pl-9 border-2 border-black focus:ring-2 focus:ring-[#FF3000] focus:border-[#FF3000]"
                   />
                 </div>
@@ -432,7 +622,7 @@ export default function JobsPage() {
                     placeholder={platform === 'careerone' ? 'Location not supported for CareerOne' : 'Location (optional)'}
                     value={platform === 'careerone' ? '' : location}
                     onChange={(e) => { if (platform !== 'careerone') setLocation(e.target.value); }}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    onKeyDown={(e) => e.key === 'Enter' && startSearch()}
                     disabled={platform === 'careerone'}
                     className={`pl-9 border-2 border-black focus:ring-2 focus:ring-[#FF3000] focus:border-[#FF3000] ${platform === 'careerone' ? 'opacity-40 cursor-not-allowed' : ''}`}
                   />
@@ -440,7 +630,7 @@ export default function JobsPage() {
               </div>
 
               <div className="md:col-span-3">
-                <Button onClick={handleSearch} disabled={loading} variant="accent" className="w-full gap-2">
+                <Button onClick={startSearch} disabled={loading} variant="accent" className="w-full gap-2">
                   <Search className="w-4 h-4" />
                   {loading ? 'Searching...' : 'Search Jobs'}
                 </Button>
@@ -549,14 +739,47 @@ export default function JobsPage() {
         )}
         
         {/* Loading State */}
-        {loading && (
+        {loading && !gameVisible && (
           <div className="border-4 border-black bg-white py-16">
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-6">
               <div className="w-10 h-10 border-4 border-black border-t-[#FF3000] animate-spin" />
               <p className="text-xs font-black uppercase tracking-widest">Searching {platform === 'linkedin' ? 'LinkedIn' : platform === 'workday' ? 'Workday' : 'CareerOne'} jobs...</p>
               <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 max-w-xs text-center">
-                Fetching real-time data — typically 1–2 minutes
+                Fetching real-time data — typically {resultLimit === 'all' ? '3–5 minutes' : '1–2 minutes'}
               </p>
+              <button
+                type="button"
+                onClick={() => { setGameVisible(true); gameVisibleRef.current = true; }}
+                className="group mt-2 border-4 border-black bg-white hover:bg-black hover:text-white transition-all duration-200 px-6 py-3 flex items-center gap-3"
+              >
+                <span className="text-xl leading-none">🎮</span>
+                <span className="text-[11px] font-black uppercase tracking-widest">
+                  Play a game while you wait?
+                </span>
+                <span className="text-[9px] font-black uppercase tracking-[0.3em] border-2 border-black group-hover:border-white px-2 py-0.5 transition-colors">
+                  Easter Egg
+                </span>
+              </button>
+            </div>
+          </div>
+        )}
+        {loading && gameVisible && (
+          <div className="border-4 border-black bg-white p-6 overflow-x-auto">
+            <div className="flex items-center justify-between mb-4 min-w-[440px]">
+              <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-black/50">
+                <div className="w-4 h-4 border-2 border-black border-t-[#FF3000] animate-spin" />
+                Still searching in background...
+              </div>
+              <button
+                type="button"
+                onClick={() => { setGameVisible(false); gameVisibleRef.current = false; }}
+                className="text-[10px] font-black uppercase tracking-widest border-2 border-black px-3 py-1 hover:bg-black hover:text-white transition-colors"
+              >
+                Hide
+              </button>
+            </div>
+            <div className="flex justify-center">
+              <SnakeGame searchComplete={searchDoneWhileGaming} />
             </div>
           </div>
         )}
@@ -711,6 +934,86 @@ export default function JobsPage() {
         )}
         </div>
       </div>
+
+      {/* ── All Listings Warning Dialog ── */}
+      <Dialog open={allListingsWarning} onOpenChange={setAllListingsWarning}>
+        <DialogContent className="sm:max-w-md border-4 border-black">
+          <DialogHeader>
+            <DialogTitle className="font-black uppercase tracking-widest">⚠ This Will Take a While</DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+              All Listings mode scrapes every available job.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm font-medium leading-relaxed">
+              Fetching <span className="font-black">all listings</span> can take <span className="font-black text-[#FF3000]">3–5 minutes</span> depending on the platform and search terms. During the wait, you&apos;ll be offered a mini-game to pass the time.
+            </p>
+            <div className="border-2 border-black bg-[#F2F2F2] p-3 space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest">Why so long?</p>
+              <p className="text-[10px] font-bold text-black/60 leading-relaxed">
+                Each page of results is fetched and parsed in real-time. No pre-cached index — you always get fresh listings.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <button
+              type="button"
+              onClick={() => setAllListingsWarning(false)}
+              className="border-2 border-black px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-[#F2F2F2] transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAllListingsWarning(false);
+                void handleSearch();
+              }}
+              className="border-2 border-black bg-black text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-[#FF3000] hover:border-[#FF3000] transition-colors"
+            >
+              Got it — Search Anyway
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Game Complete Dialog ── */}
+      <Dialog open={gameCompleteDialog} onOpenChange={setGameCompleteDialog}>
+        <DialogContent className="sm:max-w-md border-4 border-black">
+          <DialogHeader>
+            <DialogTitle className="font-black uppercase tracking-widest">🎉 Search Complete!</DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+              Your job results are ready and waiting.
+            </DialogDescription>
+          </DialogHeader>
+          <p className="text-sm font-medium leading-relaxed">
+            The job search finished. You can view your results now or keep playing — the jobs will still be there.
+          </p>
+          <DialogFooter className="gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => {
+                setGameCompleteDialog(false);
+                // keep game open — user chose to keep playing
+              }}
+              className="border-2 border-black px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-[#F2F2F2] transition-colors"
+            >
+              Keep Playing 🕹
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setGameCompleteDialog(false);
+                setGameVisible(false);
+                gameVisibleRef.current = false;
+              }}
+              className="border-2 border-black bg-black text-white px-4 py-2 text-[10px] font-black uppercase tracking-widest hover:bg-[#FF3000] hover:border-[#FF3000] transition-colors"
+            >
+              View Jobs →
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
