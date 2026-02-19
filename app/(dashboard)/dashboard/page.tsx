@@ -377,7 +377,13 @@ export default function DashboardPage() {
         <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col gap-6 border-4 border-black bg-white p-6 swiss-grid-pattern">
         <div className="space-y-2">
-          <h1 className="text-3xl font-black uppercase tracking-widest cursor-default" onClick={handleTitleClick} title="">My CVs</h1>
+          <div className="flex items-baseline gap-2 group/title">
+            <h1 className="text-3xl font-black uppercase tracking-widest cursor-default" onClick={handleTitleClick}>My CVs</h1>
+            <span
+              className="text-[10px] text-black/20 group-hover/title:text-black/40 transition-colors cursor-default select-none"
+              title="psst... something is hidden here 🎮"
+            >✦</span>
+          </div>
           <p className="text-xs font-bold uppercase tracking-widest text-black/70">
             Manage and edit all your CV versions
           </p>

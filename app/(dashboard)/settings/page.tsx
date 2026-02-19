@@ -255,7 +255,13 @@ export default function SettingsPage() {
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-black uppercase tracking-widest cursor-default" onClick={handleSettingsTitleClick}>Settings</h1>
+            <div className="flex items-baseline gap-2 group/title">
+              <h1 className="text-3xl font-black uppercase tracking-widest cursor-default" onClick={handleSettingsTitleClick}>Settings</h1>
+              <span
+                className="text-[10px] text-black/20 group-hover/title:text-black/40 transition-colors cursor-default select-none relative"
+                title="psst... something is hidden here 🎮"
+              >✦</span>
+            </div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-black/60 mt-1">
               Customize your CSpark experience
             </p>
