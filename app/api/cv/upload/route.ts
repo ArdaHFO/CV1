@@ -58,20 +58,22 @@ function normalizeResumeContent(input: Partial<ResumeContent>, fileName: string)
   const safeArray = <T>(value: unknown): T[] => (Array.isArray(value) ? (value as T[]) : []);
 
   // Normalize skills: AI may return strings or partial objects missing id/category
-  const normalizeSkills = (raw: unknown) => {
+  const normalizeSkills = (raw: unknown): import('@/types').Skill[] => {
     if (!Array.isArray(raw)) return [];
     return raw.map((s: unknown, idx: number) => {
       if (typeof s === 'string') {
-        return { id: `skill-${idx}`, name: s, category: 'Technical', level: 'intermediate' };
+        return { id: `skill-${idx}`, name: s, category: 'Technical', level: 'intermediate' as const };
       }
       const obj = s as Record<string, unknown>;
+      const validLevels = ['beginner', 'intermediate', 'advanced', 'expert'] as const;
+      const level = validLevels.includes(obj.level as typeof validLevels[number])
+        ? (obj.level as typeof validLevels[number])
+        : 'intermediate' as const;
       return {
         id: String(obj.id || `skill-${idx}`),
         name: String(obj.name || ''),
         category: String(obj.category || 'Technical'),
-        level: ['beginner', 'intermediate', 'advanced', 'expert'].includes(obj.level as string)
-          ? obj.level
-          : 'intermediate',
+        level,
       };
     });
   };
