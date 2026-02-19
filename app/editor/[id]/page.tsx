@@ -53,7 +53,7 @@ function normalizeLoadedContent(raw: ResumeContent): ResumeContent {
       if (typeof s === 'string') {
         return { id: `s-${Math.random().toString(36).slice(2)}`, name: s, category: 'Technical', level: 'intermediate' };
       }
-      const obj = s as Record<string, unknown>;
+      const obj = s as unknown as Record<string, unknown>;
       return {
         id: (typeof obj.id === 'string' ? obj.id : null) || `s-${Math.random().toString(36).slice(2)}`,
         name: typeof obj.name === 'string' ? obj.name : '',
