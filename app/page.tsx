@@ -405,9 +405,9 @@ export default function Home() {
                   <Marquee pauseOnHover speed={18} className="mt-0">
                     <div className="flex items-center gap-10 pr-16">
                       <Image
-                        src="/linkedin.png"
+                        src="/linkedin2.png"
                         alt="LinkedIn"
-                        width={20}
+                        width={80}
                         height={20}
                         className="shrink-0 object-contain"
                       />
