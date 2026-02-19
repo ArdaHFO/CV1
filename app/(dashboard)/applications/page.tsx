@@ -214,15 +214,14 @@ export default function ApplicationsPage() {
     setSaving(true);
     const note = await addApplicationNote(selectedApplication.id, currentUserId, noteText.trim());
     if (note) {
+      const updatedNotes = [...(selectedApplication.notes || []), note];
+      const updatedApplication = { ...selectedApplication, notes: updatedNotes };
       setApplications((prev) =>
-        prev.map((item) =>
-          item.id === selectedApplication.id
-            ? { ...item, notes: [...(item.notes || []), note] }
-            : item
-        )
+        prev.map((item) => (item.id === selectedApplication.id ? updatedApplication : item))
       );
+      setSelectedApplication(updatedApplication);
       setNoteText('');
-      setNoteOpen(false);
+      // Keep dialog open so user can see the newly added note
     }
     setSaving(false);
   };
@@ -271,17 +270,16 @@ export default function ApplicationsPage() {
     );
 
     if (interview) {
+      const updatedInterviews = [...(selectedApplication.interviews || []), interview];
+      const updatedApplication = { ...selectedApplication, interviews: updatedInterviews };
       setApplications((prev) =>
-        prev.map((item) =>
-          item.id === selectedApplication.id
-            ? { ...item, interviews: [...(item.interviews || []), interview] }
-            : item
-        )
+        prev.map((item) => (item.id === selectedApplication.id ? updatedApplication : item))
       );
+      setSelectedApplication(updatedApplication);
       setInterviewStage('Interview');
       setInterviewDate('');
       setInterviewNotes('');
-      setInterviewOpen(false);
+      // Keep dialog open so user can see the newly logged interview
     }
     setSaving(false);
   };
@@ -410,26 +408,67 @@ export default function ApplicationsPage() {
                 </div>
 
                 {/* Notes */}
-                <div className="p-5 space-y-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Notes</p>
-                  <p className="text-xs font-bold uppercase tracking-widest">
-                    {application.notes?.length ?? 0} note{(application.notes?.length ?? 0) !== 1 ? 's' : ''}
-                  </p>
-                  <Button size="sm" variant="outline"
+                <div className="p-5 space-y-3 flex flex-col">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Notes</p>
+                    <span className="text-[9px] font-black uppercase tracking-widest border border-black px-1.5 py-0.5 bg-[#F2F2F2]">
+                      {application.notes?.length ?? 0}
+                    </span>
+                  </div>
+                  {(application.notes?.length ?? 0) === 0 ? (
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/30">No notes yet</p>
+                  ) : (
+                    <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                      {application.notes?.map((n) => (
+                        <div key={n.id} className="border-2 border-black bg-[#F2F2F2] p-2">
+                          <p className="text-[11px] font-medium text-black leading-relaxed whitespace-pre-wrap break-words">{n.note}</p>
+                          <p className="text-[9px] font-black uppercase tracking-widest text-black/40 mt-1.5">
+                            {new Date(n.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <Button size="sm" variant="outline" className="mt-auto"
                     onClick={() => { setSelectedApplication(application); setNoteOpen(true); }}>
-                    Add Note
+                    + Add Note
                   </Button>
                 </div>
 
                 {/* Interviews */}
-                <div className="p-5 space-y-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Interviews</p>
-                  <p className="text-xs font-bold uppercase tracking-widest">
-                    {application.interviews?.length ?? 0} interview{(application.interviews?.length ?? 0) !== 1 ? 's' : ''}
-                  </p>
-                  <Button size="sm" variant="outline"
+                <div className="p-5 space-y-3 flex flex-col">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Interviews</p>
+                    <span className="text-[9px] font-black uppercase tracking-widest border border-black px-1.5 py-0.5 bg-[#F2F2F2]">
+                      {application.interviews?.length ?? 0}
+                    </span>
+                  </div>
+                  {(application.interviews?.length ?? 0) === 0 ? (
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/30">No interviews logged</p>
+                  ) : (
+                    <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                      {application.interviews?.map((iv) => (
+                        <div key={iv.id} className="border-2 border-black bg-[#F2F2F2] p-2">
+                          <div className="flex items-center gap-2 flex-wrap mb-1">
+                            <span className="text-[10px] font-black uppercase tracking-widest border-2 border-black bg-white px-1.5 py-0.5">
+                              {iv.stage}
+                            </span>
+                            {iv.scheduled_at && (
+                              <span className="text-[10px] font-bold text-black/60">
+                                {new Date(iv.scheduled_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+                              </span>
+                            )}
+                          </div>
+                          {iv.notes && (
+                            <p className="text-[11px] font-medium text-black leading-relaxed whitespace-pre-wrap break-words">{iv.notes}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <Button size="sm" variant="outline" className="mt-auto"
                     onClick={() => { setSelectedApplication(application); setInterviewOpen(true); }}>
-                    Log Interview
+                    + Log Interview
                   </Button>
                 </div>
               </div>
@@ -566,52 +605,120 @@ export default function ApplicationsPage() {
       </Dialog>
 
       {/* ── Note Dialog ── */}
-      <Dialog open={noteOpen} onOpenChange={setNoteOpen}>
+      <Dialog open={noteOpen} onOpenChange={(open) => { setNoteOpen(open); if (!open) setNoteText(''); }}>
         <DialogContent className="sm:max-w-lg border-4 border-black">
           <DialogHeader>
-            <DialogTitle className="font-black uppercase tracking-widest">Add Note</DialogTitle>
-            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">Capture key details or feedback.</DialogDescription>
+            <DialogTitle className="font-black uppercase tracking-widest">
+              Notes{selectedApplication ? ` — ${selectedApplication.job_title} @ ${selectedApplication.company}` : ''}
+            </DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+              {(selectedApplication?.notes?.length ?? 0) === 0 ? 'No notes yet.' : `${selectedApplication?.notes?.length} note${(selectedApplication?.notes?.length ?? 0) !== 1 ? 's' : ''} saved.'`}
+            </DialogDescription>
           </DialogHeader>
+
+          {/* Existing notes */}
+          {(selectedApplication?.notes?.length ?? 0) > 0 && (
+            <div className="max-h-52 overflow-y-auto space-y-2 border-2 border-black p-3 bg-[#F2F2F2]">
+              {selectedApplication?.notes?.map((n) => (
+                <div key={n.id} className="border-2 border-black bg-white p-3">
+                  <p className="text-sm font-medium text-black leading-relaxed whitespace-pre-wrap break-words">{n.note}</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest text-black/40 mt-2">
+                    {new Date(n.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add new note */}
           <div className="space-y-2">
-            <Label className="text-[10px] font-black uppercase tracking-widest">Note</Label>
-            <Textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} rows={4} className="border-2 border-black" />
+            <Label className="text-[10px] font-black uppercase tracking-widest">New Note</Label>
+            <Textarea
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              rows={4}
+              placeholder="Type your note here…"
+              className="border-2 border-black"
+            />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setNoteOpen(false)}>Cancel</Button>
-            <Button variant="accent" onClick={handleAddNote} disabled={saving}>{saving ? 'Saving...' : 'Add Note'}</Button>
+            <Button variant="outline" onClick={() => setNoteOpen(false)}>Close</Button>
+            <Button variant="accent" onClick={handleAddNote} disabled={saving || !noteText.trim()}>
+              {saving ? 'Saving...' : 'Add Note'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* ── Interview Dialog ── */}
-      <Dialog open={interviewOpen} onOpenChange={setInterviewOpen}>
+      <Dialog open={interviewOpen} onOpenChange={(open) => { setInterviewOpen(open); if (!open) { setInterviewStage('Interview'); setInterviewDate(''); setInterviewNotes(''); } }}>
         <DialogContent className="sm:max-w-lg border-4 border-black">
           <DialogHeader>
-            <DialogTitle className="font-black uppercase tracking-widest">Log Interview</DialogTitle>
-            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">Track interview stages and notes.</DialogDescription>
+            <DialogTitle className="font-black uppercase tracking-widest">
+              Interviews{selectedApplication ? ` — ${selectedApplication.job_title} @ ${selectedApplication.company}` : ''}
+            </DialogTitle>
+            <DialogDescription className="text-[10px] font-bold uppercase tracking-widest text-black/60">
+              {(selectedApplication?.interviews?.length ?? 0) === 0 ? 'No interviews logged yet.' : `${selectedApplication?.interviews?.length} interview stage${(selectedApplication?.interviews?.length ?? 0) !== 1 ? 's' : ''} logged.`}
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
+
+          {/* Existing interviews */}
+          {(selectedApplication?.interviews?.length ?? 0) > 0 && (
+            <div className="max-h-52 overflow-y-auto space-y-2 border-2 border-black p-3 bg-[#F2F2F2]">
+              {selectedApplication?.interviews?.map((iv) => (
+                <div key={iv.id} className="border-2 border-black bg-white p-3">
+                  <div className="flex items-center gap-2 flex-wrap mb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest border-2 border-black px-2 py-0.5 bg-[#F2F2F2]">
+                      {iv.stage}
+                    </span>
+                    {iv.scheduled_at && (
+                      <span className="text-xs font-bold text-black/60">
+                        {new Date(iv.scheduled_at).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </span>
+                    )}
+                  </div>
+                  {iv.notes ? (
+                    <p className="text-sm font-medium text-black leading-relaxed whitespace-pre-wrap break-words">{iv.notes}</p>
+                  ) : (
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/30">No notes for this stage.</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Log new interview */}
+          <div className="border-t-2 border-black pt-4 space-y-3">
+            <p className="text-[10px] font-black uppercase tracking-widest text-black/40">Log New Stage</p>
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase tracking-widest">Stage</Label>
               <Select value={interviewStage} onValueChange={setInterviewStage}>
                 <SelectTrigger className="border-2 border-black"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {['Screening', 'Interview', 'Offer'].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                  {['Phone Screen', 'Screening', 'Technical', 'Interview', 'Final Round', 'Offer', 'Other'].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label className="text-[10px] font-black uppercase tracking-widest">Date</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest">Date &amp; Time</Label>
               <Input type="datetime-local" value={interviewDate} onChange={(e) => setInterviewDate(e.target.value)} className="border-2 border-black" />
             </div>
             <div className="space-y-2">
               <Label className="text-[10px] font-black uppercase tracking-widest">Notes</Label>
-              <Textarea value={interviewNotes} onChange={(e) => setInterviewNotes(e.target.value)} rows={4} className="border-2 border-black" />
+              <Textarea
+                value={interviewNotes}
+                onChange={(e) => setInterviewNotes(e.target.value)}
+                rows={3}
+                placeholder="Questions asked, impressions, next steps…"
+                className="border-2 border-black"
+              />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setInterviewOpen(false)}>Cancel</Button>
-            <Button variant="accent" onClick={handleAddInterview} disabled={saving}>{saving ? 'Saving...' : 'Log Interview'}</Button>
+            <Button variant="outline" onClick={() => setInterviewOpen(false)}>Close</Button>
+            <Button variant="accent" onClick={handleAddInterview} disabled={saving}>
+              {saving ? 'Saving...' : 'Log Interview'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
