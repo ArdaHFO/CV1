@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 
   title: {
-    default: "CSpark | AI CV Builder & Multi-Platform Job Search",
-    template: "%s | CSpark",
+    default: "cspark | AI CV Builder & Multi-Platform Job Search",
+    template: "%s | cspark",
   },
   description:
     "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3 70B. Free to start — no credit card required.",
@@ -43,9 +43,9 @@ export const metadata: Metadata = {
     "CV for LinkedIn",
     "Meta Llama resume",
   ],
-  authors: [{ name: "CSpark", url: BASE_URL }],
-  creator: "CSpark",
-  publisher: "CSpark",
+  authors: [{ name: "cspark", url: BASE_URL }],
+  creator: "cspark",
+  publisher: "cspark",
 
   robots: {
     index: true,
@@ -67,8 +67,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: BASE_URL,
-    siteName: "CSpark",
-    title: "CSpark | AI CV Builder & Multi-Platform Job Search",
+    siteName: "cspark",
+    title: "cspark | AI CV Builder & Multi-Platform Job Search",
     description:
       "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3. Free to start.",
     images: [
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "CSpark — AI CV Builder & Multi-Platform Job Search",
+        alt: "cspark — AI CV Builder & Multi-Platform Job Search",
         type: "image/png",
       },
     ],
@@ -84,7 +84,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "CSpark | AI CV Builder & Multi-Platform Job Search",
+    title: "cspark | AI CV Builder & Multi-Platform Job Search",
     description:
       "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Free to start.",
     images: ["/og-image.png"],
@@ -105,8 +105,8 @@ export const metadata: Metadata = {
   category: "technology",
 
   other: {
-    "application-name": "CSpark",
-    "apple-mobile-web-app-title": "CSpark",
+    "application-name": "cspark",
+    "apple-mobile-web-app-title": "cspark",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
     "mobile-web-app-capable": "yes",

@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "CSpark — AI CV Builder & Job Search",
-    short_name: "CSpark",
+    name: "cspark — AI CV Builder & Job Search",
+    short_name: "cspark",
     description:
       "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3.",
     start_url: "/",

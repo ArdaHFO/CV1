@@ -78,11 +78,11 @@ export default function Home() {
 
   const faqItems = [
     {
-      q: 'Which job platforms does CSpark support?',
-      a: 'CSpark supports LinkedIn, Workday, and CareerOne. Search jobs from any of these platforms and get an AI-optimized CV matched to each role.',
+      q: 'Which job platforms does cspark support?',
+      a: 'cspark supports LinkedIn, Workday, and CareerOne. Search jobs from any of these platforms and get an AI-optimized CV matched to each role.',
     },
     {
-      q: 'Is CSpark really free?',
+      q: 'Is cspark really free?',
       a: 'Yes. The free plan includes 1 CV, 1 CV import, 1 AI optimization, and 1 job search (up to 25 results). Pro unlocks everything unlimited.',
     },
     {
@@ -108,7 +108,7 @@ export default function Home() {
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      name: "CSpark",
+      name: "cspark",
       url: "https://www.cspark.app",
       description:
         "AI-powered CV builder and multi-platform job search across LinkedIn, Workday & CareerOne.",
@@ -127,7 +127,7 @@ export default function Home() {
       "@context": "https://schema.org",
       "@type": "Organization",
       "@id": "https://www.cspark.app/#organization",
-      name: "CSpark",
+      name: "cspark",
       url: "https://www.cspark.app",
       logo: {
         "@type": "ImageObject",
@@ -136,7 +136,7 @@ export default function Home() {
         height: 512,
       },
       description:
-        "CSpark is an AI CV builder and multi-platform job search tool, powered by Meta Llama 3.3 70B.",
+        "cspark is an AI CV builder and multi-platform job search tool, powered by Meta Llama 3.3 70B.",
       foundingDate: "2024",
       sameAs: [],
     },
@@ -146,17 +146,17 @@ export default function Home() {
       "@type": "WebPage",
       "@id": "https://www.cspark.app/#webpage",
       url: "https://www.cspark.app",
-      name: "CSpark | AI CV Builder & Multi-Platform Job Search",
+      name: "cspark | AI CV Builder & Multi-Platform Job Search",
       description:
         "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3. Free to start.",
       isPartOf: {
         "@type": "WebSite",
-        name: "CSpark",
+        name: "cspark",
         url: "https://www.cspark.app",
       },
       about: {
         "@type": "SoftwareApplication",
-        name: "CSpark",
+        name: "cspark",
         "@id": "https://www.cspark.app/#software",
       },
       primaryImageOfPage: {
@@ -177,7 +177,7 @@ export default function Home() {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "@id": "https://www.cspark.app/#software",
-      name: "CSpark",
+      name: "cspark",
       description:
         "AI resume builder with real-time job search across LinkedIn, Workday and CareerOne, ATS optimization, and job-specific CV tailoring.",
       applicationCategory: "CareerApplication",
