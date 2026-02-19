@@ -532,96 +532,128 @@ export default function Home() {
 
         <section
           id="method"
-          className="scroll-mt-20 border-t-4 border-black bg-white px-4 py-20 sm:px-6 lg:px-8"
+          className="scroll-mt-20 border-t-4 border-black bg-[#F9F9F9] px-4 py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto max-w-7xl">
-            <div className="grid gap-12 lg:grid-cols-[5fr_7fr]">
-              <div>
-                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
-                  02. Method
+
+            <div className="mb-14 max-w-2xl">
+              <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                02. Method
+              </div>
+              <h2 className="mt-4 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                How CSPARK works.
+              </h2>
+              <p className="mt-4 text-sm font-bold uppercase tracking-widest text-black/50">
+                A five-step pipeline — from raw job listing to a sent application. No copy-pasting, no guessing.
+              </p>
+            </div>
+
+            <div className="grid gap-0 lg:grid-cols-2">
+
+              {/* Left: vertical step timeline */}
+              <div className="border-4 border-black bg-white">
+                {[
+                  {
+                    step: '01',
+                    label: 'Find the job',
+                    detail: 'Search LinkedIn, Workday or CareerOne — results appear in real-time inside CSPARK.',
+                    time: '~1 min',
+                  },
+                  {
+                    step: '02',
+                    label: 'AI reads the listing',
+                    detail: 'Meta Llama 3.3 extracts required skills, keywords, seniority signals and tone from the job post.',
+                    time: '~5 sec',
+                  },
+                  {
+                    step: '03',
+                    label: 'Your CV is scored',
+                    detail: 'CSPARK compares your CV against the role and surfaces a ranked list of gaps — missing keywords, weak bullets, misaligned summary.',
+                    time: '~10 sec',
+                  },
+                  {
+                    step: '04',
+                    label: 'AI rewrites the weak parts',
+                    detail: 'One click. The AI rewrites your summary, skills and bullet points to match the role while keeping your real experience intact.',
+                    time: '~20 sec',
+                  },
+                  {
+                    step: '05',
+                    label: 'Export and apply',
+                    detail: 'Download as PDF, share via link or QR code — everything tracked in your Application Tracker.',
+                    time: '~30 sec',
+                  },
+                ].map((item, i, arr) => (
+                  <div
+                    key={item.step}
+                    className={`flex gap-0 ${i < arr.length - 1 ? 'border-b-4 border-black' : ''}`}
+                  >
+                    {/* Step number column */}
+                    <div className="flex w-16 shrink-0 flex-col items-center border-r-4 border-black bg-[#F2F2F2] py-6">
+                      <span className="text-xs font-black uppercase tracking-widest text-[#FF3000]">{item.step}</span>
+                    </div>
+                    {/* Content */}
+                    <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-6">
+                      <div className="flex items-center justify-between gap-4">
+                        <h3 className="text-base font-black uppercase tracking-widest">{item.label}</h3>
+                        <span className="shrink-0 border-2 border-black bg-[#F2F2F2] px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-black/50">{item.time}</span>
+                      </div>
+                      <p className="text-xs font-bold uppercase tracking-widest leading-relaxed text-black/55">{item.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right: concrete before/after example */}
+              <div className="border-4 border-l-0 border-black bg-black text-white">
+                <div className="border-b-4 border-white/20 px-7 py-5">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF3000]">Live example</span>
+                  <div className="mt-1 text-sm font-black uppercase tracking-widest">Senior Product Manager @ Stripe</div>
                 </div>
-                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
-                  From job post to ATS-ready CV in minutes.
-                </h2>
-                <p className="mt-6 text-lg font-medium uppercase tracking-[0.12em] text-black/80">
-                  Structured pipeline, visible every step. Search, analyze,
-                  optimize, and deliver.
-                </p>
-                <div className="mt-8 grid gap-4">
+
+                <div className="px-7 py-6 border-b-4 border-white/20">
+                  <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mb-3">Before AI optimization</div>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 shrink-0 bg-white/20" />
+                      <p className="text-xs font-bold uppercase tracking-widest text-white/40 line-through leading-relaxed">Managed product roadmap and worked with cross-functional teams to ship features.</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 shrink-0 bg-white/20" />
+                      <p className="text-xs font-bold uppercase tracking-widest text-white/40 line-through leading-relaxed">Responsible for improving key metrics.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="px-7 py-6 border-b-4 border-white/20">
+                  <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF3000] mb-3">After — AI rewritten for this role</div>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 shrink-0 bg-[#FF3000]" />
+                      <p className="text-xs font-bold uppercase tracking-widest text-white/80 leading-relaxed">Owned end-to-end roadmap for 3 payment products — drove 22% increase in checkout conversion via A/B-tested UX changes.</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <span className="mt-1 h-2 w-2 shrink-0 bg-[#FF3000]" />
+                      <p className="text-xs font-bold uppercase tracking-widest text-white/80 leading-relaxed">Aligned 4 cross-functional squads (Eng, Design, Data, Compliance) to ship SDK v3 — 0 critical regressions on launch day.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 divide-x-4 divide-white/20">
                   {[
-                    {
-                      icon: Search,
-                      title: 'Search jobs across platforms',
-                    },
-                    {
-                      icon: Sparkles,
-                      title: 'AI extracts role requirements',
-                    },
-                    {
-                      icon: FileText,
-                      title: 'CV sections refined for ATS',
-                    },
-                    {
-                      icon: Target,
-                      title: 'Preview diffs before applying',
-                    },
-                  ].map((item, index) => (
-                    <div
-                      key={item.title}
-                      className="group flex items-center gap-4 border-2 border-black bg-[#F2F2F2] px-5 py-4 transition-colors hover:bg-black hover:text-white"
-                    >
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border-2 border-black bg-white group-hover:border-white group-hover:bg-white/10">
-                        <item.icon className="h-6 w-6" />
-                      </div>
-                      <div className="text-sm font-bold uppercase tracking-widest">
-                        {String(index + 1).padStart(2, '0')}. {item.title}
-                      </div>
+                    { label: 'ATS match score', before: '41%', after: '89%' },
+                    { label: 'Keywords added', before: '—', after: '+14' },
+                    { label: 'Time taken', before: '—', after: '28s' },
+                  ].map((s) => (
+                    <div key={s.label} className="px-5 py-5">
+                      <div className="text-[9px] font-black uppercase tracking-widest text-white/30 mb-2">{s.label}</div>
+                      <div className="text-xs font-bold uppercase text-white/30 line-through">{s.before}</div>
+                      <div className="text-xl font-black uppercase text-[#FF3000]">{s.after}</div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="border-4 border-black bg-[#F2F2F2] p-8 swiss-dots">
-                <div className="grid gap-6 md:grid-cols-2">
-                  {[
-                    {
-                      icon: Search,
-                      title: 'Job intelligence',
-                      text: 'Fetch real job listings from LinkedIn, Workday & CareerOne.',
-                    },
-                    {
-                      icon: Zap,
-                      title: 'Rapid tailoring',
-                      text: 'Rewrite summaries and bullet points to align with roles.',
-                    },
-                    {
-                      icon: Shield,
-                      title: 'Secure data',
-                      text: 'Encryption and GDPR-first handling for every profile.',
-                    },
-                    {
-                      icon: QrCode,
-                      title: 'Instant sharing',
-                      text: 'Publish links, PDFs, and QR codes on demand.',
-                    },
-                  ].map((item) => (
-                    <div
-                      key={item.title}
-                      className="group border-2 border-black bg-white p-6 transition-colors hover:bg-black hover:text-white"
-                    >
-                      <div className="flex h-12 w-12 items-center justify-center border-2 border-black bg-[#F2F2F2] group-hover:border-white/20 group-hover:bg-white/10">
-                        <item.icon className="h-6 w-6" />
-                      </div>
-                      <h3 className="mt-4 text-lg font-black uppercase tracking-widest">
-                        {item.title}
-                      </h3>
-                      <p className="mt-3 text-sm font-medium uppercase tracking-widest text-black/70 group-hover:text-white/70">
-                        {item.text}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </section>
