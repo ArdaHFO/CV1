@@ -81,28 +81,32 @@ export default function Home() {
 
   const faqItems = [
     {
-      q: 'Which job platforms does cspark support?',
-      a: 'cspark supports LinkedIn, Workday, and CareerOne. Search jobs from any of these platforms and get an AI-optimized CV matched to each role.',
+      q: 'Which job platforms does CSPARK support?',
+      a: 'CSPARK integrates directly with LinkedIn, Workday, and CareerOne. You search across all three from inside CSPARK — no tab switching, no copy-pasting. Results are fetched in real-time and each listing can be opened, analysed, and matched to your CV without leaving the app. More platforms are on the roadmap.',
     },
     {
-      q: 'Is cspark really free?',
-      a: 'Yes. The free plan includes 1 CV, 1 CV import, 1 AI optimization, and 1 job search (up to 25 results). Pro unlocks everything unlimited.',
+      q: 'Is CSPARK really free to use?',
+      a: 'Yes. The free plan gives you 1 CV, 1 CV import from an existing file, 1 AI optimization, and 1 job search (up to 25 results). It is intentionally generous enough to complete one full job application cycle start to finish. Pro removes all limits — unlimited CVs, imports, AI optimizations, and job searches — and adds the Application Tracker, Job Tracker, and full AI history per role.',
     },
     {
-      q: 'How does the AI optimization work?',
-      a: 'AI analyzes job requirements and refines your CV sections to match keywords and priorities.',
+      q: 'How does the AI CV optimization actually work?',
+      a: 'When you run an optimization, CSPARK sends the full job description alongside your CV to Meta Llama 3.3 70B. The model identifies missing keywords, weak bullet points, misaligned summary language, and seniority gaps. It then rewrites only the affected sections — your experience, skills, and summary — while preserving your real career history. Every change is shown as a diff so you can review, accept or revert before exporting.',
     },
     {
-      q: 'Is my data secure?',
-      a: 'We use encryption, are GDPR compliant, and you control your data and exports.',
+      q: 'What is the CV vs Job Match score?',
+      a: 'The match score compares your CV text against the job listing and returns a percentage indicating how well your profile aligns with the role requirements. It surfaces a ranked list of missing ATS keywords, skills the employer emphasised, and sections where your language diverges from the job post. You can then run an AI optimization to close those gaps in one click.',
     },
     {
-      q: 'Can I create multiple CVs?',
-      a: 'Free includes 1 CV. Pro includes unlimited CV versions and unlimited CV imports from existing files.',
+      q: 'Can I track applications and saved jobs?',
+      a: 'Yes — CSPARK includes two separate trackers. The Application Tracker lets you log every job you have applied to, attach notes, and mark interview stages (applied, screening, interview, offer, rejected). The Job Tracker lets you save any listing from search results as Interested, Applied, or Skipped so you can revisit your pipeline without losing jobs you saw earlier.',
     },
     {
-      q: 'What export formats do you support?',
-      a: 'Export to PDF, share with a link, or generate a QR code.',
+      q: 'Is my CV data secure?',
+      a: 'Your data is stored in a GDPR-compliant Supabase database with row-level security — meaning only your authenticated account can access your CVs and profile. CV content sent to the AI is processed in-memory and never stored or used for model training. You can delete your account and all associated data at any time from the Settings page.',
+    },
+    {
+      q: 'What export formats are available?',
+      a: 'You can export your CV as a PDF (print-ready, ATS-safe layout), share it via a public link with a custom URL, or generate a QR code that links directly to your live CV. All three options are available from the CV editor in one click. The PDF is rendered from a clean HTML template — not a screenshot — so ATS parsers can read it correctly.',
     },
   ];
 
@@ -934,7 +938,7 @@ export default function Home() {
                   06. FAQ
                 </div>
                 <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
-                  Straight answers. Zero noise.
+                  Straight answers.<br /><span className="whitespace-nowrap">Zero noise.</span>
                 </h2>
               </div>
               <div id="faq-section" className="grid gap-4">
