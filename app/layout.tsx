@@ -21,8 +21,8 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
 
   title: {
-    default: "cspark | AI CV Builder & Multi-Platform Job Search",
-    template: "%s | cspark",
+    default: "CSPARK | AI CV Builder & Multi-Platform Job Search",
+    template: "%s | CSPARK",
   },
   description:
     "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3 70B. Free to start — no credit card required.",
@@ -43,9 +43,9 @@ export const metadata: Metadata = {
     "CV for LinkedIn",
     "Meta Llama resume",
   ],
-  authors: [{ name: "cspark", url: BASE_URL }],
-  creator: "cspark",
-  publisher: "cspark",
+  authors: [{ name: "CSPARK", url: BASE_URL }],
+  creator: "CSPARK",
+  publisher: "CSPARK",
 
   robots: {
     index: true,
@@ -67,8 +67,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: BASE_URL,
-    siteName: "cspark",
-    title: "cspark | AI CV Builder & Multi-Platform Job Search",
+    siteName: "CSPARK",
+    title: "CSPARK | AI CV Builder & Multi-Platform Job Search",
     description:
       "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3. Free to start.",
     images: [
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "cspark — AI CV Builder & Multi-Platform Job Search",
+        alt: "CSPARK — AI CV Builder & Multi-Platform Job Search",
         type: "image/png",
       },
     ],
@@ -84,12 +84,12 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "cspark | AI CV Builder & Multi-Platform Job Search",
+    title: "CSPARK | AI CV Builder & Multi-Platform Job Search",
     description:
       "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Free to start.",
     images: ["/og-image.png"],
-    creator: "@cspark_app",
-    site: "@cspark_app",
+    creator: "@CSPARK_app",
+    site: "@CSPARK_app",
   },
 
   icons: {
@@ -105,8 +105,8 @@ export const metadata: Metadata = {
   category: "technology",
 
   other: {
-    "application-name": "cspark",
-    "apple-mobile-web-app-title": "cspark",
+    "application-name": "CSPARK",
+    "apple-mobile-web-app-title": "CSPARK",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "default",
     "mobile-web-app-capable": "yes",

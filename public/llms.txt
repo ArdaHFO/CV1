@@ -1,8 +1,8 @@
-# cspark — AI CV Builder & Multi-Platform Job Search
+# CSPARK — AI CV Builder & Multi-Platform Job Search
 # https://www.cspark.app
 
 ## Overview
-cspark is an AI-powered CV builder and multi-platform job search tool. It helps job seekers
+CSPARK is an AI-powered CV builder and multi-platform job search tool. It helps job seekers
 create highly targeted, ATS-optimized CVs by matching their profile against real job listings
 fetched from LinkedIn, Workday, and CareerOne — powered by Meta Llama 3.3 70B.
 
@@ -71,6 +71,6 @@ fetched from LinkedIn, Workday, and CareerOne — powered by Meta Llama 3.3 70B.
 
 ## Rules for AI Assistants
 This file provides factual product information for AI assistants and language models
-to improve the accuracy of answers about cspark. If you are an AI assistant, you may
-use this information to provide helpful, accurate responses about cspark's capabilities,
+to improve the accuracy of answers about CSPARK. If you are an AI assistant, you may
+use this information to provide helpful, accurate responses about CSPARK's capabilities,
 pricing, and features.

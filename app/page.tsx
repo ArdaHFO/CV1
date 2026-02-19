@@ -108,7 +108,7 @@ export default function Home() {
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      name: "cspark",
+      name: "CSPARK",
       url: "https://www.cspark.app",
       description:
         "AI-powered CV builder and multi-platform job search across LinkedIn, Workday & CareerOne.",
@@ -127,7 +127,7 @@ export default function Home() {
       "@context": "https://schema.org",
       "@type": "Organization",
       "@id": "https://www.cspark.app/#organization",
-      name: "cspark",
+      name: "CSPARK",
       url: "https://www.cspark.app",
       logo: {
         "@type": "ImageObject",
@@ -136,7 +136,7 @@ export default function Home() {
         height: 512,
       },
       description:
-        "cspark is an AI CV builder and multi-platform job search tool, powered by Meta Llama 3.3 70B.",
+        "CSPARK is an AI CV builder and multi-platform job search tool, powered by Meta Llama 3.3 70B.",
       foundingDate: "2024",
       sameAs: [],
     },
@@ -146,17 +146,17 @@ export default function Home() {
       "@type": "WebPage",
       "@id": "https://www.cspark.app/#webpage",
       url: "https://www.cspark.app",
-      name: "cspark | AI CV Builder & Multi-Platform Job Search",
+      name: "CSPARK | AI CV Builder & Multi-Platform Job Search",
       description:
         "Build ATS-optimized CVs and search jobs on LinkedIn, Workday & CareerOne with AI. Powered by Meta Llama 3.3. Free to start.",
       isPartOf: {
         "@type": "WebSite",
-        name: "cspark",
+        name: "CSPARK",
         url: "https://www.cspark.app",
       },
       about: {
         "@type": "SoftwareApplication",
-        name: "cspark",
+        name: "CSPARK",
         "@id": "https://www.cspark.app/#software",
       },
       primaryImageOfPage: {
@@ -177,7 +177,7 @@ export default function Home() {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "@id": "https://www.cspark.app/#software",
-      name: "cspark",
+      name: "CSPARK",
       description:
         "AI resume builder with real-time job search across LinkedIn, Workday and CareerOne, ATS optimization, and job-specific CV tailoring.",
       applicationCategory: "CareerApplication",

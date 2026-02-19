@@ -47,7 +47,7 @@ export function PricingWithChart({ isDark = true }: PricingWithChartProps) {
 							<p className={`text-sm ${
 								isDark ? 'text-white/60' : 'text-gray-600'
 							}`}>
-								Try cspark and build your first job-tailored CV.
+								Try CSPARK and build your first job-tailored CV.
 							</p>
 						</div>
 						<Button asChild variant="outline" className={`w-full ${
