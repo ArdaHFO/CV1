@@ -449,10 +449,7 @@ export default function Home() {
               </div>
             </div>
 
-            <ImageReveal
-              size="compact"
-              className="border-4 border-black bg-[#F2F2F2] swiss-grid-pattern"
-            />
+            <ImageReveal className="border-4 border-black" />
           </div>
         </section>
 
