@@ -363,13 +363,10 @@ export default function Home() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
 
-        <section aria-labelledby="hero-heading" className="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 lg:px-8">
+        <section aria-labelledby="hero-heading" className="mx-auto max-w-7xl px-4 pb-20 pt-10 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <div>
-              <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
-                01. System
-              </div>
-              <h1 className="mt-6 text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-[9rem]">
+              <h1 className="text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-[9rem]">
                 Search{' '}
                 <MorphingText
                   texts={['LinkedIn', 'Workday', 'CareerOne']}
@@ -402,7 +399,7 @@ export default function Home() {
               </div>
 
               <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                <div className="w-full shrink-0 overflow-hidden border-2 border-black bg-white px-3 py-1 sm:w-[380px]">
+                <div className="w-full shrink-0 overflow-hidden border-2 border-black bg-white px-3 py-2 sm:w-[420px]">
                   <Marquee pauseOnHover speed={18} className="mt-0">
                     <div className="flex items-center gap-6 pr-6">
                       <Image
@@ -429,8 +426,8 @@ export default function Home() {
                       <Image
                         src="/launchllama.png"
                         alt="Launch Llama"
-                        width={110}
-                        height={20}
+                        width={130}
+                        height={30}
                         className="shrink-0 object-contain"
                       />
                     </div>
