@@ -53,10 +53,9 @@ export default function Home() {
   const PROMO_CODE = process.env.NEXT_PUBLIC_PROMO_CODE ?? 'WELCOME10';
 
   const getColumns = (width: number) => {
-    if (width < 640) return 1;    // sm
-    if (width < 1024) return 2;   // lg
-    if (width < 1280) return 3;   // xl
-    return 3;                     // 2xl and up
+    if (width < 640) return 1;    // sm - 1 column
+    if (width < 1024) return 2;   // lg - 2 columns
+    return 3;                     // xl+ - 3 columns
   };
 
   useEffect(() => {
@@ -464,68 +463,82 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Features Masonry Grid */}
-            <div className="w-full">
-              <MasonryGrid columns={columns} gap={4}>
+            {/* Features Grid Section */}
+            <div className="w-full mt-12">
+              <div className="mb-8">
+                <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
+                  01. Features
+                </div>
+                <h2 className="mt-4 text-4xl font-black uppercase leading-tight sm:text-5xl">
+                  Everything you need in one place
+                </h2>
+              </div>
+              
+              <MasonryGrid columns={columns} gap={6} className="w-full">
                 {[
                   {
                     num: '01',
                     label: 'My CVs',
-                    desc: 'Create & manage unlimited versions',
+                    desc: 'Create, manage, and export unlimited CV versions for different roles',
                     src: '/dashboard.png',
                   },
                   {
                     num: '02',
                     label: 'Find Jobs',
-                    desc: 'Search across all platforms',
+                    desc: 'Real-time job search across LinkedIn, Workday & CareerOne platforms',
                     src: '/jobsearch.png',
                   },
                   {
                     num: '03',
                     label: 'Application Tracker',
-                    desc: 'Track every application',
+                    desc: 'Track every application, note and interview in one central dashboard',
                     src: '/applicationtracker.png',
                   },
                   {
                     num: '04',
                     label: 'Job Tracker',
-                    desc: 'Mark & revisit jobs',
+                    desc: 'Mark jobs as applied, skipped, or interested and revisit anytime',
                     src: '/jobtracker.png',
                   },
                   {
                     num: '05',
                     label: 'AI Optimizations',
-                    desc: 'History of all changes',
+                    desc: 'Complete history of every AI-driven CV change per job posting',
                     src: '/optimizations.png',
                   },
                   {
                     num: '06',
                     label: 'CV vs Job Match',
-                    desc: 'Score & fix the gaps',
+                    desc: 'Score your CV against job listings and identify gaps to fix',
                     src: '/joblistinganalyzeoptimize.png',
                   },
                 ].map((feature) => (
                   <div
                     key={feature.num}
-                    className="relative rounded-lg overflow-hidden group transition-all duration-300 ease-out hover:shadow-xl border-4 border-black bg-black"
+                    className="relative rounded-xl overflow-hidden group cursor-pointer transition-all duration-500 ease-out hover:shadow-2xl border-4 border-black bg-black h-96 sm:h-80 lg:h-96"
                   >
+                    {/* Image */}
                     <img
                       src={feature.src}
                       alt={feature.label}
-                      className="w-full h-auto object-cover group-hover:opacity-70 transition-opacity duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
-                        e.currentTarget.src = 'https://placehold.co/400x300/1a1a1a/ffffff?text=Feature';
+                        e.currentTarget.src = 'https://placehold.co/600x400/1a1a1a/ffffff?text=Feature';
                       }}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-100" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FF3000] mb-1">
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-100 group-hover:via-black/70 transition-opacity duration-300" />
+                    
+                    {/* Content */}
+                    <div className="absolute inset-x-0 bottom-0 p-6 text-white translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                      <div className="text-[11px] font-black uppercase tracking-[0.35em] text-[#FF3000] mb-2">
                         {feature.num}
                       </div>
-                      <h3 className="text-sm font-black uppercase tracking-widest mb-2">
+                      <h3 className="text-xl font-black uppercase tracking-widest mb-3 leading-tight">
                         {feature.label}
                       </h3>
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-white/60">
+                      <p className="text-sm font-bold uppercase tracking-widest text-white/70 leading-snug">
                         {feature.desc}
                       </p>
                     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { motion, type Variants } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface MasonryGridProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -12,21 +12,31 @@ interface MasonryGridProps extends React.HTMLAttributes<HTMLDivElement> {
   columns?: number;
   /**
    * The gap between items in the grid, corresponding to Tailwind's spacing scale.
-   * @default 4
+   * @default 6
    */
   gap?: number;
 }
 
 const MasonryGrid = React.forwardRef<HTMLDivElement, MasonryGridProps>(
-  ({ className, columns = 3, gap = 4, children, ...props }, ref) => {
-    // Dynamically create the style object for column layout
-    const style = {
-      columnCount: columns,
-      columnGap: `${gap * 0.25}rem`, // Converts gap unit to rem
-    };
+  ({ className, columns = 3, gap = 6, children }, ref) => {
+    // Create grid template columns dynamically
+    const gridColsClass = {
+      1: 'grid-cols-1',
+      2: 'grid-cols-2',
+      3: 'grid-cols-3',
+      4: 'grid-cols-4',
+    }[columns] || 'grid-cols-3';
+
+    const gapClass = {
+      3: 'gap-3',
+      4: 'gap-4',
+      5: 'gap-5',
+      6: 'gap-6',
+      8: 'gap-8',
+    }[gap] || 'gap-6';
 
     // Animation variants for child elements
-    const cardVariants: Variants = {
+    const itemVariants = {
       hidden: { opacity: 0, y: 20 },
       visible: {
         opacity: 1,
@@ -37,20 +47,32 @@ const MasonryGrid = React.forwardRef<HTMLDivElement, MasonryGridProps>(
       },
     };
 
+    const containerVariants = {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.1,
+          delayChildren: 0.1,
+        },
+      },
+    };
+
     return (
-      <div ref={ref} style={style} className={cn('w-full', className)} {...props}>
+      <motion.div
+        ref={ref}
+        className={cn(`grid ${gridColsClass} ${gapClass} w-full`, className)}
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+      >
         {React.Children.map(children, (child) => (
-          <motion.div
-            className="mb-4 break-inside-avoid" // Prevents items from breaking across columns
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }} // Animate when 20% of the item is visible
-          >
+          <motion.div variants={itemVariants}>
             {child}
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     );
   }
 );
