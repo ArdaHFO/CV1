@@ -426,6 +426,13 @@ export default function Home() {
                         height={20}
                         className="shrink-0 object-contain"
                       />
+                      <Image
+                        src="/launchllama.png"
+                        alt="Launch Llama"
+                        width={110}
+                        height={20}
+                        className="shrink-0 object-contain"
+                      />
                     </div>
                   </Marquee>
                 </div>
