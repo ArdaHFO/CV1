@@ -208,6 +208,15 @@
   }
 }
 
+@keyframes aurora {
+  from {
+    background-position: 50% 50%, 50% 50%;
+  }
+  to {
+    background-position: 350% 50%, 350% 50%;
+  }
+}
+
 @layer utilities {
   .animate-marquee {
     animation: marquee var(--duration, 30s) linear infinite;
@@ -215,6 +224,10 @@
 
   .animate-marquee-reverse {
     animation: marquee var(--duration, 30s) linear infinite reverse;
+  }
+
+  .animate-aurora {
+    animation: aurora 60s linear infinite;
   }
 }
 
