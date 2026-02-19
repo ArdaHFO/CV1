@@ -12,6 +12,79 @@ export interface FeatureItem {
   alt: string;
 }
 
+interface GalleryRowProps {
+  items: FeatureItem[];
+  rowIndex: number;
+  hoveredIndex: number | null;
+  onHover: (index: number | null) => void;
+  onOpen: (index: number) => void;
+}
+
+// Defined OUTSIDE FeatureGallery so React never sees a new component type on re-render
+const GalleryRow: React.FC<GalleryRowProps> = ({ items, rowIndex, hoveredIndex, onHover, onOpen }) => (
+  <div className="flex gap-3 h-[460px] w-full">
+    {items.map((feature, itemIndex) => {
+      const globalIndex = rowIndex * 3 + itemIndex;
+      const isHovered = hoveredIndex === globalIndex;
+      const flexVal = hoveredIndex === null ? 1 : isHovered ? 2.5 : 0.65;
+      return (
+        <motion.article
+          key={feature.num}
+          className="relative cursor-pointer overflow-hidden border-4 border-black bg-[#111]"
+          style={{ flex: 1, minWidth: 0 }}
+          animate={{ flex: flexVal }}
+          transition={{ duration: 0.45, ease: 'easeInOut' }}
+          onMouseEnter={() => onHover(globalIndex)}
+          onMouseLeave={() => onHover(null)}
+          onClick={() => onOpen(globalIndex)}
+        >
+          {/* Screenshot — object-contain so nothing is ever cropped */}
+          <img
+            src={feature.src}
+            alt={feature.alt}
+            className="w-full h-full object-contain object-center"
+            style={{ display: 'block' }}
+            draggable={false}
+          />
+
+          {/* Gradient overlay */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.20) 45%, transparent 70%)' }}
+            animate={{ opacity: isHovered ? 1 : 0.65 }}
+            transition={{ duration: 0.3 }}
+          />
+
+          {/* Text */}
+          <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+            <span className="block text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]">
+              {feature.num}
+            </span>
+            <motion.h3
+              className="mt-1 font-black uppercase tracking-widest leading-tight overflow-hidden whitespace-nowrap"
+              animate={{ fontSize: isHovered ? '1.35rem' : '0.95rem' }}
+              transition={{ duration: 0.3 }}
+            >
+              {feature.label}
+            </motion.h3>
+            <motion.p
+              className="mt-1.5 font-bold uppercase tracking-widest text-white/70 overflow-hidden"
+              style={{ fontSize: '0.72rem' }}
+              animate={{
+                maxHeight: isHovered ? '60px' : '0px',
+                opacity: isHovered ? 1 : 0,
+              }}
+              transition={{ duration: 0.3 }}
+            >
+              {feature.desc}
+            </motion.p>
+          </div>
+        </motion.article>
+      );
+    })}
+  </div>
+);
+
 interface FeatureGalleryProps {
   features: FeatureItem[];
   className?: string;
@@ -21,17 +94,9 @@ const FeatureGallery: React.FC<FeatureGalleryProps> = ({ features, className = '
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  // Split into two rows of 3
   const row1 = features.slice(0, 3);
   const row2 = features.slice(3, 6);
 
-  const getFlex = (rowIndex: number, itemIndex: number) => {
-    const globalIndex = rowIndex * 3 + itemIndex;
-    if (hoveredIndex === null) return 1;
-    return hoveredIndex === globalIndex ? 2.5 : 0.65;
-  };
-
-  const openImage = (index: number) => setSelectedIndex(index);
   const closeImage = () => setSelectedIndex(null);
 
   const goNext = (e: React.MouseEvent) => {
@@ -46,76 +111,11 @@ const FeatureGallery: React.FC<FeatureGalleryProps> = ({ features, className = '
       setSelectedIndex((selectedIndex - 1 + features.length) % features.length);
   };
 
-  const GalleryRow = ({ items, rowIndex }: { items: FeatureItem[]; rowIndex: number }) => (
-    <div className="flex gap-3 h-[420px] w-full">
-      {items.map((feature, itemIndex) => {
-        const globalIndex = rowIndex * 3 + itemIndex;
-        const isHovered = hoveredIndex === globalIndex;
-        return (
-          <motion.article
-            key={feature.num}
-            className="relative cursor-pointer overflow-hidden border-4 border-black bg-black"
-            style={{ flex: 1 }}
-            animate={{ flex: getFlex(rowIndex, itemIndex) }}
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-            onMouseEnter={() => setHoveredIndex(globalIndex)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            onClick={() => openImage(globalIndex)}
-          >
-            {/* Screenshot */}
-            <img
-              src={feature.src}
-              alt={feature.alt}
-              className="w-full h-full object-cover object-top"
-              style={{ display: 'block' }}
-            />
-
-            {/* Base darkening when not hovered */}
-            <motion.div
-              className="absolute inset-0"
-              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.25) 40%, transparent 70%)' }}
-              animate={{ opacity: isHovered ? 1 : 0.6 }}
-              transition={{ duration: 0.35 }}
-            />
-
-            {/* Label — always visible but larger on hover */}
-            <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-              <motion.span
-                className="block text-[11px] font-black uppercase tracking-[0.4em] text-[#FF3000]"
-                animate={{ opacity: 1 }}
-              >
-                {feature.num}
-              </motion.span>
-              <motion.h3
-                className="mt-1 font-black uppercase tracking-widest leading-tight overflow-hidden whitespace-nowrap"
-                animate={{ fontSize: isHovered ? '1.35rem' : '0.95rem' }}
-                transition={{ duration: 0.35 }}
-              >
-                {feature.label}
-              </motion.h3>
-              <motion.p
-                className="mt-1.5 font-bold uppercase tracking-widest text-white/70 overflow-hidden"
-                animate={{
-                  maxHeight: isHovered ? '60px' : '0px',
-                  opacity: isHovered ? 1 : 0,
-                  fontSize: '0.72rem',
-                }}
-                transition={{ duration: 0.35 }}
-              >
-                {feature.desc}
-              </motion.p>
-            </div>
-          </motion.article>
-        );
-      })}
-    </div>
-  );
-
   return (
     <div className={className}>
       <div className="flex flex-col gap-3">
-        <GalleryRow items={row1} rowIndex={0} />
-        <GalleryRow items={row2} rowIndex={1} />
+        <GalleryRow items={row1} rowIndex={0} hoveredIndex={hoveredIndex} onHover={setHoveredIndex} onOpen={setSelectedIndex} />
+        <GalleryRow items={row2} rowIndex={1} hoveredIndex={hoveredIndex} onHover={setHoveredIndex} onOpen={setSelectedIndex} />
       </div>
 
       {/* Lightbox */}
