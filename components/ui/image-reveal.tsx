@@ -65,10 +65,13 @@ export interface ImageRevealProps extends React.HTMLAttributes<HTMLDivElement> {
 const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
   ({ className, ...props }, ref) => {
     const [active, setActive] = useState<Feature>(features[0]);
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
     const handleActivate = (f: Feature) => {
       if (f.id === active.id) return;
+      setIsTransitioning(true);
       setActive(f);
+      setTimeout(() => setIsTransitioning(false), 300);
     };
 
     return (
@@ -79,56 +82,76 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
       >
         {/* Screenshot preview panel */}
         <div
-          className="relative w-full border-b-4 border-black bg-black overflow-hidden"
+          className="relative w-full border-b-4 border-black bg-black overflow-hidden group"
           style={{ aspectRatio: '16/9' }}
         >
-          {features.map((f) => (
-            <img
-              key={f.id}
-              src={f.src}
-              alt={f.label}
-              className={cn(
-                'absolute inset-0 w-full h-full object-cover object-top',
-                'transition-[opacity,transform] duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]',
-                f.id === active.id
-                  ? 'opacity-100 scale-100 translate-y-0'
-                  : 'opacity-0 scale-[1.04] translate-y-3 pointer-events-none'
-              )}
-            />
-          ))}
+          {features.map((f) => {
+            const isActive = f.id === active.id;
+            const isExiting = !isActive && isTransitioning;
+            return (
+              <img
+                key={f.id}
+                src={f.src}
+                alt={f.label}
+                className={cn(
+                  'absolute inset-0 w-full h-full object-cover object-top',
+                  'transition-all duration-300 ease-out',
+                  isActive
+                    ? 'opacity-100 scale-100 blur-0'
+                    : isExiting
+                      ? 'opacity-0 scale-95 blur-md'
+                      : 'opacity-0 scale-[1.02] blur-sm'
+                )}
+              />
+            );
+          })}
+
+          {/* Subtle accent line on hover */}
+          <div
+            className={cn(
+              'absolute inset-0 pointer-events-none border-2 border-[#FF3000]/0',
+              'transition-all duration-300 ease-out'
+            )}
+          />
 
           {/* Bottom bar with active label */}
-          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-black px-4 py-2.5">
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-black px-4 py-2.5 backdrop-blur-sm bg-black/95">
             <div className="flex items-center gap-3">
-              <span className="text-[#FF3000] text-[10px] font-black uppercase tracking-[0.35em]">
+              <span
+                className={cn(
+                  'text-[10px] font-black uppercase tracking-[0.35em] transition-all duration-300',
+                  'text-[#FF3000]'
+                )}
+              >
                 {active.num}
               </span>
-              <span className="text-white text-[10px] font-black uppercase tracking-widest">
+              <span className="text-white text-[10px] font-black uppercase tracking-widest transition-all duration-300">
                 {active.label}
               </span>
-              <span className="hidden sm:block text-white/40 text-[9px] font-bold uppercase tracking-widest">
+              <span className="hidden sm:block text-white/40 text-[9px] font-bold uppercase tracking-widest transition-all duration-300">
                 — {active.desc}
               </span>
             </div>
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {features.map((f) => (
                 <button
                   key={f.id}
                   type="button"
                   onClick={() => handleActivate(f)}
                   className={cn(
-                    'h-1.5 transition-all duration-300',
-                    f.id === active.id ? 'w-6 bg-[#FF3000]' : 'w-1.5 bg-white/30 hover:bg-white/60'
+                    'h-1.5 transition-all duration-300 cursor-pointer',
+                    f.id === active.id
+                      ? 'w-6 bg-[#FF3000] shadow-lg shadow-[#FF3000]/50'
+                      : 'w-1.5 bg-white/40 hover:bg-white/70 hover:shadow-md hover:shadow-white/20'
                   )}
                 />
               ))}
             </div>
           </div>
         </div>
-
         {/* Feature list */}
         <div className="divide-y-2 divide-black">
-          {features.map((f) => {
+          {features.map((f, idx) => {
             const isActive = f.id === active.id;
             return (
               <button
@@ -137,15 +160,24 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
                 onMouseEnter={() => handleActivate(f)}
                 onClick={() => handleActivate(f)}
                 className={cn(
-                  'group w-full flex items-center gap-4 px-4 py-3.5 text-left transition-colors duration-150',
-                  isActive ? 'bg-black' : 'bg-white hover:bg-[#F2F2F2]'
+                  'group w-full flex items-center gap-4 px-4 py-3.5 text-left',
+                  'transition-all duration-200 ease-out cursor-pointer',
+                  isActive
+                    ? 'bg-black shadow-inner'
+                    : 'bg-white hover:bg-gradient-to-r hover:from-white hover:to-[#F5F5F5]'
                 )}
+                style={{
+                  transitionDelay: isActive ? `${idx * 20}ms` : '0ms',
+                }}
               >
                 {/* Number */}
                 <span
                   className={cn(
                     'shrink-0 text-[10px] font-black uppercase tracking-[0.2em] w-5 leading-none',
-                    isActive ? 'text-[#FF3000]' : 'text-black/25 group-hover:text-black/50'
+                    'transition-all duration-200',
+                    isActive
+                      ? 'text-[#FF3000] drop-shadow-lg'
+                      : 'text-black/25 group-hover:text-black/50'
                   )}
                 >
                   {f.num}
@@ -156,7 +188,8 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
                   <div
                     className={cn(
                       'text-[11px] font-black uppercase tracking-widest leading-none',
-                      isActive ? 'text-white' : 'text-black'
+                      'transition-all duration-200',
+                      isActive ? 'text-white' : 'text-black group-hover:text-black/90'
                     )}
                   >
                     {f.label}
@@ -164,18 +197,23 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
                   <div
                     className={cn(
                       'hidden sm:block text-[10px] font-bold uppercase tracking-widest mt-1 truncate',
-                      isActive ? 'text-white/50' : 'text-black/35'
+                      'transition-all duration-200',
+                      isActive
+                        ? 'text-white/60'
+                        : 'text-black/35 group-hover:text-black/50'
                     )}
                   >
                     {f.desc}
                   </div>
                 </div>
 
-                {/* Active pip */}
+                {/* Active pip with glow */}
                 <div
                   className={cn(
-                    'shrink-0 w-2 h-2 transition-all duration-200',
-                    isActive ? 'bg-[#FF3000] scale-100' : 'bg-transparent scale-0'
+                    'shrink-0 w-2 h-2 rounded-full transition-all duration-300',
+                    isActive
+                      ? 'bg-[#FF3000] shadow-lg shadow-[#FF3000]/60 scale-100'
+                      : 'bg-[#FF3000]/30 scale-75 group-hover:bg-[#FF3000]/50 group-hover:scale-85'
                   )}
                 />
               </button>
@@ -190,4 +228,3 @@ const ImageReveal = React.forwardRef<HTMLDivElement, ImageRevealProps>(
 ImageReveal.displayName = 'ImageReveal';
 
 export default ImageReveal;
-
