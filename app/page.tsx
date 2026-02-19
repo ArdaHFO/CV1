@@ -401,9 +401,9 @@ export default function Home() {
               </div>
 
               <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                <div className="w-full shrink-0 overflow-hidden border-2 border-black bg-white px-3 py-2 sm:w-[420px]">
+                <div className="w-full shrink-0 overflow-hidden border-2 border-black bg-white px-3 py-2 sm:w-[480px]">
                   <Marquee pauseOnHover speed={18} className="mt-0">
-                    <div className="flex items-center gap-6 pr-6">
+                    <div className="flex items-center gap-10 pr-16">
                       <Image
                         src="/linkedin.png"
                         alt="LinkedIn"
@@ -429,7 +429,7 @@ export default function Home() {
                       <img
                         src="/launchllama.png"
                         alt="Launch Llama"
-                        style={{ height: '24px', width: 'auto' }}
+                        style={{ height: '22px', width: 'auto', maxWidth: '120px' }}
                         className="shrink-0 object-contain"
                       />
                     </div>
