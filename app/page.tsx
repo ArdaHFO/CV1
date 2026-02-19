@@ -8,7 +8,6 @@ import {
   CheckCircle,
   Download,
   FileText,
-  Linkedin,
   PlusSquare,
   QrCode,
   Search,
@@ -80,12 +79,12 @@ export default function Home() {
 
   const faqItems = [
     {
-      q: 'Can I search for LinkedIn jobs in the platform?',
-      a: 'Yes. Search LinkedIn jobs inside CSpark and get an AI-optimized CV matched to each role.',
+      q: 'Which job platforms does CSpark support?',
+      a: 'CSpark supports LinkedIn, Workday, and CareerOne. Search jobs from any of these platforms and get an AI-optimized CV matched to each role.',
     },
     {
       q: 'Is CSpark really free?',
-      a: 'CSpark has a freemium plan with 1 CV and 1 job search (up to 25 results). Pro unlocks more searches and unlimited CVs.',
+      a: 'Yes. The free plan includes 1 CV, 1 CV import, 1 AI optimization, and 1 job search (up to 25 results). Pro unlocks everything unlimited.',
     },
     {
       q: 'How does the AI optimization work?',
@@ -97,7 +96,7 @@ export default function Home() {
     },
     {
       q: 'Can I create multiple CVs?',
-      a: 'Free includes 1 CV. Pro includes unlimited versions for different roles.',
+      a: 'Free includes 1 CV. Pro includes unlimited CV versions and unlimited CV imports from existing files.',
     },
     {
       q: 'What export formats do you support?',
@@ -111,7 +110,7 @@ export default function Home() {
       '@type': 'SoftwareApplication',
       name: 'CSpark',
       description:
-        'AI resume builder with real-time LinkedIn job search, ATS optimization, and job-specific CV tailoring.',
+        'AI resume builder with real-time job search across LinkedIn, Workday and CareerOne, ATS optimization, and job-specific CV tailoring.',
       applicationCategory: 'CareerApplication',
       operatingSystem: 'Web',
       url: 'https://www.cspark.app',
@@ -213,7 +212,7 @@ export default function Home() {
                 CSpark
               </span>
               <span className="text-base font-black uppercase tracking-[0.2em]">
-                LinkedIn CV Lab
+                AI CV Lab
               </span>
             </div>
           </div>
@@ -372,8 +371,8 @@ export default function Home() {
                 <div className="mt-8 grid gap-4">
                   {[
                     {
-                      icon: Linkedin,
-                      title: 'LinkedIn search inside CSpark',
+                      icon: Search,
+                      title: 'Search jobs across platforms',
                     },
                     {
                       icon: Sparkles,
@@ -409,7 +408,7 @@ export default function Home() {
                     {
                       icon: Search,
                       title: 'Job intelligence',
-                      text: 'Fetch real LinkedIn listings and match keyword density.',
+                      text: 'Fetch real job listings from LinkedIn, Workday & CareerOne.',
                     },
                     {
                       icon: Zap,
@@ -473,9 +472,9 @@ export default function Home() {
             <div className="mt-12 grid gap-6 md:grid-cols-3">
               {[
                 {
-                  title: 'LinkedIn sync',
-                  text: 'Live role imports, zero copy paste.',
-                  icon: Linkedin,
+                  title: 'Multi-platform sync',
+                  text: 'Live role imports from LinkedIn, Workday & CareerOne.',
+                  icon: Search,
                 },
                 {
                   title: 'ATS optimized',
@@ -536,17 +535,19 @@ export default function Home() {
                   Free for starters. Pro for volume.
                 </h2>
                 <p className="mt-6 text-lg font-medium uppercase tracking-[0.12em] text-black/80">
-                  Pro unlocks unlimited CV creation, advanced optimization, and
-                  higher LinkedIn search limits.
+                  Pro unlocks unlimited everything — CVs, job searches, AI
+                  optimizations, and imports. Pay-as-you-go add-on packs also
+                  available.
                 </p>
                 <div className="mt-8 border-4 border-black bg-[#F2F2F2] p-6">
                   <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
                     Pro benefits
                   </div>
                   <ul className="mt-4 space-y-3 text-xs font-bold uppercase tracking-widest text-black/70">
-                    <li>Unlimited CV versions</li>
+                    <li>Unlimited CV creation</li>
+                    <li>Unlimited CV imports</li>
+                    <li>Unlimited job searches (LinkedIn, Workday, CareerOne)</li>
                     <li>Unlimited AI optimizations</li>
-                    <li>10 LinkedIn job searches per cycle</li>
                     <li>Permanent share links + QR codes</li>
                     <li>Priority processing + support</li>
                   </ul>
@@ -573,8 +574,10 @@ export default function Home() {
                     <tbody>
                       {[
                         { feature: 'CV creations', free: '1', pro: 'Unlimited' },
+                        { feature: 'CV imports', free: '1', pro: 'Unlimited' },
                         { feature: 'AI optimizations', free: '1', pro: 'Unlimited' },
-                        { feature: 'LinkedIn searches', free: '1 (25 results)', pro: '10 (50/all)' },
+                        { feature: 'Job searches', free: '1 (25 results)', pro: 'Unlimited' },
+                        { feature: 'Platforms', free: 'LinkedIn only', pro: 'LinkedIn · Workday · CareerOne' },
                         { feature: 'Shareable links', free: '7 days', pro: 'Permanent' },
                         { feature: 'QR codes', free: 'Limited', pro: 'Unlimited' },
                         { feature: 'Support', free: 'Standard', pro: 'Priority' },
@@ -592,8 +595,16 @@ export default function Home() {
                   <div className="text-xs font-black uppercase tracking-[0.3em]">
                     Pro starts at
                   </div>
-                  <div className="text-3xl font-black uppercase text-[#FF3000]">
-                    $19.99<span className="text-base font-bold">/mo</span> <span className="text-lg">or $199.99<span className="text-base font-bold">/yr</span></span>
+                  <div>
+                    <div className="text-3xl font-black uppercase text-[#FF3000]">
+                      $19.99<span className="text-base font-bold">/mo</span>
+                    </div>
+                    <div className="text-sm font-bold uppercase tracking-widest text-black/60">
+                      or $199.99/yr — save ~17%
+                    </div>
+                    <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-black/40">
+                      Add-on packs from $9.99
+                    </div>
                   </div>
                   <Button asChild variant="accent" size="lg">
                     <Link href="/register" className="flex items-center gap-3">
