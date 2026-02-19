@@ -425,11 +425,11 @@ export default function Home() {
                         height={20}
                         className="shrink-0 object-contain"
                       />
-                      <Image
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
                         src="/launchllama.png"
                         alt="Launch Llama"
-                        width={130}
-                        height={30}
+                        style={{ height: '24px', width: 'auto' }}
                         className="shrink-0 object-contain"
                       />
                     </div>
