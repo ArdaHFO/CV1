@@ -372,7 +372,7 @@ export default function Home() {
         />
 
         <AuroraBackground className="w-full" showRadialGradient>
-        <section aria-labelledby="hero-heading" className="mx-auto w-full max-w-7xl px-4 pb-20 pt-10 sm:px-6 lg:px-8">
+        <section aria-labelledby="hero-heading" className="mx-auto w-full max-w-7xl px-4 pb-20 pt-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <div>
               <h1 className="text-[1.5rem] font-black uppercase leading-[0.9] tracking-tight sm:text-6xl lg:text-[9rem]">
