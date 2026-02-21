@@ -476,7 +476,7 @@ export default function Home() {
               </div>
               <h2
                 id="features-heading"
-                className="mt-4 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl"
+                className="mt-4 text-3xl font-black uppercase leading-tight text-black sm:text-5xl lg:text-6xl"
               >
                 Everything in one place
               </h2>
@@ -544,7 +544,7 @@ export default function Home() {
               <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                 02. Method
               </div>
-              <h2 className="mt-4 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
+              <h2 className="mt-4 text-3xl font-black uppercase leading-tight text-black sm:text-5xl lg:text-6xl">
                 How CSPARK works.
               </h2>
               <p className="mt-4 text-sm font-bold uppercase tracking-widest text-black/50">
@@ -671,7 +671,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   03. Advantages
                 </div>
-                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight text-black sm:text-5xl lg:text-6xl">
                   Every tool.<br />One workflow.
                 </h2>
                 <p className="mt-4 max-w-xl text-sm font-bold uppercase tracking-widest text-black/50">
@@ -788,7 +788,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   04. Pricing
                 </div>
-                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight text-black sm:text-5xl lg:text-6xl">
                   Free for starters. Pro for volume.
                 </h2>
                 <p className="mt-6 text-lg font-medium uppercase tracking-[0.12em] text-black/80">
@@ -882,7 +882,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   05. Journal
                 </div>
-                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight text-black sm:text-5xl lg:text-6xl">
                   Precision feedback from teams and candidates.
                 </h2>
                 <div className="mt-6 flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-black/70">
@@ -937,7 +937,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   06. FAQ
                 </div>
-                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight text-black sm:text-5xl lg:text-6xl">
                   Straight answers.<br /><span className="whitespace-nowrap">Zero noise.</span>
                 </h2>
               </div>
@@ -983,7 +983,7 @@ export default function Home() {
               <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                 07. Start
               </div>
-              <h2 className="mt-4 text-4xl font-black uppercase leading-tight sm:text-5xl">
+              <h2 className="mt-4 text-4xl font-black uppercase leading-tight text-black sm:text-5xl">
                 Build a job-specific CV today.
               </h2>
             </div>
