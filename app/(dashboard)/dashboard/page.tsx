@@ -10,6 +10,7 @@ import {
   Edit,
   Trash,
   Copy,
+  Check,
   ExternalLink,
   Star,
   Pencil,
@@ -119,6 +120,8 @@ export default function DashboardPage() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [userId, setUserId] = useState('');
+  const [userUsername, setUserUsername] = useState('');
+  const [linkCopied, setLinkCopied] = useState<string | null>(null);
   const { isDark } = useAppDarkModeState();
 
   // Easter egg: click title 7× to open Pong
@@ -156,10 +159,7 @@ export default function DashboardPage() {
       };
     };
 
-    console.log(`[LOAD_BILLING] response.ok=${response.ok}, payload.success=${payload.success}, payload.status=${JSON.stringify(payload.status)}`);
-
     if (!response.ok || !payload.success || !payload.status) {
-      console.log(`[LOAD_BILLING_FALLBACK] Using default: tier=freemium, remainingCv=1`);
       setPlanTier('freemium');
       setRemainingCvCreations(1);
       return { tier: 'freemium' as PlanTier, remainingCv: 1 };
@@ -168,7 +168,6 @@ export default function DashboardPage() {
     setPlanTier(payload.status.planTier);
     const remaining = payload.status.remaining.cvCreations === 'unlimited' ? Number.POSITIVE_INFINITY : payload.status.remaining.cvCreations;
     setRemainingCvCreations(remaining);
-    console.log(`[LOAD_BILLING_SUCCESS] planTier=${payload.status.planTier}, remaining=${remaining}`);
     return { tier: payload.status.planTier, remainingCv: remaining };
   };
 
@@ -181,6 +180,7 @@ export default function DashboardPage() {
       }
 
       setUserId(user.id);
+      setUserUsername(user.username || '');
 
       // Ensure the FK target exists (some older accounts may be missing profiles rows).
       await ensureProfileRow();
@@ -207,7 +207,6 @@ export default function DashboardPage() {
     // If profile bootstrap fails, do NOT consume billing credits.
     const profileOk = await ensureProfileRow();
     if (!profileOk) {
-      console.log(`[HANDLE_CREATE_PROFILE_FAIL] Profile row could not be ensured`);
       setCreating(false);
       return;
     }
@@ -215,10 +214,7 @@ export default function DashboardPage() {
     const latestBilling = await loadBillingStatus();
     const tier = latestBilling.tier;
 
-    console.log(`[HANDLE_CREATE_CHECK] tier=${tier}, remainingCv=${latestBilling.remainingCv}, check_result=${tier === 'freemium' && latestBilling.remainingCv <= 0}`);
-
     if (tier === 'freemium' && latestBilling.remainingCv <= 0) {
-      console.log(`[HANDLE_CREATE_BLOCKED] No remaining CV creations`);
       setCvLimitMessage('Ücretsiz paket ile 1 CV oluşturabilirsiniz. Sınırınıza ulaştınız.');
       setShowUpgradeModal(true);
       return;
@@ -238,7 +234,6 @@ export default function DashboardPage() {
     if (!newResume) {
       // Resume creation failed - don't consume any quota
       setCreating(false);
-      console.log(`[CREATE_RESUME_FAILED] reason=${reason}`);
       if (reason === 'missing_profile') {
         setCvLimitMessage('Your account profile is missing. Please sign out and sign in again.');
       } else if (reason === 'rls_denied') {
@@ -248,8 +243,6 @@ export default function DashboardPage() {
       }
       return;
     }
-
-    console.log(`[CREATE_RESUME_SUCCESS] resumeId=${newResume.id}`);
 
     // Resume created successfully - now consume the quota
     const consumeResponse = await fetch('/api/billing/consume', {
@@ -265,12 +258,9 @@ export default function DashboardPage() {
       status?: { remaining: { cvCreations: number | 'unlimited' } };
     };
 
-    console.log(`[CONSUME_RESPONSE] ok=${consumeResponse.ok}, success=${consumePayload.success}, allowed=${consumePayload.allowed}`);
-
     if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
       // Quota consumption failed - clean up the resume we created
       setCreating(false);
-      console.log(`[CONSUME_FAILED] Deleting resume ${newResume.id}`);
       
       // Delete the resume we just created since quota consumption was denied
       await deleteResume(newResume.id);
@@ -350,11 +340,12 @@ export default function DashboardPage() {
     setRenameTitle('');
   };
 
-  const copyResumeLink = (resume: Resume) => {
-    const link = `${window.location.origin}/preview/username/${resume.slug}`;
-    navigator.clipboard.writeText(link);
-    // TODO: Show toast notification
-    alert('Link copied!');
+  const copyResumeLink = (resumeId: string, resumeSlug: string) => {
+    const uname = userUsername || 'user';
+    const link = `${window.location.origin}/preview/${uname}/${resumeSlug}`;
+    navigator.clipboard.writeText(link).catch(() => {});
+    setLinkCopied(resumeId);
+    setTimeout(() => setLinkCopied(null), 2000);
   };
 
   if (loading) {
@@ -624,12 +615,12 @@ export default function DashboardPage() {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => copyResumeLink(resume)}>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copy Link
+                    <DropdownMenuItem onClick={() => copyResumeLink(resume.id, resume.slug)}>
+                      {linkCopied === resume.id ? <Check className="mr-2 h-4 w-4 text-green-600" /> : <Copy className="mr-2 h-4 w-4" />}
+                      {linkCopied === resume.id ? 'Copied!' : 'Copy Link'}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => window.open(`/preview/username/${resume.slug}`, '_blank')}
+                      onClick={() => window.open(`/preview/${userUsername || 'user'}/${resume.slug}`, '_blank')}
                     >
                       <ExternalLink className="mr-2 h-4 w-4" />
                       Preview
@@ -659,7 +650,7 @@ export default function DashboardPage() {
                   variant="outline"
                   size="icon"
                   className="border-2 border-black h-9 w-9 shrink-0"
-                  onClick={() => window.open(`/preview/username/${resume.slug}`, '_blank')}
+                  onClick={() => window.open(`/preview/${userUsername || 'user'}/${resume.slug}`, '_blank')})
                 >
                   <ExternalLink className="w-4 h-4" />
                 </Button>

@@ -34,9 +34,9 @@ const STATUS_OPTIONS: ApplicationStatus[] = ['Applied', 'Screening', 'Interview'
 const getStatusStyle = (status: ApplicationStatus) => {
   switch (status) {
     case 'Applied':    return 'border-black bg-black text-white';
-    case 'Screening':  return 'border-black bg-[#F2F2F2] text-black';
-    case 'Interview':  return 'border-black bg-white text-black';
-    case 'Offer':      return 'border-black bg-black text-white';
+    case 'Screening':  return 'border-[#FF8C00] bg-[#FF8C00] text-white';
+    case 'Interview':  return 'border-[#0A66C2] bg-[#0A66C2] text-white';
+    case 'Offer':      return 'border-[#16a34a] bg-[#16a34a] text-white';
     case 'Rejected':   return 'border-[#FF3000] bg-[#FF3000] text-white';
     default:           return 'border-black bg-white text-black';
   }

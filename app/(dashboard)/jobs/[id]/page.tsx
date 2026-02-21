@@ -350,7 +350,12 @@ export default function JobDetailPage() {
   const [selectedSuggestionIndexes, setSelectedSuggestionIndexes] = useState<number[]>([]);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [trackerStatus, setTrackerStatus] = useState<JobTrackerStatus | null>(null);
+  const [notification, setNotification] = useState<{type:'success'|'error'|'info', message:string}|null>(null);
   const { isDark } = useAppDarkModeState();
+  const showNotification = (type: 'success'|'error'|'info', message: string, duration = 3500) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), duration);
+  };
 
   // Load tracker status for this job
   useEffect(() => {
@@ -386,7 +391,6 @@ export default function JobDetailPage() {
             ),
           };
         }
-        console.log('Found job from localStorage:', foundJob?.title);
       } catch (error) {
         console.error('Error parsing localStorage jobs:', error);
       }
@@ -395,7 +399,6 @@ export default function JobDetailPage() {
     // Fallback to mock data if not found in localStorage
     if (!foundJob) {
       foundJob = mockJobs.find((j) => j.id === jobId) || null;
-      console.log('Using mock job as fallback:', foundJob?.title);
     }
     
     setJob(foundJob);
@@ -419,8 +422,6 @@ export default function JobDetailPage() {
   const handleOptimize = async () => {
     if (!job || !selectedResumeId) return;
 
-    console.log(`[JOB_OPTIMIZE_START] jobId=${job.id}, resumeId=${selectedResumeId}`);
-
     // Check billing limits before optimization
     const consumeResponse = await fetch('/api/billing/consume', {
       method: 'POST',
@@ -438,12 +439,10 @@ export default function JobDetailPage() {
 
     if (!consumeResponse.ok || !consumePayload.success || !consumePayload.allowed) {
       // Show upgrade modal for free users
-      console.log(`[JOB_OPTIMIZE_BLOCKED] Showing upgrade modal`);
       setShowUpgradeModal(true);
       return;
     }
 
-    console.log(`[JOB_OPTIMIZE_ALLOWED] Starting optimization`);
     setOptimizing(true);
 
     try {
@@ -464,7 +463,7 @@ export default function JobDetailPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        alert(data?.error || 'Optimization failed. Please try again.');
+        showNotification('error', data?.error || 'Optimization failed. Please try again.');
         return;
       }
 
@@ -472,7 +471,7 @@ export default function JobDetailPage() {
       setSourceResumeContent(baseResumeContent);
       setSelectedSuggestionIndexes(data.result.suggestions.map((_: unknown, index: number) => index));
 
-      alert('Optimization analysis is ready. Review suggestions and apply approved changes.');
+      showNotification('success', 'Optimization ready — review suggestions below');
     } catch (error) {
       console.error('Optimization error:', error);
     } finally {
@@ -502,10 +501,10 @@ export default function JobDetailPage() {
     if (created) {
       // Also write to the lightweight localStorage tracker
       try { trackJob(job, 'applied'); } catch { /* best-effort */ }
-      alert('Application tracked! Opening your Application Tracker.');
+      showNotification('success', 'Application tracked — opening tracker');
       router.push('/applications');
     } else {
-      alert('Could not track application. Please try again.');
+      showNotification('error', 'Could not track application. Please try again.');
     }
   };
 
@@ -523,7 +522,7 @@ export default function JobDetailPage() {
     }
 
     if (selectedSuggestionIndexes.length === 0) {
-      alert('Please select at least one suggestion to apply.');
+      showNotification('info', 'Please select at least one suggestion to apply.');
       return;
     }
 
@@ -569,6 +568,15 @@ export default function JobDetailPage() {
   return (
     <div className={`min-h-screen relative py-8 ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
+      {notification && (
+        <div className={`fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-xs font-black uppercase tracking-widest ${
+          notification.type === 'success' ? 'bg-[#16a34a] text-white' :
+          notification.type === 'error' ? 'bg-[#FF3000] text-white' :
+          'bg-black text-white'
+        }`}>
+          {notification.message}
+        </div>
+      )}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <Button

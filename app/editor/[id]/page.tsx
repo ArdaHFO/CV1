@@ -116,6 +116,11 @@ export default function EditorPage() {
   const cvInnerRef = useRef<HTMLDivElement>(null);
   const [cvNativeHeight, setCvNativeHeight] = useState(1123);
   const [showHistory, setShowHistory] = useState(false);
+  const [notification, setNotification] = useState<{type:'success'|'error'|'info', message:string}|null>(null);
+  const showNotification = (type: 'success'|'error'|'info', message: string, duration = 3000) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), duration);
+  };
 
   // Measure the actual rendered height of the CV inner content so the outer
   // wrapper grows correctly for multi-page CVs.
@@ -327,19 +332,19 @@ export default function EditorPage() {
         setContent(updatedContent);
         setIsDirty(true);
         
-        // Only show alert if not in silent mode (manual sync)
+        // Only show notification if not in silent mode (manual sync)
         if (!silent) {
-          alert('✅ CV updated from LaTeX code!');
+          showNotification('success', 'CV updated from LaTeX code');
         }
       } else {
         if (!silent) {
-          alert('⚠️ Could not parse LaTeX. Please check your syntax.');
+          showNotification('error', 'Could not parse LaTeX — please check your syntax');
         }
       }
     } catch (error) {
       console.error('Parse error:', error);
       if (!silent) {
-        alert('❌ Error parsing LaTeX code.');
+        showNotification('error', 'Error parsing LaTeX code');
       }
     } finally {
       setIsParsingLatex(false);
@@ -380,8 +385,7 @@ export default function EditorPage() {
     } catch { /* best-effort */ }
 
     setIsDirty(false);
-    // TODO: Show success toast
-    alert('CV saved successfully!');
+    showNotification('success', 'CV saved successfully');
 
     setIsSaving(false);
   };
@@ -418,7 +422,7 @@ export default function EditorPage() {
       }
     } catch (error) {
       console.error('Error downloading PDF:', error);
-      alert('Failed to download PDF');
+      showNotification('error', 'Failed to download PDF');
     }
   };
 
@@ -551,14 +555,14 @@ export default function EditorPage() {
       const payload = await response.json();
 
       if (!response.ok || !payload.success) {
-        alert(payload?.error || 'Job search failed. Please try again.');
+        showNotification('error', payload?.error || 'Job search failed. Please try again.');
         return;
       }
 
       setOptimizeJobs(Array.isArray(payload.jobs) ? payload.jobs : []);
     } catch (error) {
       console.error('Job search error:', error);
-      alert('Job search failed. Please try again.');
+      showNotification('error', 'Job search failed. Please try again.');
     } finally {
       setOptimizeSearching(false);
     }
@@ -588,7 +592,7 @@ export default function EditorPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        alert(data?.error || 'Optimization failed. Please try again.');
+        showNotification('error', data?.error || 'Optimization failed. Please try again.');
         return;
       }
 
@@ -598,7 +602,7 @@ export default function EditorPage() {
       );
     } catch (error) {
       console.error('Optimization error:', error);
-      alert('Failed to optimize resume');
+      showNotification('error', 'Failed to optimize resume');
     } finally {
       setAiLoading(false);
     }
@@ -851,11 +855,11 @@ export default function EditorPage() {
           content: jsonContent,
         });
       } else {
-        alert('Error: ' + (data.error || 'Unknown error'));
+        showNotification('error', data.error || 'Unknown error');
       }
     } catch (error) {
       console.error('Keyword extraction error:', error);
-      alert('Failed to extract keywords');
+      showNotification('error', 'Failed to extract keywords');
     } finally {
       setAiLoading(false);
     }
@@ -872,7 +876,17 @@ export default function EditorPage() {
   return (
     <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
-      {/* Header */}
+      {/* Notification Banner */}
+      {notification && (
+        <div className={`fixed top-[65px] left-0 right-0 z-40 px-4 py-2 text-center text-xs font-black uppercase tracking-widest transition-all ${
+          notification.type === 'success' ? 'bg-[#16a34a] text-white' :
+          notification.type === 'error' ? 'bg-[#FF3000] text-white' :
+          'bg-black text-white'
+        }`}>
+          {notification.message}
+        </div>
+      )}
+      {/* Header */
       <header className="sticky top-0 z-50 bg-white border-b-4 border-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -1016,7 +1030,7 @@ export default function EditorPage() {
                         onClick={() => {
                           const keywordText = allKeywords.join(', ');
                           navigator.clipboard.writeText(keywordText);
-                          alert('Keywords copied to clipboard!');
+                          showNotification('info', 'Keywords copied to clipboard');
                         }}
                         variant="outline"
                         className="w-full gap-2 border-2 border-black"
@@ -1671,7 +1685,7 @@ export default function EditorPage() {
                     <Button
                       onClick={() => {
                         navigator.clipboard.writeText(latexCode);
-                        alert('LaTeX code copied to clipboard!');
+                        showNotification('info', 'LaTeX code copied to clipboard');
                       }}
                       variant="outline"
                       className="gap-2"

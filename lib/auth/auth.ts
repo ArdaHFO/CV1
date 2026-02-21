@@ -116,13 +116,14 @@ export async function signIn(data: SignInData): Promise<User | AuthError> {
       .from('profiles')
       .select('*')
       .eq('id', authData.user.id)
-      .single() as { data: { full_name?: string; avatar_url?: string; updated_at?: string } | null };
+      .single() as { data: { full_name?: string; avatar_url?: string; username?: string; updated_at?: string } | null };
 
     return {
       id: authData.user.id,
       email: authData.user.email!,
       full_name: profile?.full_name || '',
       avatar_url: profile?.avatar_url,
+      username: profile?.username,
       created_at: authData.user.created_at,
       updated_at: profile?.updated_at || new Date().toISOString(),
     };
@@ -176,13 +177,14 @@ export async function getCurrentUser(): Promise<User | null> {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single() as { data: { full_name?: string; avatar_url?: string; updated_at?: string } | null };
+      .single() as { data: { full_name?: string; avatar_url?: string; username?: string; updated_at?: string } | null };
 
     return {
       id: user.id,
       email: user.email!,
       full_name: profile?.full_name || '',
       avatar_url: profile?.avatar_url,
+      username: profile?.username,
       created_at: user.created_at,
       updated_at: profile?.updated_at || new Date().toISOString(),
     };

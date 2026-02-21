@@ -65,8 +65,8 @@ export default function OptimizationsPage() {
   };
 
   return (
-    <div className={`min-h-screen relative ${isDark ? 'bg-black text-white' : 'bg-[#F2F2F2] text-black'}`}>
-      <ShaderBackground />
+    <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
+      <ShaderBackground isDark={isDark} />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-10 space-y-8">
         {/* Header */}

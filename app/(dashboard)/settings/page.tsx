@@ -108,6 +108,8 @@ export default function SettingsPage() {
 
   // Easter egg: click 'Settings' title 5× to open Memory Card game
   const [memOpen, setMemOpen] = useState(false);
+  const [importMsg, setImportMsg] = useState<{ok: boolean; text: string} | null>(null);
+  const [resetConfirm, setResetConfirm] = useState(false);
   const memCountRef = useRef(0);
   const memTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handleSettingsTitleClick = () => {
@@ -219,19 +221,25 @@ export default function SettingsPage() {
         const normalized = normalizeAppSettings(imported);
         setSettings(normalized);
         localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(normalized));
-        alert('Settings imported successfully!');
+        setImportMsg({ ok: true, text: 'Settings imported successfully' });
+        setTimeout(() => setImportMsg(null), 3000);
       } catch (error) {
-        alert('Failed to import settings');
+        setImportMsg({ ok: false, text: 'Failed to import settings' });
+        setTimeout(() => setImportMsg(null), 3000);
       }
     };
     reader.readAsText(file);
   };
 
   const resetSettings = () => {
-    if (confirm('Are you sure? This will reset all settings to defaults.')) {
-      setSettings(defaultSettings);
-      localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(defaultSettings));
+    if (!resetConfirm) {
+      setResetConfirm(true);
+      setTimeout(() => setResetConfirm(false), 4000);
+      return;
     }
+    setResetConfirm(false);
+    setSettings(defaultSettings);
+    localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(defaultSettings));
   };
 
   const updateSetting = (section: keyof Settings, key: string, value: any) => {
@@ -312,14 +320,21 @@ export default function SettingsPage() {
                     </Button>
                     <input type="file" accept=".json" onChange={importSettings} className="hidden" />
                   </label>
+                  {importMsg && (
+                    <p className={`text-[10px] font-black uppercase tracking-widest px-1 ${importMsg.ok ? 'text-[#16a34a]' : 'text-[#FF3000]'}`}>{importMsg.text}</p>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="w-full justify-start gap-2 border-2 border-[#FF3000] text-[#FF3000] hover:bg-[#FF3000] hover:text-white text-[10px] font-black uppercase tracking-widest"
+                    className={`w-full justify-start gap-2 border-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
+                      resetConfirm
+                        ? 'border-[#FF3000] bg-[#FF3000] text-white hover:bg-[#cc2800]'
+                        : 'border-[#FF3000] text-[#FF3000] hover:bg-[#FF3000] hover:text-white'
+                    }`}
                     onClick={resetSettings}
                   >
                     <Trash2 className="w-4 h-4" />
-                    Reset
+                    {resetConfirm ? 'Confirm Reset?' : 'Reset'}
                   </Button>
                 </div>
               </div>

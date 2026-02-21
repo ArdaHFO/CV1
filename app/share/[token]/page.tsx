@@ -26,6 +26,7 @@ export default function SharePage() {
   const [data, setData] = useState<SharedLinkData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pdfError, setPdfError] = useState(false);
   const { isDark } = useAppDarkModeState();
 
   useEffect(() => {
@@ -80,7 +81,8 @@ export default function SharePage() {
       }
     } catch (error) {
       console.error('Error downloading PDF:', error);
-      alert('Failed to generate PDF');
+      setPdfError(true);
+      setTimeout(() => setPdfError(false), 3000);
     }
   };
 
@@ -151,6 +153,11 @@ export default function SharePage() {
   return (
     <div className={`min-h-screen relative ${isDark ? 'dark' : ''} bg-white text-black`}>
       <ShaderBackground isDark={isDark} />
+      {pdfError && (
+        <div className="fixed top-0 left-0 right-0 z-50 px-4 py-2 text-center text-xs font-black uppercase tracking-widest bg-[#FF3000] text-white">
+          Failed to generate PDF — please try again
+        </div>
+      )}
       <div className="relative z-10 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
