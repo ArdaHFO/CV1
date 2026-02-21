@@ -22,7 +22,7 @@ interface GalleryRowProps {
 
 // Defined OUTSIDE FeatureGallery so React never sees a new component type on re-render
 const GalleryRow: React.FC<GalleryRowProps> = ({ items, rowIndex, hoveredIndex, onHover, onOpen }) => (
-  <div className="flex gap-3 h-[460px] w-full">
+  <div className="flex gap-3 h-[300px] sm:h-[460px] min-w-[520px] sm:min-w-0 sm:w-full">
     {items.map((feature, itemIndex) => {
       const globalIndex = rowIndex * 3 + itemIndex;
       const isHovered = hoveredIndex === globalIndex;
@@ -122,7 +122,7 @@ const FeatureGallery: React.FC<FeatureGalleryProps> = ({ features, className = '
 
   return (
     <div className={className}>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 overflow-x-auto pb-1">
         <GalleryRow items={row1} rowIndex={0} hoveredIndex={hoveredIndex} onHover={setHoveredIndex} onOpen={setSelectedIndex} />
         <GalleryRow items={row2} rowIndex={1} hoveredIndex={hoveredIndex} onHover={setHoveredIndex} onOpen={setSelectedIndex} />
       </div>

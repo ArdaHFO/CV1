@@ -310,16 +310,16 @@ export default function Home() {
       )}
 
       <nav className="sticky top-0 z-50 border-b-4 border-black bg-white">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4">
+        <div className="mx-auto flex h-14 sm:h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Image
               src={isDark ? '/favicon-white.png' : '/favicon.png'}
               alt="CSpark logo"
               width={88}
               height={88}
-              className="h-20 w-20 object-contain"
+              className="h-11 w-11 sm:h-20 sm:w-20 object-contain"
             />
-            <div className="flex flex-col leading-none">
+            <div className="hidden sm:flex flex-col leading-none">
               <span className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                 CSpark
               </span>
@@ -348,16 +348,16 @@ export default function Home() {
               FAQ
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
             <Link
               href={currentUser ? '/dashboard' : '/login'}
-              className="text-sm font-bold uppercase tracking-widest text-black transition-colors hover:text-[#FF3000]"
+              className="text-xs sm:text-sm font-bold uppercase tracking-widest text-black transition-colors hover:text-[#FF3000]"
             >
               {currentUser ? displayName : 'Sign In'}
             </Link>
             {!currentUser && (
-              <Button asChild variant="accent" size="sm">
+              <Button asChild variant="accent" size="sm" className="hidden sm:inline-flex">
                 <Link href="/register">Start Free</Link>
               </Button>
             )}
@@ -375,7 +375,7 @@ export default function Home() {
         <section aria-labelledby="hero-heading" className="mx-auto w-full max-w-7xl px-4 pb-20 pt-10 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
             <div>
-              <h1 className="text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-[9rem]">
+              <h1 className="text-[1.5rem] font-black uppercase leading-[0.9] tracking-tight sm:text-6xl lg:text-[9rem]">
                 Search{' '}
                 <MorphingText
                   texts={['LinkedIn', 'Workday', 'CareerOne']}
@@ -384,13 +384,13 @@ export default function Home() {
                     Workday: '#005CB9',
                     CareerOne: '#00A651',
                   }}
-                  className="mx-0 inline-block h-[0.9em] w-[9ch] max-w-none align-baseline text-left text-[1em] font-black uppercase leading-[0.9] tracking-tight md:h-[0.9em] md:text-[1em] lg:text-[1em]"
+                  className="mx-0 inline-block h-[0.9em] w-[8ch] sm:w-[9ch] max-w-none align-baseline text-left text-[1em] font-black uppercase leading-[0.9] tracking-tight md:h-[0.9em] md:text-[1em] lg:text-[1em]"
                 />{' '}
                 Jobs.
                 <br />
                 Tailor Your CV.
               </h1>
-              <p className="mt-6 max-w-2xl text-lg font-medium uppercase tracking-[0.12em] text-black/80">
+              <p className="mt-6 max-w-2xl text-sm sm:text-lg font-medium uppercase tracking-[0.12em] text-black/80">
                 A precise, job-specific CV workflow powered by Meta Llama 3.3 and
                 real-time job search.
               </p>
@@ -448,7 +448,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mt-8 flex items-center gap-4 border-4 border-black bg-[#F2F2F2] px-6 py-4">
+              <div className="mt-8 flex items-center gap-3 sm:gap-4 border-4 border-black bg-[#F2F2F2] px-4 sm:px-6 py-4">
                 <MetaLogo className="h-10 w-10" />
                 <div>
                   <div className="text-xs font-black uppercase tracking-[0.3em] text-[#FF3000]">
@@ -476,7 +476,7 @@ export default function Home() {
               </div>
               <h2
                 id="features-heading"
-                className="mt-4 text-5xl font-black uppercase leading-tight sm:text-6xl"
+                className="mt-4 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl"
               >
                 Everything in one place
               </h2>
@@ -544,7 +544,7 @@ export default function Home() {
               <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                 02. Method
               </div>
-              <h2 className="mt-4 text-5xl font-black uppercase leading-tight sm:text-6xl">
+              <h2 className="mt-4 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
                 How CSPARK works.
               </h2>
               <p className="mt-4 text-sm font-bold uppercase tracking-widest text-black/50">
@@ -609,7 +609,7 @@ export default function Home() {
               </div>
 
               {/* Right: concrete before/after example */}
-              <div className="border-4 border-l-0 border-black bg-black text-white flex flex-col">
+              <div className="border-4 border-black lg:border-l-0 bg-black text-white flex flex-col">
                 <div className="border-b-4 border-white/20 px-7 py-5">
                   <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF3000]">Live example</span>
                   <div className="mt-1 text-sm font-black uppercase tracking-widest">Senior Product Manager @ Stripe</div>
@@ -671,7 +671,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   03. Advantages
                 </div>
-                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
                   Every tool.<br />One workflow.
                 </h2>
                 <p className="mt-4 max-w-xl text-sm font-bold uppercase tracking-widest text-black/50">
@@ -788,7 +788,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   04. Pricing
                 </div>
-                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
                   Free for starters. Pro for volume.
                 </h2>
                 <p className="mt-6 text-lg font-medium uppercase tracking-[0.12em] text-black/80">
@@ -882,7 +882,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   05. Journal
                 </div>
-                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
                   Precision feedback from teams and candidates.
                 </h2>
                 <div className="mt-6 flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-black/70">
@@ -937,7 +937,7 @@ export default function Home() {
                 <div className="text-xs font-black uppercase tracking-[0.4em] text-[#FF3000]">
                   06. FAQ
                 </div>
-                <h2 className="mt-6 text-5xl font-black uppercase leading-tight sm:text-6xl">
+                <h2 className="mt-6 text-3xl font-black uppercase leading-tight sm:text-5xl lg:text-6xl">
                   Straight answers.<br /><span className="whitespace-nowrap">Zero noise.</span>
                 </h2>
               </div>
